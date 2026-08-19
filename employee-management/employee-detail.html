@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Details - Attendance & Payroll ERP</title>
+
+    <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/admin-dashboard.css">
+    <link rel="stylesheet" href="../css/employee-detail.css">
+
+
+</head>
+
+<body>
+
+    <div class="conatiner-fluid py-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between  align-items-md-center ">
+            <div>
+                <h2 class="mb-1">Employee Details</h2>
+                <p class="text-muted mb-0">
+                    View employee information
+                </p>
+            </div>
+
+            <div class="d-flex gap-2">
+                <a href="employee.html" class="btn btn-outline-secondary">
+                    Back to Employees
+                </a>
+
+                <button type="button" class="btn btn-primary" id="editEmployeeButton">Edit Employee</button>
+            </div>
+        </div>
+
+        <!-- employee data -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <div class="row g-4">
+                    <div class="col-12">
+                        <h5 class="mb-3">
+                            Basic Information
+                        </h5>
+                    </div>
+
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <label class="form-label text-muted">
+                            Employee ID
+                        </label>
+
+                        <div class="employee-detail-value" id="employeeCode">
+                            -
+                        </div>
+                    </div>
+
+                    <!-- first Name -->
+
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <label class="form-label text-muted">
+                            First Name
+                        </label>
+                        <div class="employee-detail-value" id="firstName">
+                            -
+                        </div>
+                    </div>
+                    <!-- last name -->
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <label class="form-label text-muted">
+                            Last Name
+                        </label>
+                        <div class="employee-detail-value" id="lastName">
+                            -
+                        </div>
+                    </div>
+
+                    <!-- email -->
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <label class="form-label text-muted">
+                            Email
+                        </label>
+                        <div class="employee-detail-value" id="email">
+                            -
+                        </div>
+                    </div>
+
+                    <!-- phone -->
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <label class="form-label text-muted">
+                            Phone
+                        </label>
+                        <div class="employee-detail-value" id="phone">
+                            -
+                        </div>
+                    </div>
+                    <!-- status -->
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <label class="form-label text-muted">
+                            Status
+                        </label>
+                        <div id="status">
+                            <span class="badge text-bg-secondary">
+                                -
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- role info -->
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <div class="row g-4">
+                    <div class="col-12">
+                        <h5 class="mb-3">
+                            Job Information
+                        </h5>
+                    </div>
+
+                    <!-- Department -->
+                    <div class="col-12 col-md-6">
+                        <label class="form-label text-muted">
+                            Department
+                        </label>
+                        <div class="employee-detail-value" id="departmentName">
+                            -
+                        </div>
+                    </div>
+                    <!-- Designation -->
+                    <div class="col-12 col-md-6">
+                        <label class="form-label text-muted">
+                            Designation
+                        </label>
+                        <div class="employee-detail-value" id="designation">
+                            -
+                        </div>
+                    </div>
+                    <!-- Role-->
+                    <div class="col-12 col-md-6">
+                        <label class="form-label text-muted">
+                            Role
+                        </label>
+                        <div class="employee-detail-value" id="roleName">
+                            -
+                        </div>
+                    </div>
+                    <!-- Joining Date-->
+                    <div class="col-12 col-md-6">
+                        <label class="form-label text-muted">
+                            Joining Date
+                        </label>
+                        <div class="employee-detail-value" id="joiningDate">
+                            -
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action -->
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="d-flex flex-column flex-sm-row justify-content-end gap-2">
+                    <a href="employee.html" class="btn btn-outline-secondary">Back to Employees</a>
+
+                    <button type="button" class="btn btn-primary" id="editEmployeeButtonBottom">Edit Employee</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="../assets/js/bootstrap.bundle.min.js"></script>
+
+    <script src="../js/config.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/auth.js"></script>
+
+    <script src="../js/employee-detail.js"></script>
+</body>
+
+</html>

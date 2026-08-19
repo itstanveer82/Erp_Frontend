@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Login | Attendance & Payroll ERP</title>
+
+    <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/login.css">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body class="login-page">
+
+    <div class="login-wrapper">
+
+        <!-- Left Branding Section -->
+        <div class="login-brand-section">
+
+            <div class="brand-content">
+
+                <div class="brand-logo">
+                    <span>AP</span>
+                </div>
+
+                <span class="brand-label">ATTENDANCE & PAYROLL</span>
+
+                <h1>Manage Your Workforce Smarter.</h1>
+
+                <p>
+                    A simple and secure way to manage employees,
+                    attendance and payroll from one powerful platform.
+                </p>
+
+                <div class="brand-features">
+
+                    <div class="brand-feature">
+                        <span class="feature-icon">✓</span>
+                        <span>Employee Management</span>
+                    </div>
+
+                    <div class="brand-feature">
+                        <span class="feature-icon">✓</span>
+                        <span>Attendance Tracking</span>
+                    </div>
+
+                    <div class="brand-feature">
+                        <span class="feature-icon">✓</span>
+                        <span>Payroll Management</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Right Login Section -->
+        <div class="login-form-section">
+
+            <div class="login-card">
+
+                <div class="mobile-logo">
+                    <div class="mobile-logo-icon">AP</div>
+                    <span>Attendance & Payroll ERP</span>
+                </div>
+
+                <div class="login-header">
+                    <h2>Welcome Back!</h2>
+                    <p>Sign in to continue to your account.</p>
+                </div>
+
+
+                <form id="loginForm" novalidate>
+
+                    <!-- Email -->
+                    <div class="form-group-custom">
+
+                        <label for="email">Email Address</label>
+
+                        <div class="input-wrapper">
+
+                            <span class="input-icon">@</span>
+
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                class="form-control"
+                                placeholder="Enter your email"
+                                autocomplete="email"
+                                required>
+
+                        </div>
+
+                        <div class="invalid-feedback">
+                            Please enter a valid email address.
+                        </div>
+
+                    </div>
+
+
+                    <!-- Password -->
+                    <div class="form-group-custom">
+
+                        <label for="password">Password</label>
+
+                        <div class="input-wrapper password-wrapper">
+
+                            <span class="input-icon">🔒</span>
+
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                class="form-control"
+                                placeholder="Enter your password"
+                                autocomplete="current-password"
+                                required>
+
+                            <button
+                                type="button"
+                                id="togglePassword"
+                                class="toggle-password"
+                                aria-label="Show password">
+
+                                <span id="togglePasswordText">Show</span>
+
+                            </button>
+
+                        </div>
+
+                        <div class="invalid-feedback">
+                            Please enter your password.
+                        </div>
+
+                    </div>
+
+
+                    <!-- Remember / Forgot -->
+                    <div class="login-options">
+
+                        <div class="form-check">
+
+                            <input
+                                type="checkbox"
+                                class="form-check-input"
+                                id="rememberMe"
+                                name="rememberMe">
+
+                            <label
+                                class="form-check-label"
+                                for="rememberMe">
+
+                                Remember me
+
+                            </label>
+
+                        </div>
+
+                        <a
+                            href="forget-password.html"
+                            id="forgotPassword"
+                            class="forgot-link">
+
+                            Forgot Password?
+
+                        </a>
+
+                    </div>
+
+
+                    <!-- Error -->
+                    <div
+                        id="loginError"
+                        class="alert alert-danger d-none"
+                        role="alert">
+
+                    </div>
+
+
+                    <!-- Login Button -->
+                    <button
+                        type="submit"
+                        class="login-btn"
+                        id="loginButton">
+
+                        <span id="loginButtonText">Login</span>
+
+                        <span
+                            id="loginLoader"
+                            class="spinner-border spinner-border-sm d-none"
+                            aria-hidden="true">
+
+                        </span>
+
+                    </button>
+
+                </form>
+
+
+                <div class="login-footer">
+                    <span>Secure Employee Management System</span>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script src="../js/config.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/auth.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,15 @@
+.form-control,
+.form-select{
+        min-height: 42px;
+}
+
+.textarea.form-control{
+    min-height: 100px;
+}
+@media (max-width: 575.98px) {
+
+    .card-body {
+        padding: 1rem;
+    }
+
+}
