@@ -3,32 +3,48 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
     <title>Admin Dashboard - Attendance & Payroll ERP</title>
 
     <!-- Bootstrap -->
-    <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+    <link rel="stylesheet"
+        href="../assets/css/bootstrap.min.css">
 
     <!-- CSS -->
-    <link rel="stylesheet" href="../css/admin-dashboard.css">
+    <link rel="stylesheet"
+        href="../css/admin-dashboard.css">
 </head>
 
 <body>
 
-    <!-- Top Navbar -->
+    <!-- =========================
+         TOP NAVBAR
+    ========================== -->
     <nav class="navbar admin-navbar">
 
         <div class="container-fluid">
 
             <!-- Brand -->
-            <a class="navbar-brand admin-brand" href="dashboard.html">
+            <a class="navbar-brand admin-brand"
+                href="dashboard.html">
 
-                <span class="brand-logo">AP</span>
+                <span class="brand-logo">
+                    AP
+                </span>
 
                 <span class="brand-text">
-                    <strong>Attendance & Payroll</strong>
-                    <small>ERP Management System</small>
+
+                    <strong>
+                        Attendance & Payroll
+                    </strong>
+
+                    <small>
+                        ERP Management System
+                    </small>
+
                 </span>
 
             </a>
@@ -38,17 +54,32 @@
             <div class="admin-user-area">
 
                 <div class="user-details">
-                    <span class="user-name" id="userName">
+
+                    <span class="user-name"
+                        id="userName">
+
                         System Admin
+
                     </span>
 
-                    <span class="user-role" id="userRole">
+                    <span class="user-role"
+                        id="userRole">
+
                         ADMIN
+
                     </span>
+
                 </div>
 
-                <button type="button" id="logoutButton" class="logout-btn">
-                    Logout
+
+                <!-- Profile -->
+                <button type="button"
+                    class="navbar-profile-btn"
+                    data-view="profile"
+                    title="My Profile">
+
+                    👤
+
                 </button>
 
             </div>
@@ -58,7 +89,9 @@
     </nav>
 
 
-    <!-- Dashboard Layout -->
+    <!-- =========================
+         DASHBOARD LAYOUT
+    ========================== -->
     <div class="dashboard-layout">
 
 
@@ -77,12 +110,18 @@
         </div>
 
 
-        <!-- Sidebar -->
+        <!-- =========================
+             SIDEBAR
+        ========================== -->
         <aside class="dashboard-sidebar collapse d-md-block"
             id="dashboardSidebar">
 
             <div class="sidebar-header">
-                <span>ADMIN PANEL</span>
+
+                <span>
+                    ADMIN PANEL
+                </span>
+
             </div>
 
 
@@ -93,7 +132,10 @@
                     type="button"
                     data-view="dashboard">
 
-                    <span class="menu-icon">▦</span>
+                    <span class="menu-icon">
+                        ▦
+                    </span>
+
                     Dashboard
 
                 </button>
@@ -104,7 +146,10 @@
                     type="button"
                     data-view="employees">
 
-                    <span class="menu-icon">♙</span>
+                    <span class="menu-icon">
+                        ♙
+                    </span>
+
                     Employees
 
                 </button>
@@ -115,7 +160,10 @@
                     type="button"
                     data-view="attendance">
 
-                    <span class="menu-icon">◷</span>
+                    <span class="menu-icon">
+                        ◷
+                    </span>
+
                     Attendance
 
                 </button>
@@ -127,7 +175,10 @@
                     type="button"
                     data-view="roles">
 
-                    <span class="menu-icon">◉</span>
+                    <span class="menu-icon">
+                        ◉
+                    </span>
+
                     Roles
 
                 </button>
@@ -139,7 +190,10 @@
                     type="button"
                     data-view="permissions">
 
-                    <span class="menu-icon">⚿</span>
+                    <span class="menu-icon">
+                        ⚿
+                    </span>
+
                     Permissions
 
                 </button>
@@ -150,7 +204,10 @@
                     type="button"
                     data-view="payroll">
 
-                    <span class="menu-icon">₹</span>
+                    <span class="menu-icon">
+                        ₹
+                    </span>
+
                     Payroll
 
                 </button>
@@ -161,7 +218,10 @@
                     type="button"
                     data-view="reports">
 
-                    <span class="menu-icon">▤</span>
+                    <span class="menu-icon">
+                        ▤
+                    </span>
+
                     Reports
 
                 </button>
@@ -172,18 +232,16 @@
             <!-- Sidebar User -->
             <div class="sidebar-user">
 
-                <div class="sidebar-user-avatar" id="userInitials">
-                    SA
-                </div>
-
                 <div>
-                    <strong id="sidebarUserName">
-                        System Admin
-                    </strong>
 
-                    <small id="sidebarUserEmail">
-                        admin@example.com
-                    </small>
+                    <button type="button"
+                        id="logoutButton"
+                        class="logout-btn">
+
+                        Logout
+
+                    </button>
+
                 </div>
 
             </div>
@@ -191,14 +249,17 @@
         </aside>
 
 
-        <!-- Main Content -->
+        <!-- =========================
+             MAIN CONTENT
+        ========================== -->
         <main class="dashboard-main">
 
 
             <!-- =========================
                  DASHBOARD VIEW
             ========================== -->
-            <section id="dashboardView" class="content-view">
+            <section id="dashboardView"
+                class="content-view">
 
                 <!-- Welcome -->
                 <div class="dashboard-welcome">
@@ -223,7 +284,9 @@
 
                     <div class="current-role-card">
 
-                        <span>Current Role</span>
+                        <span>
+                            Current Role
+                        </span>
 
                         <strong id="currentRole">
                             ROLE_ADMIN
@@ -246,8 +309,15 @@
                             </div>
 
                             <div>
-                                <span>Total Employees</span>
-                                <h2 id="totalEmployees">--</h2>
+
+                                <span>
+                                    Total Employees
+                                </span>
+
+                                <h2 id="totalEmployees">
+                                    --
+                                </h2>
+
                             </div>
 
                         </div>
@@ -264,8 +334,15 @@
                             </div>
 
                             <div>
-                                <span>Present Today</span>
-                                <h2 id="presentToday">--</h2>
+
+                                <span>
+                                    Present Today
+                                </span>
+
+                                <h2 id="presentToday">
+                                    --
+                                </h2>
+
                             </div>
 
                         </div>
@@ -282,8 +359,15 @@
                             </div>
 
                             <div>
-                                <span>Absent Today</span>
-                                <h2 id="absentToday">--</h2>
+
+                                <span>
+                                    Absent Today
+                                </span>
+
+                                <h2 id="absentToday">
+                                    --
+                                </h2>
+
                             </div>
 
                         </div>
@@ -300,8 +384,15 @@
                             </div>
 
                             <div>
-                                <span>Late Today</span>
-                                <h2 id="lateToday">--</h2>
+
+                                <span>
+                                    Late Today
+                                </span>
+
+                                <h2 id="lateToday">
+                                    --
+                                </h2>
+
                             </div>
 
                         </div>
@@ -317,8 +408,15 @@
                     <div class="section-heading">
 
                         <div>
-                            <h3>Quick Actions</h3>
-                            <p>Quickly access important management modules.</p>
+
+                            <h3>
+                                Quick Actions
+                            </h3>
+
+                            <p>
+                                Quickly access important management modules.
+                            </p>
+
                         </div>
 
                     </div>
@@ -333,7 +431,9 @@
                                 type="button"
                                 data-view="employees">
 
-                                <strong>Employees</strong>
+                                <strong>
+                                    Employees
+                                </strong>
 
                                 <span>
                                     Manage employee information
@@ -351,7 +451,9 @@
                                 type="button"
                                 data-view="roles">
 
-                                <strong>Roles</strong>
+                                <strong>
+                                    Roles
+                                </strong>
 
                                 <span>
                                     Manage system roles
@@ -369,7 +471,9 @@
                                 type="button"
                                 data-view="permissions">
 
-                                <strong>Permissions</strong>
+                                <strong>
+                                    Permissions
+                                </strong>
 
                                 <span>
                                     View system permissions
@@ -387,7 +491,9 @@
                                 type="button"
                                 data-view="reports">
 
-                                <strong>Reports</strong>
+                                <strong>
+                                    Reports
+                                </strong>
 
                                 <span>
                                     View organization reports
@@ -408,8 +514,15 @@
                     <div class="section-heading">
 
                         <div>
-                            <h3>Your Access</h3>
-                            <p>Roles and permissions assigned to your account.</p>
+
+                            <h3>
+                                Your Access
+                            </h3>
+
+                            <p>
+                                Roles and permissions assigned to your account.
+                            </p>
+
                         </div>
 
                     </div>
@@ -454,6 +567,171 @@
 
 
                             <div id="dashboardPermissions"
+                                class="permission-tags">
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+            </section>
+
+
+            <!-- =========================
+                 PROFILE VIEW
+            ========================== -->
+            <section id="profileView"
+                class="content-view d-none">
+
+                <div class="page-header">
+
+                    <div>
+
+                        <p class="page-label">
+                            MY ACCOUNT
+                        </p>
+
+                        <h1>
+                            My Profile
+                        </h1>
+
+                        <p>
+                            View your account information and assigned access.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Profile Information -->
+                <div class="management-card profile-card">
+
+                    <div class="profile-card-header">
+
+                        <div class="profile-avatar"
+                            id="profileInitials">
+
+                            AD
+
+                        </div>
+
+
+                        <div>
+
+                            <h4 id="profileName">
+                                System Admin
+                            </h4>
+
+                            <p id="profileEmail">
+                                No email available
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="profile-details">
+
+                        <div class="profile-detail-item">
+
+                            <span class="profile-detail-label">
+                                Full Name
+                            </span>
+
+                            <strong id="profileFullName">
+                                --
+                            </strong>
+
+                        </div>
+
+
+                        <div class="profile-detail-item">
+
+                            <span class="profile-detail-label">
+                                Email Address
+                            </span>
+
+                            <strong id="profileEmailAddress">
+                                --
+                            </strong>
+
+                        </div>
+
+
+                        <div class="profile-detail-item">
+
+                            <span class="profile-detail-label">
+                                Assigned Role
+                            </span>
+
+                            <strong id="profileRole">
+                                --
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Profile Access -->
+                <section class="dashboard-section">
+
+                    <div class="section-heading">
+
+                        <div>
+
+                            <h3>
+                                My Access
+                            </h3>
+
+                            <p>
+                                Roles and permissions assigned to your account.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="access-card">
+
+                        <span class="access-title">
+                            Assigned Roles
+                        </span>
+
+
+                        <div id="profileRoles"
+                            class="role-badges">
+
+                        </div>
+
+
+                        <div class="permissions-preview">
+
+                            <div class="permissions-preview-header">
+
+                                <span>
+                                    Permissions
+                                </span>
+
+                                <span id="profilePermissionCount"
+                                    class="permission-count">
+
+                                    0
+
+                                </span>
+
+                            </div>
+
+
+                            <div id="profilePermissions"
                                 class="permission-tags">
 
                             </div>
@@ -615,7 +893,9 @@
                                     <th>Role Name</th>
                                     <th>Description</th>
                                     <th>Permissions</th>
-                                    <th class="text-end">Actions</th>
+                                    <th class="text-end">
+                                        Actions
+                                    </th>
 
                                 </tr>
 
@@ -947,7 +1227,7 @@
     <script src="../js/config.js"></script>
     <script src="../js/api.js"></script>
     <script src="../js/auth.js"></script>
-    <script src="../js/dashboard.js"></script>
+    <script src="../js/admin-dashboard.js"></script>
 
 </body>
 

@@ -1,8 +1,9 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-   
-    // AUTHENTICATION
-  
+    // ==============================
+    // AUTHENTICATION CHECK
+    // ==============================
+
     const authData = getAuthData();
 
     if (!authData || !authData.token) {
@@ -13,35 +14,108 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // Support new login structure
+    // ==============================
+    // USER DATA
+    // ==============================
+
     const user = authData.user || {};
 
-    const firstName = user.firstName || "";
-    const lastName = user.lastName || "";
 
-    const fullName =
-        `${firstName} ${lastName}`.trim() ||
-        authData.email ||
-        "User";
+    const firstName =
+        user.firstName ||
+        authData.firstName ||
+        "";
+
+
+    const lastName =
+        user.lastName ||
+        authData.lastName ||
+        "";
+
 
     const email =
         user.email ||
         authData.email ||
+        localStorage.getItem("email") ||
         "";
 
-    const roles =
-        user.roles ||
-        (authData.role ? [authData.role] : []);
 
-    const permissions =
-        user.permissions ||
-        authData.permissions ||
-        [];
+    const fullName =
+        user.name ||
+        user.fullName ||
+        authData.name ||
+        authData.fullName ||
+        `${firstName} ${lastName}`.trim() ||
+        email ||
+        "System Admin";
 
 
-    // =========================
-    // DOM ELEMENTS
-    // =========================
+    // ==============================
+    // GET ROLES
+    // ==============================
+
+    let userRoles = [];
+
+
+    if (Array.isArray(user.roles)) {
+
+        userRoles = user.roles;
+
+    } else if (Array.isArray(authData.roles)) {
+
+        userRoles = authData.roles;
+
+    } else if (authData.role) {
+
+        userRoles = [authData.role];
+
+    } else {
+
+        const storedRole =
+            localStorage.getItem("role");
+
+        if (storedRole) {
+
+            userRoles = [storedRole];
+
+        }
+
+    }
+
+
+    // ==============================
+    // GET PERMISSIONS
+    // ==============================
+
+    let userPermissions = [];
+
+
+    if (Array.isArray(user.permissions)) {
+
+        userPermissions = user.permissions;
+
+    } else if (Array.isArray(authData.permissions)) {
+
+        userPermissions = authData.permissions;
+
+    }
+
+
+    // ==============================
+    // DEBUG
+    // ==============================
+
+    console.log("Auth Data:", authData);
+    console.log("User:", user);
+    console.log("Full Name:", fullName);
+    console.log("Email:", email);
+    console.log("Roles:", userRoles);
+    console.log("Permissions:", userPermissions);
+
+
+    // ==============================
+    // USER INFORMATION ELEMENTS
+    // ==============================
 
     const userName =
         document.getElementById("userName");
@@ -49,310 +123,685 @@ document.addEventListener("DOMContentLoaded", function () {
     const userRole =
         document.getElementById("userRole");
 
-    const sidebarUserName =
-        document.getElementById("sidebarUserName");
-
-    const sidebarUserEmail =
-        document.getElementById("sidebarUserEmail");
-
-    const userInitials =
-        document.getElementById("userInitials");
-
     const dashboardWelcome =
         document.getElementById("dashboardWelcome");
 
     const currentRole =
         document.getElementById("currentRole");
 
-    const dashboardRoles =
-        document.getElementById("dashboardRoles");
 
-    const dashboardPermissions =
-        document.getElementById("dashboardPermissions");
+    // ==============================
+    // NAVBAR USER INFORMATION
+    // ==============================
 
-    const permissionCount =
-        document.getElementById("permissionCount");
+    if (userName) {
 
-
-    // =========================
-    // USER INFORMATION
-    // =========================
-
-    userName.textContent = fullName;
-
-    userRole.textContent =
-        roles.length > 0
-            ? roles.join(", ")
-            : "No Role";
-
-    sidebarUserName.textContent = fullName;
-    sidebarUserEmail.textContent = email;
-
-    dashboardWelcome.textContent =
-        `Welcome back, ${firstName || fullName}!`;
-
-    currentRole.textContent =
-        roles.length > 0
-            ? roles[0]
-            : "No Role";
-
-
-    // User initials
-    const initials =
-        `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase()
-        || fullName.substring(0, 2).toUpperCase();
-
-    userInitials.textContent = initials;
-
-
-    // =========================
-    // PERMISSION HELPER
-    // =========================
-
-    function hasPermission(permissionName) {
-
-        return permissions.includes(permissionName);
+        userName.textContent = fullName;
 
     }
 
 
-    // =========================
-    // RENDER DASHBOARD ACCESS
-    // =========================
+    if (userRole) {
 
-    if (roles.length === 0) {
+        userRole.textContent =
+            userRoles.length > 0
+                ? userRoles.join(", ")
+                : "ADMIN";
 
-        dashboardRoles.innerHTML =
-            `<span class="permission-tag">No role assigned</span>`;
+    }
 
-    } else {
+
+    // ==============================
+    // DASHBOARD WELCOME
+    // ==============================
+
+    if (dashboardWelcome) {
+
+        const welcomeName =
+            firstName ||
+            fullName ||
+            "User";
+
+        dashboardWelcome.textContent =
+            `Welcome back, ${welcomeName}`;
+
+    }
+
+
+    // ==============================
+    // CURRENT ROLE
+    // ==============================
+
+    if (currentRole) {
+
+        currentRole.textContent =
+            userRoles.length > 0
+                ? userRoles.join(", ")
+                : "ADMIN";
+
+    }
+
+
+    // ==============================
+    // USER INITIALS
+    // ==============================
+
+    let initials = "";
+
+
+    if (firstName) {
+
+        initials += firstName.charAt(0);
+
+    }
+
+
+    if (lastName) {
+
+        initials += lastName.charAt(0);
+
+    }
+
+
+    if (!initials && fullName) {
+
+        const nameParts =
+            fullName.trim().split(" ");
+
+        if (nameParts.length >= 2) {
+
+            initials =
+                nameParts[0].charAt(0) +
+                nameParts[1].charAt(0);
+
+        } else {
+
+            initials =
+                fullName.substring(0, 2);
+
+        }
+
+    }
+
+
+    if (!initials) {
+
+        initials = "AD";
+
+    }
+
+
+    initials = initials.toUpperCase();
+
+
+    // ==============================
+    // DASHBOARD ROLES
+    // ==============================
+
+    function renderDashboardRoles() {
+
+        const dashboardRoles =
+            document.getElementById("dashboardRoles");
+
+        if (!dashboardRoles) {
+            return;
+        }
+
 
         dashboardRoles.innerHTML = "";
 
-        roles.forEach(function (role) {
 
-            const badge = document.createElement("span");
+        if (userRoles.length === 0) {
 
-            badge.className = "role-badge";
-            badge.textContent = role;
+            dashboardRoles.innerHTML = `
+                <span class="permission-tag">
+                    No roles assigned
+                </span>
+            `;
 
-            dashboardRoles.appendChild(badge);
+            return;
+
+        }
+
+
+        userRoles.forEach(function (role) {
+
+            const roleBadge =
+                document.createElement("span");
+
+            roleBadge.className =
+                "role-badge";
+
+            roleBadge.textContent =
+                getDisplayName(role);
+
+            dashboardRoles.appendChild(
+                roleBadge
+            );
 
         });
 
     }
 
 
-    permissionCount.textContent = permissions.length;
+    // ==============================
+    // DASHBOARD PERMISSIONS
+    // ==============================
 
-    if (permissions.length === 0) {
+    function renderDashboardPermissions() {
 
-        dashboardPermissions.innerHTML =
-            `<span class="permission-tag">No permissions assigned</span>`;
+        const dashboardPermissions =
+            document.getElementById(
+                "dashboardPermissions"
+            );
 
-    } else {
+        const permissionCount =
+            document.getElementById(
+                "permissionCount"
+            );
+
+
+        if (permissionCount) {
+
+            permissionCount.textContent =
+                userPermissions.length;
+
+        }
+
+
+        if (!dashboardPermissions) {
+            return;
+        }
+
 
         dashboardPermissions.innerHTML = "";
 
-        permissions.forEach(function (permission) {
 
-            const tag = document.createElement("span");
+        if (userPermissions.length === 0) {
 
-            tag.className = "permission-tag";
-            tag.textContent = permission;
+            dashboardPermissions.innerHTML = `
+                <span class="permission-tag">
+                    No permissions assigned
+                </span>
+            `;
 
-            dashboardPermissions.appendChild(tag);
+            return;
 
-        });
-
-    }
-
-
-    // =========================
-    // PERMISSION BASED UI
-    // =========================
-
-    const rolesMenuButton =
-        document.getElementById("rolesMenuButton");
-
-    const permissionsMenuButton =
-        document.getElementById("permissionsMenuButton");
-
-    const addRoleButton =
-        document.getElementById("addRoleButton");
-
-
-    // Roles require ROLE_READ
-    if (!hasPermission("ROLE_READ")) {
-
-        rolesMenuButton.classList.add("d-none");
-
-    }
-
-
-    // Add Role requires ROLE_CREATE
-    if (hasPermission("ROLE_CREATE")) {
-
-        addRoleButton.classList.remove("d-none");
-
-    }
-
-
-    // Permissions require PERMISSION_READ
-    if (!hasPermission("PERMISSION_READ")) {
-
-        permissionsMenuButton.classList.add("d-none");
-
-    }
-
-
-    // =========================
-    // VIEW SWITCHING
-    // =========================
-function showView(viewName) {
-
-    // Check view exists
-    if (!views[viewName]) {
-        return;
-    }
-
-    // Hide all views
-    Object.keys(views).forEach(function (key) {
-
-        if (views[key]) {
-            views[key].classList.add("d-none");
         }
 
-    });
 
+        userPermissions.forEach(function (permission) {
 
-    // Show selected view
-    views[viewName].classList.remove("d-none");
+            const permissionTag =
+                document.createElement("span");
 
+            permissionTag.className =
+                "permission-tag";
 
-    // Update active sidebar item
-    document
-        .querySelectorAll(".sidebar-item[data-view]")
-        .forEach(function (button) {
+            permissionTag.textContent =
+                getDisplayName(permission);
 
-            button.classList.remove("active");
-
-            if (button.dataset.view === viewName) {
-                button.classList.add("active");
-            }
+            dashboardPermissions.appendChild(
+                permissionTag
+            );
 
         });
 
-
-    // Fetch roles only when Roles page is opened
-    if (viewName === "roles") {
-        loadRoles();
     }
 
 
-    // Fetch permissions only when Permissions page is opened
-    if (viewName === "permissions") {
-        loadPermissions();
+    renderDashboardRoles();
+    renderDashboardPermissions();
+
+
+    // ==============================
+    // PROFILE INFORMATION
+    // ==============================
+
+    const profileName =
+        document.getElementById("profileName");
+
+    const profileEmail =
+        document.getElementById("profileEmail");
+
+    const profileFullName =
+        document.getElementById("profileFullName");
+
+    const profileEmailAddress =
+        document.getElementById(
+            "profileEmailAddress"
+        );
+
+    const profileRole =
+        document.getElementById("profileRole");
+
+    const profileInitials =
+        document.getElementById(
+            "profileInitials"
+        );
+
+    const profileRoles =
+        document.getElementById("profileRoles");
+
+    const profilePermissions =
+        document.getElementById(
+            "profilePermissions"
+        );
+
+    const profilePermissionCount =
+        document.getElementById(
+            "profilePermissionCount"
+        );
+
+
+    if (profileName) {
+
+        profileName.textContent =
+            fullName;
+
     }
 
-}
+
+    if (profileEmail) {
+
+        profileEmail.textContent =
+            email || "No email available";
+
+    }
+
+
+    if (profileFullName) {
+
+        profileFullName.textContent =
+            fullName || "--";
+
+    }
+
+
+    if (profileEmailAddress) {
+
+        profileEmailAddress.textContent =
+            email || "--";
+
+    }
+
+
+    if (profileRole) {
+
+        profileRole.textContent =
+            userRoles.length > 0
+                ? userRoles
+                    .map(getDisplayName)
+                    .join(", ")
+                : "ADMIN";
+
+    }
+
+
+    if (profileInitials) {
+
+        profileInitials.textContent =
+            initials;
+
+    }
+
+
+    // ==============================
+    // PROFILE ROLES
+    // ==============================
+
+    function renderProfileRoles() {
+
+        if (!profileRoles) {
+            return;
+        }
+
+
+        profileRoles.innerHTML = "";
+
+
+        if (userRoles.length === 0) {
+
+            profileRoles.innerHTML = `
+                <span class="permission-tag">
+                    No roles assigned
+                </span>
+            `;
+
+            return;
+
+        }
+
+
+        userRoles.forEach(function (role) {
+
+            const roleBadge =
+                document.createElement("span");
+
+            roleBadge.className =
+                "role-badge";
+
+            roleBadge.textContent =
+                getDisplayName(role);
+
+            profileRoles.appendChild(
+                roleBadge
+            );
+
+        });
+
+    }
+
+
+    // ==============================
+    // PROFILE PERMISSIONS
+    // ==============================
+
+    function renderProfilePermissions() {
+
+        if (profilePermissionCount) {
+
+            profilePermissionCount.textContent =
+                userPermissions.length;
+
+        }
+
+
+        if (!profilePermissions) {
+            return;
+        }
+
+
+        profilePermissions.innerHTML = "";
+
+
+        if (userPermissions.length === 0) {
+
+            profilePermissions.innerHTML = `
+                <span class="permission-tag">
+                    No permissions assigned
+                </span>
+            `;
+
+            return;
+
+        }
+
+
+        userPermissions.forEach(
+            function (permission) {
+
+                const permissionTag =
+                    document.createElement("span");
+
+                permissionTag.className =
+                    "permission-tag";
+
+                permissionTag.textContent =
+                    getDisplayName(permission);
+
+                profilePermissions.appendChild(
+                    permissionTag
+                );
+
+            }
+        );
+
+    }
+
+
+    renderProfileRoles();
+    renderProfilePermissions();
+
+
+    // ==============================
+    // ALL VIEWS
+    // ==============================
+
+    const views = {
+
+        dashboard:
+            document.getElementById(
+                "dashboardView"
+            ),
+
+        profile:
+            document.getElementById(
+                "profileView"
+            ),
+
+        employees:
+            document.getElementById(
+                "employeesView"
+            ),
+
+        attendance:
+            document.getElementById(
+                "attendanceView"
+            ),
+
+        roles:
+            document.getElementById(
+                "rolesView"
+            ),
+
+        permissions:
+            document.getElementById(
+                "permissionsView"
+            ),
+
+        payroll:
+            document.getElementById(
+                "payrollView"
+            ),
+
+        reports:
+            document.getElementById(
+                "reportsView"
+            )
+
+    };
+
+
+    // ==============================
+    // SHOW SELECTED VIEW
+    // ==============================
 
     function showView(viewName) {
 
-        Object.keys(views).forEach(function (key) {
+        if (!views[viewName]) {
 
-            views[key].classList.add("d-none");
+            console.error(
+                "View not found:",
+                viewName
+            );
 
-        });
+            return;
+
+        }
 
 
-        views[viewName].classList.remove("d-none");
+        // Hide all views
+        Object.values(views).forEach(
+            function (view) {
 
+                if (view) {
+
+                    view.classList.add(
+                        "d-none"
+                    );
+
+                }
+
+            }
+        );
+
+
+        // Show selected view
+        views[viewName].classList.remove(
+            "d-none"
+        );
+
+
+        // ==========================
+        // UPDATE ACTIVE SIDEBAR
+        // ==========================
 
         document
-            .querySelectorAll(".sidebar-item[data-view]")
-            .forEach(function (button) {
+            .querySelectorAll(
+                ".sidebar-item[data-view]"
+            )
+            .forEach(function (item) {
 
-                button.classList.remove("active");
+                item.classList.remove(
+                    "active"
+                );
 
-                if (button.dataset.view === viewName) {
-                    button.classList.add("active");
+
+                if (
+                    item.dataset.view ===
+                    viewName
+                ) {
+
+                    item.classList.add(
+                        "active"
+                    );
+
                 }
 
             });
 
 
+        // ==========================
+        // CLOSE MOBILE SIDEBAR
+        // ==========================
+
+        if (window.innerWidth < 768) {
+
+            const sidebar =
+                document.getElementById(
+                    "dashboardSidebar"
+                );
+
+
+            if (
+                sidebar &&
+                sidebar.classList.contains(
+                    "show"
+                )
+            ) {
+
+                const collapseInstance =
+                    bootstrap.Collapse.getInstance(
+                        sidebar
+                    );
+
+
+                if (collapseInstance) {
+
+                    collapseInstance.hide();
+
+                }
+
+            }
+
+        }
+
+
+        // ==========================
+        // SCROLL TO TOP
+        // ==========================
+
+        window.scrollTo({
+
+            top: 0,
+            behavior: "smooth"
+
+        });
+
+
+        // ==========================
+        // LOAD API DATA
+        // ==========================
+
         if (viewName === "roles") {
+
             loadRoles();
+
         }
 
 
         if (viewName === "permissions") {
+
             loadPermissions();
+
         }
 
     }
 
 
+    // ==============================
+    // SIDEBAR + QUICK ACTIONS +
+    // PROFILE BUTTON
+    // ==============================
+
     document
         .querySelectorAll("[data-view]")
-        .forEach(function (element) {
+        .forEach(function (item) {
 
-            element.addEventListener("click", function () {
+            item.addEventListener(
+                "click",
+                function (event) {
 
-                const viewName = this.dataset.view;
+                    const viewName =
+                        this.dataset.view;
 
-                if (views[viewName]) {
-                    showView(viewName);
+
+                    if (views[viewName]) {
+
+                        event.preventDefault();
+
+                        showView(viewName);
+
+                    }
+
                 }
-
-            });
+            );
 
         });
 
 
-    // =========================
-    // ALERT HELPER
-    // =========================
-
-    function showMessage(elementId, message, type) {
-
-        const element =
-            document.getElementById(elementId);
-
-        element.innerHTML = `
-            <div class="custom-alert ${type}">
-                ${message}
-            </div>
-        `;
-
-    }
-
-
-    function clearMessage(elementId) {
-
-        document.getElementById(elementId).innerHTML = "";
-
-    }
-
-
-    // =========================
-    // LOAD ROLES
-    // =========================
+    // ==============================
+    // LOAD ALL ROLES
+    // GET /api/roles
+    // ==============================
 
     async function loadRoles() {
 
-        const tableBody =
-            document.getElementById("rolesTableBody");
+        const rolesTableBody =
+            document.getElementById(
+                "rolesTableBody"
+            );
 
 
-        clearMessage("rolesMessage");
+        if (!rolesTableBody) {
+
+            console.error(
+                "rolesTableBody not found"
+            );
+
+            return;
+
+        }
 
 
-        tableBody.innerHTML = `
+        rolesTableBody.innerHTML = `
             <tr>
-                <td colspan="5" class="text-center py-5">
+                <td colspan="5"
+                    class="text-center py-4">
+
                     Loading roles...
+
                 </td>
             </tr>
         `;
@@ -364,18 +813,26 @@ function showView(viewName) {
                 await apiRequest("/api/roles");
 
 
-            const rolesData =
-                response.data || [];
+            console.log(
+                "Roles API Response:",
+                response
+            );
 
 
-            if (rolesData.length === 0) {
+            const roles =
+                Array.isArray(response.data)
+                    ? response.data
+                    : [];
 
-                tableBody.innerHTML = `
+
+            if (roles.length === 0) {
+
+                rolesTableBody.innerHTML = `
                     <tr>
                         <td colspan="5"
-                            class="text-center py-5 text-muted">
+                            class="text-center py-4 text-muted">
 
-                            No roles found.
+                            No roles found
 
                         </td>
                     </tr>
@@ -386,17 +843,37 @@ function showView(viewName) {
             }
 
 
-            tableBody.innerHTML = "";
+            rolesTableBody.innerHTML = "";
 
 
-            rolesData.forEach(function (role) {
+            roles.forEach(function (role) {
+
+                const permissions =
+                    Array.isArray(role.permissions)
+                        ? role.permissions
+                        : [];
+
 
                 const permissionsHtml =
-                    renderRolePermissions(role.permissions);
+                    permissions.length > 0
+                        ? permissions.map(
+                            function (permission) {
 
+                                return `
+                                    <span class="small-permission-tag">
+                                        ${escapeHtml(
+                                            getDisplayName(permission)
+                                        )}
+                                    </span>
+                                `;
 
-                const actionsHtml =
-                    renderRoleActions(role);
+                            }
+                        ).join("")
+                        : `
+                            <span class="text-muted">
+                                No permissions
+                            </span>
+                        `;
 
 
                 const row =
@@ -405,455 +882,97 @@ function showView(viewName) {
 
                 row.innerHTML = `
 
-                    <td>${role.id ?? "--"}</td>
-
                     <td>
-                        <span class="table-role-name">
-                            ${escapeHtml(role.name)}
-                        </span>
+                        ${escapeHtml(role.id)}
                     </td>
 
-                    <td>
-                        <span class="table-description">
-                            ${escapeHtml(role.description || "--")}
-                        </span>
+                    <td class="table-role-name">
+                        ${escapeHtml(
+                            getDisplayName(role)
+                        )}
+                    </td>
+
+                    <td class="table-description">
+                        ${escapeHtml(
+                            role.description || "--"
+                        )}
                     </td>
 
                     <td class="table-permissions">
                         ${permissionsHtml}
                     </td>
 
-                    <td>
-                        ${actionsHtml}
+                    <td class="text-end">
+                        <span class="text-muted">
+                            --
+                        </span>
                     </td>
 
                 `;
 
 
-                tableBody.appendChild(row);
+                rolesTableBody.appendChild(
+                    row
+                );
 
             });
 
 
         } catch (error) {
 
-            console.error("Roles Error:", error);
+            console.error(
+                "Failed to fetch roles:",
+                error
+            );
 
 
-            tableBody.innerHTML = `
+            rolesTableBody.innerHTML = `
                 <tr>
                     <td colspan="5"
-                        class="text-center py-5 text-danger">
+                        class="text-center py-4 text-danger">
 
-                        Failed to load roles.
+                        ${escapeHtml(
+                            error.message ||
+                            "Failed to load roles"
+                        )}
 
                     </td>
                 </tr>
             `;
 
-
-            showMessage(
-                "rolesMessage",
-                error.message || "Unable to fetch roles.",
-                "error"
-            );
-
         }
 
     }
 
 
-    // =========================
-    // ROLE PERMISSIONS
-    // =========================
-
-    function renderRolePermissions(rolePermissions) {
-
-        if (
-            !Array.isArray(rolePermissions) ||
-            rolePermissions.length === 0
-        ) {
-
-            return `<span class="text-muted">No permissions</span>`;
-
-        }
-
-
-        return rolePermissions.map(function (permission) {
-
-            const permissionName =
-                typeof permission === "string"
-                    ? permission
-                    : permission.name;
-
-            return `
-                <span class="small-permission-tag">
-                    ${escapeHtml(permissionName)}
-                </span>
-            `;
-
-        }).join("");
-
-    }
-
-
-    // =========================
-    // ROLE ACTION BUTTONS
-    // =========================
-
-    function renderRoleActions(role) {
-
-        const buttons = [];
-
-
-        if (hasPermission("ROLE_UPDATE")) {
-
-            buttons.push(`
-                <button
-                    type="button"
-                    class="edit-role-btn"
-                    data-role-id="${role.id}"
-                    data-role-name="${escapeAttribute(role.name)}"
-                    data-role-description="${escapeAttribute(role.description || "")}">
-
-                    Edit
-
-                </button>
-            `);
-
-        }
-
-
-        if (hasPermission("ROLE_DELETE")) {
-
-            buttons.push(`
-                <button
-                    type="button"
-                    class="delete-role-btn"
-                    data-role-id="${role.id}"
-                    data-role-name="${escapeAttribute(role.name)}">
-
-                    Delete
-
-                </button>
-            `);
-
-        }
-
-
-        if (buttons.length === 0) {
-            return `<span class="text-muted">No actions</span>`;
-        }
-
-
-        return `
-            <div class="action-buttons">
-                ${buttons.join("")}
-            </div>
-        `;
-
-    }
-
-
-    // =========================
-    // ROLE MODAL
-    // =========================
-
-    const roleModalElement =
-        document.getElementById("roleModal");
-
-    const roleModal =
-        new bootstrap.Modal(roleModalElement);
-
-
-    const roleForm =
-        document.getElementById("roleForm");
-
-    const roleId =
-        document.getElementById("roleId");
-
-    const roleName =
-        document.getElementById("roleName");
-
-    const roleDescription =
-        document.getElementById("roleDescription");
-
-    const roleModalTitle =
-        document.getElementById("roleModalTitle");
-
-    const saveRoleButton =
-        document.getElementById("saveRoleButton");
-
-
-    // Add Role
-    addRoleButton.addEventListener("click", function () {
-
-        roleForm.reset();
-
-        roleId.value = "";
-
-        clearMessage("roleFormMessage");
-
-        roleModalTitle.textContent =
-            "Add New Role";
-
-        saveRoleButton.textContent =
-            "Create Role";
-
-        roleModal.show();
-
-    });
-
-
-    // Edit/Delete event delegation
-    document
-        .getElementById("rolesTableBody")
-        .addEventListener("click", function (event) {
-
-            const editButton =
-                event.target.closest(".edit-role-btn");
-
-            const deleteButton =
-                event.target.closest(".delete-role-btn");
-
-
-            if (editButton) {
-
-                openEditRoleModal(editButton);
-
-            }
-
-
-            if (deleteButton) {
-
-                deleteRole(
-                    deleteButton.dataset.roleId,
-                    deleteButton.dataset.roleName
-                );
-
-            }
-
-        });
-
-
-    // Open Edit Modal
-    function openEditRoleModal(button) {
-
-        roleId.value =
-            button.dataset.roleId;
-
-        roleName.value =
-            button.dataset.roleName;
-
-        roleDescription.value =
-            button.dataset.roleDescription;
-
-
-        clearMessage("roleFormMessage");
-
-
-        roleModalTitle.textContent =
-            "Edit Role";
-
-        saveRoleButton.textContent =
-            "Update Role";
-
-
-        roleModal.show();
-
-    }
-
-
-    // =========================
-    // CREATE / UPDATE ROLE
-    // =========================
-
-    roleForm.addEventListener("submit", async function (event) {
-
-        event.preventDefault();
-
-
-        clearMessage("roleFormMessage");
-
-
-        const name =
-            roleName.value.trim();
-
-        const description =
-            roleDescription.value.trim();
-
-
-        if (name === "" || description === "") {
-
-            showMessage(
-                "roleFormMessage",
-                "Role name and description are required.",
-                "error"
-            );
-
-            return;
-
-        }
-
-
-        const isEdit =
-            roleId.value !== "";
-
-
-        const originalButtonText =
-            saveRoleButton.textContent;
-
-
-        saveRoleButton.disabled = true;
-
-        saveRoleButton.textContent =
-            isEdit
-                ? "Updating..."
-                : "Creating...";
-
-
-        try {
-
-            const endpoint =
-                isEdit
-                    ? `/api/roles/${roleId.value}`
-                    : "/api/roles";
-
-
-            const method =
-                isEdit
-                    ? "PUT"
-                    : "POST";
-
-
-            const response =
-                await apiRequest(endpoint, {
-
-                    method: method,
-
-                    body: JSON.stringify({
-                        name: name,
-                        description: description
-                    })
-
-                });
-
-
-            showMessage(
-                "rolesMessage",
-                response.message ||
-                (isEdit
-                    ? "Role updated successfully."
-                    : "Role created successfully."),
-                "success"
-            );
-
-
-            roleModal.hide();
-
-
-            await loadRoles();
-
-
-        } catch (error) {
-
-            console.error("Save Role Error:", error);
-
-
-            showMessage(
-                "roleFormMessage",
-                error.message ||
-                "Unable to save role.",
-                "error"
-            );
-
-        } finally {
-
-            saveRoleButton.disabled = false;
-
-            saveRoleButton.textContent =
-                originalButtonText;
-
-        }
-
-    });
-
-
-    // =========================
-    // DELETE ROLE
-    // =========================
-
-    async function deleteRole(id, name) {
-
-        const confirmed =
-            confirm(
-                `Are you sure you want to delete ${name}?`
-            );
-
-
-        if (!confirmed) {
-            return;
-        }
-
-
-        clearMessage("rolesMessage");
-
-
-        try {
-
-            const response =
-                await apiRequest(`/api/roles/${id}`, {
-
-                    method: "DELETE"
-
-                });
-
-
-            showMessage(
-                "rolesMessage",
-                response.message ||
-                "Role deleted successfully.",
-                "success"
-            );
-
-
-            await loadRoles();
-
-
-        } catch (error) {
-
-            console.error("Delete Role Error:", error);
-
-
-            showMessage(
-                "rolesMessage",
-                error.message ||
-                "Unable to delete role.",
-                "error"
-            );
-
-        }
-
-    }
-
-
-    // =========================
-    // LOAD PERMISSIONS
-    // =========================
+    // ==============================
+    // LOAD ALL PERMISSIONS
+    // GET /api/permissions
+    // ==============================
 
     async function loadPermissions() {
 
-        const tableBody =
-            document.getElementById("permissionsTableBody");
+        const permissionsTableBody =
+            document.getElementById(
+                "permissionsTableBody"
+            );
 
 
-        clearMessage("permissionsMessage");
+        if (!permissionsTableBody) {
+
+            console.error(
+                "permissionsTableBody not found"
+            );
+
+            return;
+
+        }
 
 
-        tableBody.innerHTML = `
+        permissionsTableBody.innerHTML = `
             <tr>
                 <td colspan="3"
-                    class="text-center py-5">
+                    class="text-center py-4">
 
                     Loading permissions...
 
@@ -865,21 +984,31 @@ function showView(viewName) {
         try {
 
             const response =
-                await apiRequest("/api/permissions");
+                await apiRequest(
+                    "/api/permissions"
+                );
 
 
-            const permissionsData =
-                response.data || [];
+            console.log(
+                "Permissions API Response:",
+                response
+            );
 
 
-            if (permissionsData.length === 0) {
+            const permissions =
+                Array.isArray(response.data)
+                    ? response.data
+                    : [];
 
-                tableBody.innerHTML = `
+
+            if (permissions.length === 0) {
+
+                permissionsTableBody.innerHTML = `
                     <tr>
                         <td colspan="3"
-                            class="text-center py-5 text-muted">
+                            class="text-center py-4 text-muted">
 
-                            No permissions found.
+                            No permissions found
 
                         </td>
                     </tr>
@@ -890,93 +1019,193 @@ function showView(viewName) {
             }
 
 
-            tableBody.innerHTML = "";
+            permissionsTableBody.innerHTML = "";
 
 
-            permissionsData.forEach(function (permission) {
+            permissions.forEach(
+                function (permission) {
 
-                const row =
-                    document.createElement("tr");
-
-
-                row.innerHTML = `
-
-                    <td>
-                        ${permission.id ?? "--"}
-                    </td>
-
-                    <td>
-                        <span class="table-permission-name">
-                            ${escapeHtml(permission.name)}
-                        </span>
-                    </td>
-
-                    <td>
-                        <span class="table-description">
-                            ${escapeHtml(permission.description || "--")}
-                        </span>
-                    </td>
-
-                `;
+                    const row =
+                        document.createElement(
+                            "tr"
+                        );
 
 
-                tableBody.appendChild(row);
+                    row.innerHTML = `
 
-            });
+                        <td>
+                            ${escapeHtml(
+                                permission.id
+                            )}
+                        </td>
+
+                        <td class="table-permission-name">
+                            ${escapeHtml(
+                                getDisplayName(
+                                    permission
+                                )
+                            )}
+                        </td>
+
+                        <td class="table-description">
+                            ${escapeHtml(
+                                permission.description ||
+                                "--"
+                            )}
+                        </td>
+
+                    `;
+
+
+                    permissionsTableBody.appendChild(
+                        row
+                    );
+
+                }
+            );
 
 
         } catch (error) {
 
-            console.error("Permissions Error:", error);
+            console.error(
+                "Failed to fetch permissions:",
+                error
+            );
 
 
-            tableBody.innerHTML = `
+            permissionsTableBody.innerHTML = `
                 <tr>
                     <td colspan="3"
-                        class="text-center py-5 text-danger">
+                        class="text-center py-4 text-danger">
 
-                        Failed to load permissions.
+                        ${escapeHtml(
+                            error.message ||
+                            "Failed to load permissions"
+                        )}
 
                     </td>
                 </tr>
             `;
-
-
-            showMessage(
-                "permissionsMessage",
-                error.message ||
-                "Unable to fetch permissions.",
-                "error"
-            );
 
         }
 
     }
 
 
-    // =========================
-    // HTML SECURITY HELPERS
-    // =========================
+    // ==============================
+    // LOGOUT
+    // ==============================
 
-    function escapeHtml(value) {
+    const logoutButton =
+        document.getElementById(
+            "logoutButton"
+        );
 
-        const div =
-            document.createElement("div");
 
-        div.textContent =
-            value === null || value === undefined
-                ? ""
-                : String(value);
+    if (logoutButton) {
 
-        return div.innerHTML;
+        logoutButton.addEventListener(
+            "click",
+            function () {
+
+                localStorage.removeItem(
+                    "authData"
+                );
+
+                localStorage.removeItem(
+                    "token"
+                );
+
+                localStorage.removeItem(
+                    "user"
+                );
+
+                localStorage.removeItem(
+                    "role"
+                );
+
+                localStorage.removeItem(
+                    "email"
+                );
+
+
+                window.location.href =
+                    "../auth/login.html";
+
+            }
+        );
 
     }
 
 
-    function escapeAttribute(value) {
+    // ==============================
+    // GET DISPLAY NAME
+    // Handles strings and API objects
+    // ==============================
 
-        return escapeHtml(value)
-            .replace(/"/g, "&quot;");
+    function getDisplayName(value) {
+
+        if (
+            value === null ||
+            value === undefined
+        ) {
+
+            return "";
+
+        }
+
+
+        if (typeof value === "string") {
+
+            return value;
+
+        }
+
+
+        if (typeof value === "object") {
+
+            return (
+                value.name ||
+                value.roleName ||
+                value.permissionName ||
+                value.code ||
+                value.authority ||
+                String(value.id || "")
+            );
+
+        }
+
+
+        return String(value);
+
+    }
+
+
+    // ==============================
+    // ESCAPE HTML
+    // ==============================
+
+    function escapeHtml(value) {
+
+        if (
+            value === null ||
+            value === undefined
+        ) {
+
+            return "";
+
+        }
+
+
+        const div =
+            document.createElement("div");
+
+
+        div.textContent =
+            String(value);
+
+
+        return div.innerHTML;
 
     }
 
