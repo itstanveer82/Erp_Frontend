@@ -1,0 +1,1137 @@
+/* FIXED EMPLOYEE HEADER */
+
+.admin-navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 70px;
+    z-index: 1050;
+}
+
+/* DASHBOARD LAYOUT */
+
+.dashboard-layout {
+    padding-top: 70px;
+}
+
+/* FIXED EMPLOYEE PANEL */
+
+.dashboard-sidebar {
+    position: fixed;
+    top: 70px;
+    left: 0;
+    bottom: 0;
+
+    width: 260px;
+    height: calc(100vh - 70px);
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    z-index: 1040;
+
+    /* Hide scrollbar - Chrome, Edge, Safari */
+    scrollbar-width: none;
+
+    /* Hide scrollbar - Firefox */
+    -ms-overflow-style: none;
+}
+
+/* Chrome / Edge / Safari */
+.dashboard-sidebar::-webkit-scrollbar {
+    display: none;
+    width: 0;
+}
+
+/* MAIN CONTENT SCROLL */
+
+.dashboard-main {
+    margin-left: 260px;
+    min-height: calc(100vh - 70px);
+}
+
+/* Attendance Calendar */
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.calendar-day {
+    border-radius: 8px;
+    padding: 12px 8px;
+    text-align: center;
+    font-size: 0.85rem;
+    background: #f5f6fa;
+}
+
+.calendar-day.day-present {
+    background: #e6f7ec;
+    color: #1a7f4b;
+}
+
+.calendar-day.day-absent {
+    background: #fde8e8;
+    color: #b3261e;
+}
+
+.calendar-day.day-leave {
+    background: #fff4e0;
+    color: #a15c00;
+}
+
+.calendar-day.day-weekend {
+    background: #eceff3;
+    color: #8a8f98;
+}
+
+.calendar-day .day-number {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+/* Leave balance cards */
+.leave-balance-card {
+    border-radius: 10px;
+    padding: 18px;
+    background: #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.leave-balance-card h4 {
+    margin: 0;
+    font-size: 1.6rem;
+}
+
+.leave-balance-card span {
+    color: #6c757d;
+    font-size: 0.85rem;
+}
+
+/* Reusable form card wrapper (apply leave / corrections / profile) */
+/* Leave policy box (red notes wali jagah, ab styled) */
+/* =========================
+   LEAVE POLICY DROPDOWN
+   ========================= */
+
+.leave-policy-dropdown {
+    margin-bottom: 20px;
+    border-left: 4px solid #e0524d;
+    border-radius: 8px;
+    background: #fff7f7;
+    overflow: hidden;
+}
+
+/* Header / Dropdown Button */
+.leave-policy-toggle {
+    width: 100%;
+    border: none;
+    background: transparent;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+
+    color: #b3261e;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-align: left;
+}
+
+.leave-policy-toggle:hover {
+    background: #fff0f0;
+}
+
+#leavePolicyArrow {
+    font-size: 12px;
+    transition: transform 0.25s ease;
+}
+
+/* Content */
+.leave-policy-content {
+    display: none;
+    padding: 4px 18px 14px;
+    border-top: 1px solid #f1cccc;
+}
+
+/* Open state */
+.leave-policy-dropdown.open .leave-policy-content {
+    display: block;
+}
+
+.leave-policy-dropdown.open #leavePolicyArrow {
+    transform: rotate(180deg);
+}
+
+/* Policy list */
+.leave-policy-content ul {
+    margin: 0;
+    padding-left: 18px;
+}
+
+.leave-policy-content li {
+    font-size: 0.82rem;
+    color: #b3261e;
+    margin-bottom: 5px;
+}
+
+/* Form styling */
+.leave-apply-form .form-label {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #34383f;
+    margin-bottom: 6px;
+}
+
+.required-star {
+    color: #e0524d;
+}
+
+.readonly-field {
+    background: #f5f6fa;
+    color: #6c757d;
+}
+
+/* CC To chips */
+.cc-input-group {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-add-cc {
+    background: #17a2b8;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 0 16px;
+    white-space: nowrap;
+}
+
+.btn-add-cc:hover {
+    background: #138496;
+    color: #fff;
+}
+
+.cc-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.cc-chip {
+    background: #eef2ff;
+    color: #3949ab;
+    border-radius: 999px;
+    padding: 4px 12px;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.cc-chip button {
+    background: none;
+    border: none;
+    color: #3949ab;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 1;
+}
+
+/* Submit button */
+.form-submit-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 24px;
+}
+
+.btn-primary-erp {
+    background: #17a2b8;
+    border: none;
+    color: #fff;
+    padding: 10px 32px;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+.btn-primary-erp:hover {
+    background: #138496;
+    color: #fff;
+}
+
+
+/* Attendance stat cards */
+.attendance-stats-row {
+    margin-bottom: 20px;
+}
+
+.attendance-stat-card {
+    border-radius: 10px;
+    padding: 16px 18px;
+    background: #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    border-left: 4px solid #ccc;
+}
+
+.attendance-stat-card span {
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+.attendance-stat-card h4 {
+    margin: 4px 0 0;
+    font-size: 1.6rem;
+    font-weight: 700;
+}
+
+.stat-present {
+    border-left-color: #1a7f4b;
+}
+
+.stat-late {
+    border-left-color: #a15c00;
+}
+
+.stat-absent {
+    border-left-color: #b3261e;
+}
+
+.stat-leave {
+    border-left-color: #3949ab;
+}
+
+/* Table card + toolbar */
+.attendance-table-card {
+    padding: 20px;
+}
+
+.attendance-toolbar {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+.attendance-toolbar .form-label {
+    font-weight: 600;
+    font-size: 0.82rem;
+    margin-bottom: 4px;
+}
+
+.attendance-toolbar>div {
+    min-width: 180px;
+}
+
+/* Status badges */
+.status-badge {
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.status-badge.PRESENT {
+    background: #e6f7ec;
+    color: #1a7f4b;
+}
+
+.status-badge.LATE {
+    background: #fff4e0;
+    color: #a15c00;
+}
+
+.status-badge.ABSENT {
+    background: #fde8e8;
+    color: #b3261e;
+}
+
+.status-badge.LEAVE {
+    background: #eef2ff;
+    color: #3949ab;
+}
+
+
+/* =========================
+   EMPLOYEE PROFILE BUTTON
+   ========================= */
+
+#employeeProfileButton {
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.sidebar-user-info {
+    min-width: 0;
+}
+
+.sidebar-user-info strong,
+.sidebar-user-info small {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* =========================================
+   EMPLOYEE PROFILE
+   ========================================= */
+
+.employee-profile {
+    background: #ffffff;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid #e8ebef;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
+}
+
+
+/* =========================================
+   PROFILE HEADER
+   ========================================= */
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+
+    padding: 28px 30px;
+
+    background: linear-gradient(135deg,
+            #f1f8fa 0%,
+            #ffffff 100%);
+
+    border-bottom: 1px solid #e8ebef;
+}
+
+.profile-avatar {
+    width: 90px;
+    height: 90px;
+
+    flex-shrink: 0;
+
+    position: relative;
+    overflow: hidden;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #17a2b8;
+    color: #fff;
+
+    font-size: 26px;
+    font-weight: 700;
+
+    border: 4px solid #ffffff;
+
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+}
+
+.profile-avatar-image {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+    display: block;
+}
+
+.profile-avatar-fallback {
+    width: 100%;
+    height: 100%;
+
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-main-info h2 {
+    margin: 0 0 5px;
+
+    font-size: 24px;
+    font-weight: 700;
+    color: #252a31;
+}
+
+.profile-main-info p {
+    margin: 0 0 10px;
+
+    color: #6c757d;
+    font-size: 14px;
+} 
+
+/* Reset Button */
+
+.profile-password-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.btn-reset-password {
+    align-self: flex-start;
+    background: #17a2b8;
+    color: #fff;
+    border: none;
+    padding: 6px 16px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-reset-password:hover {
+    background: #138496;
+}
+
+.reset-password-card {
+    margin-top: 20px;
+}
+
+/* =========================================
+   EMPLOYEE PROFILE HEADER
+========================================= */
+
+.employee-profile-wrapper {
+    position: relative;
+    width: 200px;
+}
+
+.employee-profile-button {
+    width: 200px;
+    height: 58px;
+
+    border: none;
+    background: transparent;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 5px 8px;
+    cursor: pointer;
+
+    border-radius: 10px;
+}
+
+.employee-profile-button:hover {
+    background: rgba(0, 0, 0, 0.04);
+}
+
+/* Round employee image */
+
+.employee-profile-image {
+    width: 44px;
+    height: 44px;
+
+    min-width: 44px;
+
+    border-radius: 50%;
+    overflow: hidden;
+
+    border: 2px solid #e9ecef;
+    background: #f1f3f5;
+}
+
+.employee-profile-image img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+    display: block;
+}
+
+/* Name + Employee ID */
+
+.employee-profile-info {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    text-align: left;
+}
+
+.employee-profile-info strong {
+    font-size: 13px;
+    font-weight: 600;
+
+    color: #212529;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    max-width: 125px;
+}
+
+.employee-profile-info small {
+    font-size: 11px;
+    color: #6c757d;
+
+    margin-top: 2px;
+}
+
+/* =========================================
+   PROFILE DROPDOWN
+========================================= */
+
+.employee-profile-dropdown {
+    position: absolute;
+
+    top: calc(100% + 8px);
+    right: 0;
+
+    width: 200px;
+
+    background: #fff;
+
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+
+    padding: 12px;
+
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+
+    display: none;
+
+    z-index: 9999;
+}
+
+.employee-profile-dropdown.show {
+    display: block;
+}
+
+/* =========================================
+   PROFILE HEADER
+========================================= */
+
+.profile-dropdown-header {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    padding-bottom: 12px;
+
+    border-bottom: 1px solid #eee;
+}
+
+.profile-dropdown-header img {
+    width: 42px;
+    height: 42px;
+
+    border-radius: 50%;
+
+    object-fit: cover;
+
+    border: 2px solid #e9ecef;
+}
+
+.profile-dropdown-header div {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-dropdown-header strong {
+    font-size: 12px;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.profile-dropdown-header span {
+    font-size: 10px;
+    color: #6c757d;
+
+    margin-top: 2px;
+}
+
+/* =========================================
+   SYSTEM IN / OUT
+========================================= */
+
+.profile-system-actions {
+    display: flex;
+
+    gap: 6px;
+
+    margin: 12px 0;
+}
+
+.system-btn {
+    flex: 1;
+
+    border: none;
+
+    padding: 7px 4px;
+
+    border-radius: 6px;
+
+    font-size: 10px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.system-in {
+    background: #e8f7ee;
+    color: #198754;
+}
+
+.system-in:hover {
+    background: #d1f0df;
+}
+
+.system-out {
+    background: #fff0f0;
+    color: #dc3545;
+}
+
+.system-out:hover {
+    background: #ffdede;
+}
+
+/* =========================================
+   PROFILE MENU BUTTONS
+========================================= */
+
+.profile-menu-btn {
+    width: 100%;
+
+    border: none;
+    background: transparent;
+
+    text-align: left;
+
+    padding: 9px 8px;
+
+    border-radius: 6px;
+
+    font-size: 12px;
+
+    color: #343a40;
+
+    cursor: pointer;
+}
+
+.profile-menu-btn:hover {
+    background: #f5f6f8;
+}
+
+.logout-menu-btn {
+    color: #dc3545;
+
+    margin-top: 2px;
+}
+
+.logout-menu-btn:hover {
+    background: #fff0f0;
+}
+
+/* Employee Details */
+
+.employee-header-info {
+    min-width: 0;
+    flex: 1;
+}
+
+.employee-header-info strong {
+    display: block;
+
+    max-width: 125px;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    color: #252a31;
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.employee-header-info>small {
+    display: block;
+
+    color: #7c858d;
+
+    font-size: 10px;
+
+    margin-top: 1px;
+}
+
+
+/* =========================================
+   SYSTEM IN / SYSTEM OUT
+   ========================================= */
+
+.system-attendance-buttons {
+    display: flex;
+    gap: 4px;
+
+    margin-top: 3px;
+}
+
+.system-attendance-buttons button {
+    border: none;
+
+    border-radius: 4px;
+
+    padding: 2px 5px;
+
+    font-size: 8px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    white-space: nowrap;
+}
+
+.system-in-btn {
+    background: #e7f7ed;
+    color: #198754;
+}
+
+.system-in-btn:hover {
+    background: #198754;
+    color: #ffffff;
+}
+
+.system-out-btn {
+    background: #fff0f0;
+    color: #dc3545;
+}
+
+.system-out-btn:hover {
+    background: #dc3545;
+    color: #ffffff;
+}
+
+
+/* Mobile */
+
+
+
+
+/* =========================================
+   ACTIVE STATUS
+   ========================================= */
+
+.profile-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+
+    padding: 5px 11px;
+
+    border-radius: 20px;
+
+    background: #e8f7ef;
+    color: #21864b;
+
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.status-dot {
+    width: 7px;
+    height: 7px;
+
+    border-radius: 50%;
+    background: #28a745;
+}
+
+
+/* =========================================
+   PROFILE SECTION
+   ========================================= */
+
+.profile-section {
+    padding: 25px 30px;
+
+    border-bottom: 1px solid #edf0f2;
+}
+
+.profile-section:last-child {
+    border-bottom: none;
+}
+
+
+/* Section heading */
+
+.profile-section-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    margin-bottom: 20px;
+}
+
+.profile-section-icon {
+    width: 38px;
+    height: 38px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 9px;
+
+    background: #eef8fa;
+
+    font-size: 17px;
+}
+
+.profile-section-title h4 {
+    margin: 0;
+
+    font-size: 15px;
+    font-weight: 700;
+
+    color: #30353b;
+}
+
+.profile-section-title p {
+    margin: 3px 0 0;
+
+    font-size: 12px;
+    color: #8a9098;
+}
+
+
+/* =========================================
+   INFO GRID
+   ========================================= */
+
+.profile-info-grid {
+    display: grid;
+
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 16px;
+}
+
+.profile-info-item {
+    padding: 15px 16px;
+
+    border: 1px solid #edf0f2;
+
+    border-radius: 9px;
+
+    background: #fafbfc;
+}
+
+.profile-info-item:hover {
+    background: #f7fafb;
+    border-color: #dce7ea;
+}
+
+.profile-label {
+    display: block;
+
+    margin-bottom: 6px;
+
+    color: #8a9098;
+
+    font-size: 11px;
+    font-weight: 600;
+
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.profile-info-item strong {
+    display: block;
+
+    color: #343a40;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    word-break: break-word;
+}
+
+
+/* =========================================
+   PROFILE LOADING
+   ========================================= */
+
+.profile-loading {
+    padding: 40px;
+
+    text-align: center;
+
+    color: #6c757d;
+    font-size: 16px;
+}
+
+
+.logout-panel {
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.logout-avatar {
+    background: #fff0f0;
+    color: #dc3545;
+    font-size: 22px;
+}
+
+.logout-panel:hover .logout-avatar {
+    background: #dc3545;
+    color: #fff;
+}
+
+.logout-panel strong {
+    color: #dc3545;
+}
+
+.sidebar-user-avatar {
+    width: 42px;
+    height: 42px;
+
+    border-radius: 50%;
+    overflow: hidden;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #17a2b8;
+    color: #fff;
+
+    font-weight: 700;
+}
+
+.sidebar-user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+#sidebarInitials {
+    align-items: center;
+    justify-content: center;
+}
+
+/* =========================================
+   SYSTEM IN / OUT — NAVBAR VERSION
+========================================= */
+
+.navbar-system-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.navbar-system-actions .system-btn {
+    flex: none;
+    padding: 8px 18px;
+    font-size: 12px;
+    border-radius: 8px;
+}
+
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+
+@media (max-width: 767.98px) {
+
+    .profile-header {
+        padding: 22px 20px;
+    }
+
+    .profile-avatar {
+        width: 65px;
+        height: 65px;
+
+        font-size: 21px;
+    }
+
+    .profile-main-info h2 {
+        font-size: 19px;
+    }
+
+    .profile-section {
+        padding: 20px;
+    }
+
+    .profile-info-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+@media (max-width: 767.98px) {
+
+    .admin-navbar {
+        height: 60px;
+    }
+
+    .dashboard-layout {
+        padding-top: 60px;
+    }
+
+    .dashboard-sidebar {
+        top: 60px;
+        height: calc(100vh - 60px);
+        width: 260px;
+
+        overflow-y: auto;
+        overflow-x: hidden;
+
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    .dashboard-sidebar::-webkit-scrollbar {
+        display: none;
+        width: 0;
+    }
+
+    .dashboard-main {
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 767.98px) {
+
+    .employee-header-profile {
+        width: 175px;
+        min-width: 175px;
+    }
+
+    .employee-header-avatar {
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+    }
+
+    .employee-header-info strong {
+        max-width: 105px;
+    }
+
+    .system-attendance-buttons button {
+        padding: 2px 4px;
+        font-size: 7px;
+    }
+}
+
+@media (max-width: 576px) {
+    .navbar-system-actions .system-btn {
+        padding: 6px 10px;
+        font-size: 11px;
+    }
+}

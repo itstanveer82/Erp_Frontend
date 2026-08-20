@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <title>Employee Dashboard - Attendance & Payroll ERP</title>
+
+        <!-- <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
+        <link rel="stylesheet" href="/css/admin-dashboard.css">
+        <link rel="stylesheet" href="/employee/style/employee-dashboard.css"> -->
+
+        <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+        <link rel="stylesheet" href="../css/admin-dashboard.css">
+        <link rel="stylesheet" href="style/employee-dashboard.css">
+    </head>
+
+    <body>
+
+        <!-- Top Navbar -->
+        <nav class="navbar admin-navbar">
+            <div class="container-fluid">
+
+                <a class="navbar-brand admin-brand" href="dashboard.html">
+                    <span class="brand-logo">AP</span>
+                    <span class="brand-text">
+                        <strong>Attendance & Payroll</strong>
+                        <small>Employee Portal</small>
+                    </span>
+                </a>
+
+                <div class="admin-user-area">
+
+                    <div class="navbar-system-actions">
+                        <button type="button" id="systemInButton"
+                            class="system-btn system-in">
+                            System In
+                        </button>
+                        <button type="button" id="systemOutButton"
+                            class="system-btn system-out d-none">
+                            System Out
+                        </button>
+                    </div>
+
+                    <div class="employee-profile-wrapper">
+
+                        <button type="button"
+                            id="employeeProfileButton"
+                            class="employee-profile-button">
+
+                            <div class="employee-profile-image">
+                                <img id="headerEmployeeImage"
+                                    src="/assets/image/Prime_Minister_of_India,_Shri_Narendra_Modi.jpg"
+                                    alt="Employee">
+                            </div>
+
+                            <div class="employee-profile-info">
+                                <strong id="headerEmployeeName">Narendra Modi Ji</strong>
+                                <small id="headerEmployeeId">Prime Minister</small>
+                            </div>
+
+                        </button>
+
+                        <div id="employeeProfileDropdown"
+                            class="employee-profile-dropdown">
+
+                            <div class="profile-dropdown-header">
+
+                                <img id="profileDropdownImage"
+                                    src="/assets/image/Prime_Minister_of_India,_Shri_Narendra_Modi.jpg"
+                                    alt="Employee">
+
+                                <div>
+                                    <strong id="profileDropdownName">
+                                        Narendra Modi
+                                    </strong>
+
+                                    <span id="profileDropdownId">
+                                        EMP-1001
+                                    </span>
+                                </div>
+
+                            </div>
+
+                            <button type="button"
+                                id="profileViewButton"
+                                class="profile-menu-btn">
+                                ◍ &nbsp; My Profile
+                            </button>
+
+                            <button type="button"
+                                id="logoutButton"
+                                class="profile-menu-btn logout-menu-btn">
+                                ⇥ &nbsp; Logout
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </nav>
+
+        <div class="dashboard-layout">
+
+            <div class="mobile-menu-container">
+                <button class="mobile-menu-btn" type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#dashboardSidebar">
+                    ☰ <span>Menu</span>
+                </button>
+            </div>
+
+            <!-- Sidebar -->
+            <aside class="dashboard-sidebar collapse d-md-block"
+                id="dashboardSidebar">
+
+                <div class="sidebar-header">
+                    <span>EMPLOYEE PANEL</span>
+                </div>
+
+                <div class="sidebar-menu">
+                    <button class="sidebar-item active" type="button"
+                        data-view="dashboard">
+                        <span class="menu-icon">▦</span> Dashboard
+                    </button>
+
+                    <button class="sidebar-item" type="button"
+                        data-view="my-attendance">
+                        <span class="menu-icon">◷</span> My Attendance
+                    </button>
+
+                    <button class="sidebar-item" type="button"
+                        data-view="attendance-calendar">
+                        <span class="menu-icon">▥</span> Attendance Calendar
+                    </button>
+
+                    <button class="sidebar-item" type="button"
+                        data-view="my-leaves">
+                        <span class="menu-icon">✎</span> My Leaves
+                    </button>
+
+                    <button class="sidebar-item" type="button"
+                        data-view="apply-leave">
+                        <span class="menu-icon">➕</span> Apply Leave
+                    </button>
+
+                    <button class="sidebar-item" type="button"
+                        data-view="leave-balance">
+                        <span class="menu-icon">Ⓛ</span> Leave Balance
+                    </button>
+
+                    <button class="sidebar-item" type="button"
+                        data-view="my-payroll">
+                        <span class="menu-icon">₹</span> My Payroll
+                    </button>
+
+                    <button class="sidebar-item" type="button"
+                        data-view="payslips">
+                        <span class="menu-icon">🧾</span> Payslips
+                    </button>
+
+                    <button class="sidebar-item" type="button"
+                        data-view="attendance-corrections">
+                        <span class="menu-icon">⚑</span> Attendance Corrections
+                    </button>
+
+                </div>
+
+                <div class="sidebar-user logout-panel" id="logoutPanel">
+
+                    <div class="sidebar-user-avatar" id="userInitials">
+                        <img id="sidebarProfileImage"
+                            src
+                            alt="Employee"
+                            style="display:none;">
+                        <span id="sidebarInitials">EM</span>
+                    </div>
+
+                    <div class="sidebar-user-info">
+                        <strong>Logout</strong>
+                        <small>Sign out from account</small>
+                    </div>
+
+                </div>
+
+            </aside>
+
+            <!-- Main Content -->
+            <main class="dashboard-main">
+
+                <!-- DASHBOARD OVERVIEW -->
+                <section id="dashboardView" class="content-view">
+                    <div class="dashboard-welcome">
+                        <div>
+                            <p class="page-label">EMPLOYEE PORTAL</p>
+                            <h1 id="dashboardWelcome">Welcome back!</h1>
+                            <p>View your attendance, leaves, and payroll details
+                                from here</p>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 stats-row">
+                        <div class="col-12 col-sm-6 col-xl-3">
+                            <div class="dashboard-card">
+                                <div class="stat-icon">A</div>
+                                <div><span>This Month Attendance</span><h2
+                                        id="statAttendance">--</h2></div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-xl-3">
+                            <div class="dashboard-card">
+                                <div class="stat-icon">L</div>
+                                <div><span>Leave Balance</span><h2
+                                        id="statLeaveBalance">--</h2></div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-xl-3">
+                            <div class="dashboard-card">
+                                <div class="stat-icon">C</div>
+                                <div><span>Pending Corrections</span><h2
+                                        id="statCorrections">--</h2></div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-xl-3">
+                            <div class="dashboard-card">
+                                <div class="stat-icon">₹</div>
+                                <div><span>Last Payslip</span><h2
+                                        id="statLastPayslip">--</h2></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- MY ATTENDANCE -->
+                <!-- MY ATTENDANCE -->
+                <section id="my-attendanceView" class="content-view d-none">
+                    <div class="section-heading">
+                        <div><h3>My Attendance</h3><p>Apki check-in / check-out
+                                history.</p></div>
+                    </div>
+
+                    <div class="row g-3 attendance-stats-row">
+                        <div class="col-6 col-md-3">
+                            <div class="attendance-stat-card stat-present">
+                                <span>Present</span>
+                                <h4 id="attStatPresent">--</h4>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="attendance-stat-card stat-late">
+                                <span>Late</span>
+                                <h4 id="attStatLate">--</h4>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="attendance-stat-card stat-absent">
+                                <span>Absent</span>
+                                <h4 id="attStatAbsent">--</h4>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="attendance-stat-card stat-leave">
+                                <span>Leave</span>
+                                <h4 id="attStatLeave">--</h4>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="erp-form-card attendance-table-card">
+                        <div class="attendance-toolbar">
+                            <div>
+                                <label class="form-label">Month</label>
+                                <input type="month" id="attendanceMonthFilter"
+                                    class="form-control">
+                            </div>
+                            <div>
+                                <label class="form-label">Status</label>
+                                <select id="attendanceStatusFilter"
+                                    class="form-select">
+                                    <option value="ALL">All</option>
+                                    <option value="PRESENT">Present</option>
+                                    <option value="LATE">Late</option>
+                                    <option value="ABSENT">Absent</option>
+                                    <option value="LEAVE">Leave</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="myAttendanceMessage"></div>
+
+                        <div class="table-responsive">
+                            <table class="table erp-table align-middle">
+                                <thead>
+                                    <tr><th>Date</th><th>Check-in</th><th>Check-out</th><th>Hours</th><th>Status</th></tr>
+                                </thead>
+                                <tbody id="myAttendanceTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ATTENDANCE CALENDAR -->
+                <section id="attendance-calendarView"
+                    class="content-view d-none">
+                    <div class="section-heading">
+                        <div><h3>Attendance Calendar</h3><p>Month-wise
+                                attendance overview.</p></div>
+                    </div>
+                    <div id="attendanceCalendar" class="calendar-grid"></div>
+                </section>
+
+                <!-- MY LEAVES -->
+                <section id="my-leavesView" class="content-view d-none">
+                    <div class="section-heading">
+                        <div><h3>My Leaves</h3><p>Leave applications
+                                list.</p></div>
+                    </div>
+                    <div id="myLeavesMessage"></div>
+                    <div class="table-responsive">
+                        <table class="table erp-table">
+                            <thead>
+                                <tr><th>Type</th><th>From</th><th>To</th><th>Days</th><th>Status</th><th>Applied
+                                        On</th></tr>
+                            </thead>
+                            <tbody id="myLeavesTableBody"></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- APPLY LEAVE -->
+                <section id="apply-leaveView" class="content-view d-none">
+                    <div class="section-heading">
+                        <div><h3>Apply Leave</h3><p>Naya leave request submit
+                                karein.</p></div>
+                    </div>
+
+                    <!-- LEAVE POLICY DROPDOWN -->
+                    <div class="leave-policy-dropdown">
+                        <button type="button"
+                            class="leave-policy-toggle"
+                            id="leavePolicyToggle">
+                            <span>Leave Policy</span>
+                            <span id="leavePolicyArrow">▼</span>
+                        </button>
+
+                        <div class="leave-policy-content"
+                            id="leavePolicyContent">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <ul id="leavePolicyLeft"></ul>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <ul id="leavePolicyRight"></ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="applyLeaveMessage"></div>
+
+                    <form id="applyLeaveForm"
+                        class="erp-form-card leave-apply-form">
+
+                        <div class="row g-4">
+
+                            <div class="col-md-6">
+                                <label class="form-label">Leave Type <span
+                                        class="required-star">*</span></label>
+                                <select id="leaveType" class="form-select"
+                                    required>
+                                    <option value>-- Choose Option --</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">From Session <span
+                                        class="required-star">*</span></label>
+                                <select id="fromSession" class="form-select"
+                                    required>
+                                    <option value>-- Choose Session --</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">From Date <span
+                                        class="required-star">*</span></label>
+                                <input type="date" id="leaveFromDate"
+                                    class="form-control" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">To Session <span
+                                        class="required-star">*</span></label>
+                                <select id="toSession" class="form-select"
+                                    required>
+                                    <option value>-- Choose Session --</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">To Date <span
+                                        class="required-star">*</span></label>
+                                <input type="date" id="leaveToDate"
+                                    class="form-control" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Contact Details <span
+                                        class="required-star">*</span></label>
+                                <input type="text" id="contactDetails"
+                                    class="form-control"
+                                    placeholder="Phone number during leave"
+                                    required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Number of Days <span
+                                        class="required-star">*</span></label>
+                                <input type="text" id="numberOfDays"
+                                    class="form-control readonly-field"
+                                    readonly>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Balance</label>
+                                <input type="text" id="leaveBalanceField"
+                                    class="form-control readonly-field"
+                                    readonly>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Apply To <span
+                                        class="required-star">*</span></label>
+                                <select id="applyTo" class="form-select"
+                                    required>
+                                    <option value>-- Select --</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Attachment</label>
+                                <input type="file" id="leaveAttachment"
+                                    class="form-control">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">CC To</label>
+                                <div class="cc-input-group">
+                                    <select id="ccSelect" class="form-select">
+                                        <option value>-- Select person
+                                            --</option>
+                                    </select>
+                                    <button type="button" id="addCcButton"
+                                        class="btn btn-add-cc">+ Add</button>
+                                </div>
+                                <div id="ccChipsList" class="cc-chips"></div>
+                            </div>
+
+                        </div>
+
+                        <div class="mt-4">
+                            <label class="form-label">Reason <span
+                                    class="required-star">*</span></label>
+                            <textarea id="leaveReason" class="form-control"
+                                rows="4" required></textarea>
+                        </div>
+
+                        <div class="form-submit-row">
+                            <button type="submit" id="submitLeaveButton"
+                                class="btn btn-primary-erp">Submit</button>
+                        </div>
+
+                    </form>
+                </section>
+
+                <!-- LEAVE BALANCE -->
+                <section id="leave-balanceView" class="content-view d-none">
+                    <div class="section-heading">
+                        <div><h3>Leave Balance</h3><p>View your remaining leave
+                                days by leave type.</p></div>
+                    </div>
+                    <div id="leaveBalanceCards" class="row g-3"></div>
+                </section>
+
+                <!-- MY PAYROLL -->
+                <section id="my-payrollView" class="content-view d-none">
+                    <div class="section-heading">
+                        <div><h3>My Payroll</h3><p>View your salary breakdown
+                                for the current month.</p></div>
+                    </div>
+                    <div id="myPayrollSummary" class="row g-3"></div>
+                </section>
+
+                <!-- PAYSLIPS -->
+                <section id="payslipsView" class="content-view d-none">
+                    <div class="section-heading">
+                        <div><h3>Payslips</h3><p>View or download your previous
+                                payslips anytime.</p></div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table erp-table">
+                            <thead>
+                                <tr><th>Month</th><th>Net
+                                        Pay</th><th>Status</th><th>Action</th></tr>
+                            </thead>
+                            <tbody id="payslipsTableBody"></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- ATTENDANCE CORRECTIONS -->
+                <section id="attendance-correctionsView"
+                    class="content-view d-none">
+                    <div class="section-heading">
+                        <div><h3>Attendance Corrections</h3><p>Submit a request
+                                to correct your attendance.</p></div>
+                        <button type="button" id="newCorrectionButton"
+                            class="btn btn-primary">New Request</button>
+                    </div>
+
+                    <div id="correctionFormWrapper"
+                        class="d-none erp-form-card">
+                        <div id="correctionFormMessage"></div>
+                        <form id="correctionForm" class="erp-form">
+                            <div class="mb-3">
+                                <label class="form-label">Attendance
+                                    Date</label>
+                                <input type="date" id="correctionDate"
+                                    class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Requested
+                                    Change</label>
+                                <input type="text" id="correctionChange"
+                                    class="form-control"
+                                    placeholder="e.g. Check-in time missed"
+                                    required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Reason</label>
+                                <textarea id="correctionReason"
+                                    class="form-control" rows="2"
+                                    required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Submit
+                                Request</button>
+                        </form>
+                    </div>
+
+                    <div id="correctionsMessage"></div>
+                    <div class="table-responsive">
+                        <table class="table erp-table">
+                            <thead>
+                                <tr><th>Date</th><th>Requested
+                                        Change</th><th>Reason</th><th>Status</th></tr>
+                            </thead>
+                            <tbody id="correctionsTableBody"></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- PROFILE -->
+                <!-- PROFILE -->
+                <section id="profileView" class="content-view d-none">
+                    <div class="section-heading">
+                        <div><h1>Profile</h1></div>
+                    </div>
+                    <div id="profileMessage"></div>
+                    <div id="profileCard" class="erp-form-card"></div>
+
+                    <div id="resetPasswordFormWrapper"
+                        class="d-none erp-form-card reset-password-card">
+                        <h4>Reset Password</h4>
+
+                        <div id="resetPasswordMessage"></div>
+
+                        <form id="resetPasswordForm" class="erp-form">
+                            <div class="mb-3">
+                                <label class="form-label">Current Password <span
+                                        class="required-star">*</span></label>
+                                <input type="password" id="currentPasswordField"
+                                    class="form-control" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">New Password <span
+                                        class="required-star">*</span></label>
+                                <input type="password" id="newPasswordField"
+                                    class="form-control" minlength="6" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Confirm New Password
+                                    <span class="required-star">*</span></label>
+                                <input type="password" id="confirmPasswordField"
+                                    class="form-control" minlength="6" required>
+                            </div>
+
+                            <button type="submit"
+                                class="btn btn-primary-erp">Update
+                                Password</button>
+                        </form>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+
+        <script src="../assets/js/bootstrap.bundle.min.js"></script>
+
+        <script src="../js/config.js"></script>
+        <script src="../js/api.js"></script>
+        <script src="../js/auth.js"></script>
+
+        <script src="js/demo-api.js"></script>
+        <script src="js/employee-dashboard.js"></script>
+
+    </body>
+</html>
