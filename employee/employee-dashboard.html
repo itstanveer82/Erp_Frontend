@@ -6,14 +6,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
         <title>Employee Dashboard - Attendance & Payroll ERP</title>
-
-        <!-- <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
-        <link rel="stylesheet" href="/css/admin-dashboard.css">
-        <link rel="stylesheet" href="/employee/style/employee-dashboard.css"> -->
-
         <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
         <link rel="stylesheet" href="../css/admin-dashboard.css">
         <link rel="stylesheet" href="../css/employee/employee-dashboard.css">
+
     </head>
 
     <body>
@@ -56,8 +52,10 @@
                             </div>
 
                             <div class="employee-profile-info">
-                                <strong id="headerEmployeeName">Narendra Modi Ji</strong>
-                                <small id="headerEmployeeId">Prime Minister</small>
+                                <strong id="headerEmployeeName">Narendra Modi
+                                    Ji</strong>
+                                <small id="headerEmployeeId">Prime
+                                    Minister</small>
                             </div>
 
                         </button>
@@ -128,61 +126,70 @@
                         <span class="menu-icon">▦</span> Dashboard
                     </button>
 
-                    <button class="sidebar-item" type="button"
-                        data-view="my-attendance">
-                        <span class="menu-icon">◷</span> My Attendance
+                    <!-- ATTENDANCE GROUP -->
+                    <button class="sidebar-item sidebar-group-toggle"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#attendanceGroup"
+                        aria-expanded="false">
+                        <span class="menu-icon">◷</span> Attendance
+                        <span class="group-arrow">▾</span>
                     </button>
-
-                    <button class="sidebar-item" type="button"
-                        data-view="attendance-calendar">
-                        <span class="menu-icon">▥</span> Attendance Calendar
-                    </button>
-
-                    <button class="sidebar-item" type="button"
-                        data-view="my-leaves">
-                        <span class="menu-icon">✎</span> My Leaves
-                    </button>
-
-                    <button class="sidebar-item" type="button"
-                        data-view="apply-leave">
-                        <span class="menu-icon">➕</span> Apply Leave
-                    </button>
-
-                    <button class="sidebar-item" type="button"
-                        data-view="leave-balance">
-                        <span class="menu-icon">Ⓛ</span> Leave Balance
-                    </button>
-
-                    <button class="sidebar-item" type="button"
-                        data-view="my-payroll">
-                        <span class="menu-icon">₹</span> My Payroll
-                    </button>
-
-                    <button class="sidebar-item" type="button"
-                        data-view="payslips">
-                        <span class="menu-icon">🧾</span> Payslips
-                    </button>
-
-                    <button class="sidebar-item" type="button"
-                        data-view="attendance-corrections">
-                        <span class="menu-icon">⚑</span> Attendance Corrections
-                    </button>
-
-                </div>
-
-                <div class="sidebar-user logout-panel" id="logoutPanel">
-
-                    <div class="sidebar-user-avatar" id="userInitials">
-                        <img id="sidebarProfileImage"
-                            src
-                            alt="Employee"
-                            style="display:none;">
-                        <span id="sidebarInitials">EM</span>
+                    <div class="collapse sidebar-submenu" id="attendanceGroup">
+                        <button class="sidebar-item sidebar-subitem"
+                            type="button" data-view="my-attendance">
+                            My Attendance
+                        </button>
+                        <button class="sidebar-item sidebar-subitem"
+                            type="button" data-view="attendance-calendar">
+                            Attendance Calendar
+                        </button>
+                        <button class="sidebar-item sidebar-subitem"
+                            type="button" data-view="attendance-corrections">
+                            Attendance Corrections
+                        </button>
                     </div>
 
-                    <div class="sidebar-user-info">
-                        <strong>Logout</strong>
-                        <small>Sign out from account</small>
+                    <!-- LEAVES GROUP -->
+                    <button class="sidebar-item sidebar-group-toggle"
+                        type="button"
+                        data-bs-toggle="collapse" data-bs-target="#leavesGroup"
+                        aria-expanded="false">
+                        <span class="menu-icon">✎</span> Leaves
+                        <span class="group-arrow">▾</span>
+                    </button>
+                    <div class="collapse sidebar-submenu" id="leavesGroup">
+                        <button class="sidebar-item sidebar-subitem"
+                            type="button" data-view="my-leaves">
+                            My Leaves
+                        </button>
+                        <button class="sidebar-item sidebar-subitem"
+                            type="button" data-view="apply-leave">
+                            Apply Leave
+                        </button>
+                        <button class="sidebar-item sidebar-subitem"
+                            type="button" data-view="leave-balance">
+                            Leave Balance
+                        </button>
+                    </div>
+
+                    <!-- PAYROLL GROUP -->
+                    <button class="sidebar-item sidebar-group-toggle"
+                        type="button"
+                        data-bs-toggle="collapse" data-bs-target="#payrollGroup"
+                        aria-expanded="false">
+                        <span class="menu-icon">₹</span> Payroll
+                        <span class="group-arrow">▾</span>
+                    </button>
+                    <div class="collapse sidebar-submenu" id="payrollGroup">
+                        <button class="sidebar-item sidebar-subitem"
+                            type="button" data-view="my-payroll">
+                            My Payroll
+                        </button>
+                        <!-- <button class="sidebar-item sidebar-subitem"
+                            type="button" data-view="payslips">
+                            Payslips
+                        </button> -->
                     </div>
 
                 </div>
@@ -490,11 +497,47 @@
                 <!-- MY PAYROLL -->
                 <section id="my-payrollView" class="content-view d-none">
                     <div class="section-heading">
-                        <div><h3>My Payroll</h3><p>View your salary breakdown
-                                for the current month.</p></div>
+                        <div><h3>My Payroll</h3><p>View your salary breakdown by
+                                month.</p></div>
                     </div>
-                    <div id="myPayrollSummary" class="row g-3"></div>
+
+                    <div class="table-responsive">
+                        <table class="table erp-table align-middle">
+                            <thead>
+                                <tr><th>Month</th><th>Net
+                                        Pay</th><th>Status</th><th>Action</th><th>Download</th></th></tr>
+                            </thead>
+                            <tbody id="myPayrollTableBody"></tbody>
+                        </table>
+                    </div>
                 </section>
+
+                <!-- PAYROLL SLIP MODAL -->
+                <div class="modal fade" id="payrollSlipModal" tabindex="-1"
+                    aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content role-modal-content">
+
+                            <div class="modal-header">
+                                <h5 class="modal-title"
+                                    id="payrollSlipModalTitle">Payslip</h5>
+                                <button type="button" class="btn-close"
+                                    data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+
+                            <div class="modal-body"
+                                id="payrollSlipModalBody"></div>
+
+                            <div class="modal-footer">
+                                <button type="button"
+                                    class="secondary-action-btn"
+                                    data-bs-dismiss="modal">Close</button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
 
                 <!-- PAYSLIPS -->
                 <section id="payslipsView" class="content-view d-none">
@@ -573,38 +616,77 @@
                     <div id="profileMessage"></div>
                     <div id="profileCard" class="erp-form-card"></div>
 
-                    <div id="resetPasswordFormWrapper"
-                        class="d-none erp-form-card reset-password-card">
-                        <h4>Reset Password</h4>
+                    <div class="modal fade" id="resetPasswordModal"
+                        tabindex="-1"
+                        aria-labelledby="resetPasswordModalLabel"
+                        aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content role-modal-content">
 
-                        <div id="resetPasswordMessage"></div>
+                                <div class="modal-header">
+                                    <h5 class="modal-title"
+                                        id="resetPasswordModalLabel">
+                                        <span class="modal-title-icon">🔒</span>
+                                        Reset Password
+                                    </h5>
+                                    <button type="button" class="btn-close"
+                                        data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
 
-                        <form id="resetPasswordForm" class="erp-form">
-                            <div class="mb-3">
-                                <label class="form-label">Current Password <span
-                                        class="required-star">*</span></label>
-                                <input type="password" id="currentPasswordField"
-                                    class="form-control" required>
+                                <form id="resetPasswordForm">
+                                    <div class="modal-body">
+                                        <div id="resetPasswordMessage"></div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">Current
+                                                Password <span
+                                                    class="required-star">*</span></label>
+                                            <input type="password"
+                                                id="currentPasswordField"
+                                                class="form-control"
+                                                placeholder="Enter current password"
+                                                required>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">New
+                                                Password <span
+                                                    class="required-star">*</span></label>
+                                            <input type="password"
+                                                id="newPasswordField"
+                                                class="form-control"
+                                                placeholder="Enter new password"
+                                                minlength="6" required>
+                                        </div>
+
+                                        <div class="mb-0">
+                                            <label class="form-label">Confirm
+                                                New Password
+                                                <span
+                                                    class="required-star">*</span></label>
+                                            <input type="password"
+                                                id="confirmPasswordField"
+                                                class="form-control"
+                                                placeholder="Re-enter new password"
+                                                minlength="6" required>
+                                            <small id="confirmPasswordFeedback"
+                                                class="password-match-feedback"></small>
+                                        </div>
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <button type="button"
+                                            class="secondary-action-btn"
+                                            data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit"
+                                            class="btn-primary-erp">Update
+                                            Password</button>
+                                    </div>
+                                </form>
+
                             </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">New Password <span
-                                        class="required-star">*</span></label>
-                                <input type="password" id="newPasswordField"
-                                    class="form-control" minlength="6" required>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">Confirm New Password
-                                    <span class="required-star">*</span></label>
-                                <input type="password" id="confirmPasswordField"
-                                    class="form-control" minlength="6" required>
-                            </div>
-
-                            <button type="submit"
-                                class="btn btn-primary-erp">Update
-                                Password</button>
-                        </form>
+                        </div>
                     </div>
                 </section>
 
@@ -619,6 +701,8 @@
 
         <script src="../js/employee/demo-api.js"></script>
         <script src="../js/employee/employee-dashboard.js"></script>
+
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     </body>
 </html>

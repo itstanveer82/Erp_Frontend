@@ -464,7 +464,7 @@
 
     color: #6c757d;
     font-size: 14px;
-} 
+}
 
 /* Reset Button */
 
@@ -474,25 +474,51 @@
     gap: 8px;
 }
 
+
 .btn-reset-password {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+
     align-self: flex-start;
-    background: #17a2b8;
-    color: #fff;
+    background: #66e5f8;
+    /* color: #fff; */
     border: none;
     padding: 6px 16px;
     border-radius: 6px;
     font-size: 12px;
     font-weight: 600;
     cursor: pointer;
+
+    transition: color 0.3s ease;
 }
 
-.btn-reset-password:hover {
-    background: #138496;
+/* Water drop */
+.btn-reset-password::before {
+    content: "";
+    position: absolute;
+
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+
+    background: #00000033;
+
+    left: 50%;
+    top: 50%;
+
+    transform: translate(-50%, -50%) scale(0);
+
+    transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+
+    z-index: -1;
 }
 
-.reset-password-card {
-    margin-top: 20px;
+/* Hover */
+.btn-reset-password:hover::before {
+    transform: translate(-50%, -50%) scale(15);
 }
+
 
 /* =========================================
    EMPLOYEE PROFILE HEADER
@@ -1043,8 +1069,74 @@
 }
 
 
+/* Reset Password Modal polish */
+#resetPasswordModal .modal-title-icon {
+    margin-right: 6px;
+}
+
+#resetPasswordModal .form-label {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #34383f;
+}
+
+#resetPasswordModal .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+/* SWEET ALERT TITLE SIZE  */
+#resetPasswordModal .custom-alert {
+    margin-bottom: 16px;
+}
+
+/* PASSWORD MATCH FEEDBACK  */
+.small-swal-title {
+    font-size: 18px !important;
+}
+
+.password-match-feedback {
+    display: block;
+    margin-top: 6px;
+    font-size: 0.78rem;
+    font-weight: 500;
+}
+.password-match-feedback.match {
+    color: #34b873;
+}
+.password-match-feedback.mismatch {
+    color: #d65852;
+}
+
+/*  ============================
+         Sidebar groups 
+    ============================ */
+.sidebar-group-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.sidebar-group-toggle .group-arrow {
+    font-size: 10px;
+    margin-left: auto;
+    transition: transform 0.2s ease;
+}
+.sidebar-group-toggle[aria-expanded="true"] .group-arrow {
+    transform: rotate(180deg);
+}
+.sidebar-submenu {
+    display: flex;
+    flex-direction: column;
+}
+.sidebar-subitem {
+    font-size: 0.85rem;
+    padding-left: 44px;
+}
+
+
 /* =========================================
-   RESPONSIVE
+                 RESPONSIVE
    ========================================= */
 
 @media (max-width: 767.98px) {
