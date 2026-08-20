@@ -4,12 +4,12 @@ document.addEventListener("DOMContentLoaded", function () {
     // AUTH CHECK
     // =========================
 
-    // const authData = getAuthData();
+    const authData = getAuthData();
 
-    // if (!authData || !authData.token) {
-    //     window.location.href = "../auth/login.html";
-    //     return;
-    // }
+    if (!authData || !authData.token) {
+        window.location.href = "../auth/login.html";
+        return;
+    }
 
     // =========================
     // NAVBAR / SIDEBAR USER INFO

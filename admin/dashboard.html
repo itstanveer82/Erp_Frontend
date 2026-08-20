@@ -570,11 +570,9 @@
             </section>
 
 
-            <!-- =========================
-                 PROFILE VIEW
-            ========================== -->
+
           <!-- =========================
-     PROFILE VIEW
+    // PROFILE VIEW
 ========================== -->
 <section id="profileView" class="content-view d-none">
 
@@ -801,6 +799,7 @@
         </div>
 
 
+
         <div class="reset-password-actions">
 
             <button
@@ -997,99 +996,83 @@
     </div>
 
 </section>
- <!-- =========================
-     SESSION MANAGEMENT PANEL
-========================= -->
+ 
 
-<!-- =========================
+ <!-- =========================
      SESSION MANAGEMENT MODAL
 ========================= -->
 
-<div
-    class="modal fade"
-    id="sessionsModal"
-    tabindex="-1"
-    aria-labelledby="sessionsModalLabel"
-    aria-hidden="true">
+            <div class="modal fade" id="sessionsModal" tabindex="-1" aria-labelledby="sessionsModalLabel"
+                aria-hidden="true">
 
-    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                <div class="modal-dialog modal-xl modal-dialog-scrollable">
 
-        <div class="modal-content">
+                    <div class="modal-content">
 
-            <!-- HEADER -->
+                        <!-- HEADER -->
 
-            <div class="modal-header">
+                        <div class="modal-header">
 
-                <div>
+                            <div>
 
-                    <p class="page-label mb-1">
-                        SECURITY
-                    </p>
+                                <p class="page-label mb-1">
+                                    SECURITY
+                                </p>
 
-                    <h5
-                        class="modal-title"
-                        id="sessionsModalLabel">
+                                <h5 class="modal-title" id="sessionsModalLabel">
 
-                        Session Management
+                                    Session Management
 
-                    </h5>
+                                </h5>
 
-                    <small class="text-muted">
+                                <small class="text-muted">
 
-                        View and manage devices where your account is logged in.
+                                    View and manage devices where your account is logged in.
 
-                    </small>
+                                </small>
 
-                </div>
+                            </div>
 
 
-                <button
-                    type="button"
-                    class="btn-close"
-                    data-bs-dismiss="modal"
-                    aria-label="Close">
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
 
-                </button>
+                            </button>
 
-            </div>
+                        </div>
 
 
-            <!-- BODY -->
+                        <!-- BODY -->
 
-            <div class="modal-body">
-
-
-                <!-- MESSAGE -->
-
-                <div
-                    id="sessionsMessage"
-                    class="mb-3">
-
-                </div>
+                        <div class="modal-body">
 
 
-                <!-- SESSION LIST -->
+                            <!-- MESSAGE -->
 
-                <div
-                    id="sessionsList"
-                    class="sessions-list">
+                            <div id="sessionsMessage" class="mb-3">
 
-                    <div class="text-center py-4">
+                            </div>
 
-                        Loading sessions...
+
+                            <!-- SESSION LIST -->
+
+                            <div id="sessionsList" class="sessions-list">
+
+                                <div class="text-center py-4">
+
+                                    Loading sessions...
+
+                                </div>
+
+                            </div>
+
+
+                        </div>
 
                     </div>
 
                 </div>
 
-
             </div>
-
-        </div>
-
-    </div>
-
-</div>
 
 
 
@@ -1098,10 +1081,9 @@
             ========================== -->
             <section id="employeesView" class="content-view d-none">
 
-                <div class="page-header">
+                <div class="page-header d-flex justify-content-between align-items-center">
 
                     <div>
-
                         <p class="page-label">
                             EMPLOYEE MANAGEMENT
                         </p>
@@ -1114,7 +1096,13 @@
                             Manage employee records and employee information
                             from the admin panel.
                         </p>
+                    </div>
 
+                    <div>
+                        <button type="button" class="btn btn-primary">
+                            <i class="bi bi-plus-lg"></i>
+                            Add Employee
+                        </button>
                     </div>
 
                 </div>
