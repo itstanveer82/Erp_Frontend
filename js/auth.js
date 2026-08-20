@@ -128,46 +128,61 @@ if (loginForm) {
 
         })
 
-        .then(function (data) {
+            .then(function (data) {
 
-            console.log("LOGIN FULL RESPONSE:", data);
-            console.log("LOGIN DATA:", data.data);
-            console.log("LOGIN TOKEN:", data.data?.accessToken);
-
-
-            // Save authentication data
-
-            saveAuthData(data, rememberMe.checked);
+                console.log("LOGIN FULL RESPONSE:", data);
+                console.log("LOGIN DATA:", data.data);
+                console.log("LOGIN TOKEN:", data.data?.accessToken);
 
 
-            // Redirect after successful login
+                // Save authentication data
 
-            window.location.href = "../admin/dashboard.html";
-
-        })
-
-        .catch(function (error) {
-
-            console.error("Login failed:", error);
-
-            showLoginError(
-                error.message || "Login failed. Please try again."
-            );
+                saveAuthData(data, rememberMe.checked);
 
 
-            // Reset button
+                // Redirect after successful login
 
-            loginButton.disabled = false;
+                // window.location.href = "../admin/dashboard.html";
 
-            if (loginButtonText) {
-                loginButtonText.textContent = "Login";
-            }
+                // Edit by Araj 
+                const roles = data.data.user?.roles || [];
 
-            if (loginLoader) {
-                loginLoader.classList.add("d-none");
-            }
+                if (roles.includes("ROLE_EMPLOYEE") && !roles.includes("ROLE_ADMIN")) {
 
-        });
+                    window.location.href = "../employee/employee-dashboard.html";
+
+                } else {
+
+                    window.location.href = "../admin/dashboard.html";
+
+                }
+
+
+
+            })
+
+            .catch(function (error) {
+
+                console.error("Login failed:", error);
+
+                showLoginError(
+                    error.message || "Login failed. Please try again."
+                );
+
+
+                // Reset button
+
+                loginButton.disabled = false;
+
+                if (loginButtonText) {
+                    loginButtonText.textContent = "Login";
+                }
+
+                if (loginLoader) {
+                    loginLoader.classList.add("d-none");
+                }
+
+            });
 
     });
 
