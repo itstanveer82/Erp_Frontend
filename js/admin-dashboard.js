@@ -38,7 +38,8 @@ document.addEventListener("DOMContentLoaded", function () {
         authData.email ||
         localStorage.getItem("email") ||
         "";
-
+    console.log("email:",email);
+    console.log("authdataaaaaaa:",authData);
 
     const fullName =
         user.name ||
@@ -145,7 +146,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
         userRole.textContent =
             userRoles.length > 0
-                ? userRoles.join(", ")
+                ? userRoles
+                    .map(getDisplayName)
+                    .join(", ")
                 : "ADMIN";
 
     }
@@ -176,7 +179,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
         currentRole.textContent =
             userRoles.length > 0
-                ? userRoles.join(", ")
+                ? userRoles
+                    .map(getDisplayName)
+                    .join(", ")
                 : "ADMIN";
 
     }
@@ -275,9 +280,7 @@ document.addEventListener("DOMContentLoaded", function () {
             roleBadge.textContent =
                 getDisplayName(role);
 
-            dashboardRoles.appendChild(
-                roleBadge
-            );
+            dashboardRoles.appendChild(roleBadge);
 
         });
 
@@ -484,9 +487,7 @@ document.addEventListener("DOMContentLoaded", function () {
             roleBadge.textContent =
                 getDisplayName(role);
 
-            profileRoles.appendChild(
-                roleBadge
-            );
+            profileRoles.appendChild(roleBadge);
 
         });
 
@@ -528,24 +529,22 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
 
-        userPermissions.forEach(
-            function (permission) {
+        userPermissions.forEach(function (permission) {
 
-                const permissionTag =
-                    document.createElement("span");
+            const permissionTag =
+                document.createElement("span");
 
-                permissionTag.className =
-                    "permission-tag";
+            permissionTag.className =
+                "permission-tag";
 
-                permissionTag.textContent =
-                    getDisplayName(permission);
+            permissionTag.textContent =
+                getDisplayName(permission);
 
-                profilePermissions.appendChild(
-                    permissionTag
-                );
+            profilePermissions.appendChild(
+                permissionTag
+            );
 
-            }
-        );
+        });
 
     }
 
@@ -621,7 +620,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
 
-        // Hide all views
         Object.values(views).forEach(
             function (view) {
 
@@ -637,15 +635,12 @@ document.addEventListener("DOMContentLoaded", function () {
         );
 
 
-        // Show selected view
         views[viewName].classList.remove(
             "d-none"
         );
 
 
-        // ==========================
         // UPDATE ACTIVE SIDEBAR
-        // ==========================
 
         document
             .querySelectorAll(
@@ -653,9 +648,7 @@ document.addEventListener("DOMContentLoaded", function () {
             )
             .forEach(function (item) {
 
-                item.classList.remove(
-                    "active"
-                );
+                item.classList.remove("active");
 
 
                 if (
@@ -663,18 +656,14 @@ document.addEventListener("DOMContentLoaded", function () {
                     viewName
                 ) {
 
-                    item.classList.add(
-                        "active"
-                    );
+                    item.classList.add("active");
 
                 }
 
             });
 
 
-        // ==========================
         // CLOSE MOBILE SIDEBAR
-        // ==========================
 
         if (window.innerWidth < 768) {
 
@@ -686,9 +675,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (
                 sidebar &&
-                sidebar.classList.contains(
-                    "show"
-                )
+                sidebar.classList.contains("show")
             ) {
 
                 const collapseInstance =
@@ -708,10 +695,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
 
-        // ==========================
-        // SCROLL TO TOP
-        // ==========================
-
         window.scrollTo({
 
             top: 0,
@@ -720,9 +703,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
 
-        // ==========================
         // LOAD API DATA
-        // ==========================
 
         if (viewName === "roles") {
 
@@ -911,9 +892,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 `;
 
 
-                rolesTableBody.appendChild(
-                    row
-                );
+                rolesTableBody.appendChild(row);
 
             });
 
@@ -1026,9 +1005,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 function (permission) {
 
                     const row =
-                        document.createElement(
-                            "tr"
-                        );
+                        document.createElement("tr");
 
 
                     row.innerHTML = `
@@ -1057,9 +1034,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     `;
 
 
-                    permissionsTableBody.appendChild(
-                        row
-                    );
+                    permissionsTableBody.appendChild(row);
 
                 }
             );
@@ -1091,6 +1066,549 @@ document.addEventListener("DOMContentLoaded", function () {
 
     }
 
+
+    // ==============================
+// SESSION MANAGEMENT
+// ==============================
+
+const sessionsButton =
+    document.getElementById(
+        "sessionsButton"
+    );
+
+
+const sessionsList =
+    document.getElementById(
+        "sessionsList"
+    );
+
+
+const sessionsMessage =
+    document.getElementById(
+        "sessionsMessage"
+    );
+
+
+const sessionsModalElement =
+    document.getElementById(
+        "sessionsModal"
+    );
+
+
+let sessionsModal = null;
+
+
+// ==============================
+// INITIALIZE SESSION MODAL
+// ==============================
+
+if (sessionsModalElement) {
+
+    sessionsModal =
+        new bootstrap.Modal(
+            sessionsModalElement
+        );
+
+}
+
+
+// ==============================
+// OPEN SESSION MODAL
+// ==============================
+
+if (sessionsButton) {
+
+    sessionsButton.addEventListener(
+        "click",
+        async function () {
+
+            if (!sessionsModal) {
+
+                console.error(
+                    "sessionsModal not found"
+                );
+
+                return;
+
+            }
+
+
+            // Open modal first
+
+            sessionsModal.show();
+
+
+            // Then load API data
+
+            await loadSessions();
+
+        }
+    );
+
+}
+
+
+// ==============================
+// LOAD SESSIONS
+// GET /api/sessions
+// ==============================
+
+async function loadSessions() {
+
+    if (!sessionsList) {
+
+        console.error(
+            "sessionsList not found"
+        );
+
+        return;
+
+    }
+
+
+    // Loading state
+
+    sessionsList.innerHTML = `
+        <div class="text-center py-5">
+
+            <div
+                class="spinner-border"
+                role="status">
+
+            </div>
+
+
+            <p class="mt-3 mb-0">
+
+                Loading sessions...
+
+            </p>
+
+        </div>
+    `;
+
+
+    if (sessionsMessage) {
+
+        sessionsMessage.innerHTML = "";
+
+    }
+
+
+    try {
+
+        const response =
+            await apiRequest(
+                "/api/sessions"
+            );
+
+
+        console.log(
+            "Sessions API Response:",
+            response
+        );
+
+
+        const sessions =
+            Array.isArray(response.data)
+                ? response.data
+                : [];
+
+
+        console.log(
+            "Total Sessions:",
+            sessions.length
+        );
+
+
+        // ==========================
+        // NO SESSIONS
+        // ==========================
+
+        if (sessions.length === 0) {
+
+            sessionsList.innerHTML = `
+
+                <div
+                    class="text-center py-5 text-muted">
+
+                    No active sessions found.
+
+                </div>
+
+            `;
+
+            return;
+
+        }
+
+
+        // ==========================
+        // CLEAR LOADING
+        // ==========================
+
+        sessionsList.innerHTML = "";
+
+
+        // ==========================
+        // DISPLAY SESSIONS
+        // ==========================
+
+        sessions.forEach(
+            function (session) {
+
+                const sessionCard =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                sessionCard.className =
+                    "card mb-3 shadow-sm";
+
+
+                const isCurrent =
+                    session.current === true;
+
+
+                const deviceInfo =
+                    session.deviceInfo ||
+                    "Unknown Device";
+
+
+                const ipAddress =
+                    session.ipAddress ||
+                    "--";
+
+
+                sessionCard.innerHTML = `
+
+                    <div class="card-body">
+
+
+                        <!-- TOP -->
+
+                        <div
+                            class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+
+
+                            <!-- DEVICE -->
+
+                            <div>
+
+                                <h6
+                                    class="mb-2">
+
+                                    💻
+                                    ${escapeHtml(
+                                        deviceInfo
+                                    )}
+
+                                </h6>
+
+
+                                <p
+                                    class="mb-1 text-muted">
+
+                                    <strong>
+                                        IP Address:
+                                    </strong>
+
+                                    ${escapeHtml(
+                                        ipAddress
+                                    )}
+
+                                </p>
+
+                            </div>
+
+
+                            <!-- STATUS / REVOKE -->
+
+                            <div>
+
+                                ${isCurrent
+
+                                    ? `
+
+                                        <span
+                                            class="badge text-bg-success">
+
+                                            Current Device
+
+                                        </span>
+
+                                    `
+
+                                    : `
+
+                                        <button
+                                            type="button"
+                                            class="btn btn-outline-danger btn-sm revoke-session-btn"
+                                            data-session-id="${escapeHtml(
+                                                session.id
+                                            )}">
+
+                                            Revoke
+
+                                        </button>
+
+                                    `
+
+                                }
+
+                            </div>
+
+
+                        </div>
+
+
+                        <hr>
+
+
+                        <!-- DATES -->
+
+                        <div
+                            class="row g-3">
+
+
+                            <div
+                                class="col-md-4">
+
+                                <small
+                                    class="text-muted d-block">
+
+                                    Logged In
+
+                                </small>
+
+
+                                <strong>
+
+                                    ${formatSessionDate(
+                                        session.createdAt
+                                    )}
+
+                                </strong>
+
+                            </div>
+
+
+                            <div
+                                class="col-md-4">
+
+                                <small
+                                    class="text-muted d-block">
+
+                                    Last Used
+
+                                </small>
+
+
+                                <strong>
+
+                                    ${formatSessionDate(
+                                        session.lastUsedAt
+                                    )}
+
+                                </strong>
+
+                            </div>
+
+
+                            <div
+                                class="col-md-4">
+
+                                <small
+                                    class="text-muted d-block">
+
+                                    Expires
+
+                                </small>
+
+
+                                <strong>
+
+                                    ${formatSessionDate(
+                                        session.expiryDate
+                                    )}
+
+                                </strong>
+
+                            </div>
+
+
+                        </div>
+
+
+                    </div>
+
+                `;
+
+
+                sessionsList.appendChild(
+                    sessionCard
+                );
+
+            }
+        );
+
+
+        // ==========================
+        // REVOKE BUTTON EVENTS
+        // ==========================
+
+        sessionsList
+            .querySelectorAll(
+                ".revoke-session-btn"
+            )
+            .forEach(
+                function (button) {
+
+                    button.addEventListener(
+                        "click",
+                        async function () {
+
+                            const sessionId =
+                                this.dataset.sessionId;
+
+
+                            await revokeSession(
+                                sessionId
+                            );
+
+                        }
+                    );
+
+                }
+            );
+
+
+    } catch (error) {
+
+        console.error(
+            "Failed to load sessions:",
+            error
+        );
+
+
+        sessionsList.innerHTML = `
+
+            <div
+                class="alert alert-danger">
+
+                ${escapeHtml(
+                    error.message ||
+                    "Failed to load sessions"
+                )}
+
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+// ==============================
+// REVOKE SESSION
+// DELETE /api/sessions/{sessionId}
+// ==============================
+
+async function revokeSession(sessionId) {
+
+    if (
+        sessionId === null ||
+        sessionId === undefined ||
+        sessionId === ""
+    ) {
+
+        return;
+
+    }
+
+
+    const confirmed =
+        confirm(
+            "Are you sure you want to revoke this session?"
+        );
+
+
+    if (!confirmed) {
+
+        return;
+
+    }
+
+
+    try {
+
+        const response =
+            await apiRequest(
+                `/api/sessions/${sessionId}`,
+                {
+                    method: "DELETE"
+                }
+            );
+
+
+        console.log(
+            "Revoke Session Response:",
+            response
+        );
+
+
+        if (sessionsMessage) {
+
+            sessionsMessage.innerHTML = `
+
+                <div
+                    class="alert alert-success">
+
+                    Session revoked successfully.
+
+                </div>
+
+            `;
+
+        }
+
+
+        // Reload updated session list
+
+        await loadSessions();
+
+
+    } catch (error) {
+
+        console.error(
+            "Failed to revoke session:",
+            error
+        );
+
+
+        if (sessionsMessage) {
+
+            sessionsMessage.innerHTML = `
+
+                <div
+                    class="alert alert-danger">
+
+                    ${escapeHtml(
+                        error.message ||
+                        "Failed to revoke session"
+                    )}
+
+                </div>
+
+            `;
+
+        }
+
+    }
+
+}
 
     // ==============================
     // LOGOUT
@@ -1206,6 +1724,44 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
         return div.innerHTML;
+
+    }
+
+
+    // ==============================
+    // FORMAT SESSION DATE
+    // ==============================
+
+    function formatSessionDate(dateValue) {
+
+        if (!dateValue) {
+
+            return "--";
+
+        }
+
+
+        const date =
+            new Date(dateValue);
+
+
+        if (Number.isNaN(date.getTime())) {
+
+            return "--";
+
+        }
+
+
+        return date.toLocaleString(
+            "en-IN",
+            {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit"
+            }
+        );
 
     }
 

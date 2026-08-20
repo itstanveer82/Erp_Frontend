@@ -206,11 +206,25 @@ function showLoginError(message) {
 
 function saveAuthData(data, remember) {
 
+    const loginData = data.data;
+
     const authData = {
 
-        token: data.data.accessToken,
-        email: data.data.email,
-        role: data.data.role
+        token: loginData.accessToken,
+
+        refreshToken: loginData.refreshToken,
+
+        tokenType: loginData.tokenType,
+
+        expiresIn: loginData.expiresIn,
+
+        user: loginData.user,
+
+        email: loginData.user?.email || "",
+
+        role: Array.isArray(loginData.user?.roles)
+            ? loginData.user.roles[0] || ""
+            : ""
 
     };
 
@@ -222,8 +236,6 @@ function saveAuthData(data, remember) {
             JSON.stringify(authData)
         );
 
-        // Remove old session data
-
         sessionStorage.removeItem("authData");
 
     } else {
@@ -232,8 +244,6 @@ function saveAuthData(data, remember) {
             "authData",
             JSON.stringify(authData)
         );
-
-        // Remove old local data
 
         localStorage.removeItem("authData");
 
