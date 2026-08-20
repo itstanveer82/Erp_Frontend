@@ -46,32 +46,65 @@
             </a>
 
 
-            <!-- User Area -->
-            <div class="admin-user-area">
+<!-- ADMIN PROFILE -->
+<div class="admin-profile-wrapper">
 
-                <div class="user-details">
+    <button type="button"
+        id="adminProfileButton"
+        class="admin-profile-button">
 
-                    <span class="user-name" id="userName">
+        <div class="admin-profile-avatar">
+            <span id="headerAdminInitials">AD</span>
+        </div>
 
-                        System Admin
+        <div class="admin-profile-info">
+            <strong id="headerAdminName">System Admin</strong>
+            <small id="headerAdminRole">ADMIN</small>
+        </div>
 
-                    </span>
+    </button>
 
-                    <span class="user-role" id="userRole">
+    <!-- PROFILE DROPDOWN -->
+    <div id="adminProfileDropdown"
+        class="admin-profile-dropdown">
 
-                        ADMIN
+        <div class="admin-dropdown-header">
 
-                    </span>
+            <div class="admin-dropdown-avatar">
+                <span id="dropdownAdminInitials">AD</span>
+            </div>
 
-                </div>
+            <div>
+                <strong id="dropdownAdminName">
+                    System Admin
+                </strong>
 
+                <span id="dropdownAdminRole">
+                    ADMIN
+                </span>
+            </div>
 
-                <!-- Profile -->
-                <button type="button" class="navbar-profile-btn" data-view="profile" title="My Profile">
+        </div>
 
-                    👤
+        <button type="button"
+            id="profileViewButton"
+            class="admin-profile-menu-btn">
 
-                </button>
+            ◍ &nbsp; My Profile
+
+        </button>
+
+        <button type="button"
+            id="dropdownLogoutButton"
+            class="admin-profile-menu-btn admin-logout-menu-btn">
+
+            ⇥ &nbsp; Logout
+
+        </button>
+
+    </div>
+
+</div>
 
             </div>
 
@@ -540,166 +573,430 @@
             <!-- =========================
                  PROFILE VIEW
             ========================== -->
-            <section id="profileView" class="content-view d-none">
+          <!-- =========================
+     PROFILE VIEW
+========================== -->
+<section id="profileView" class="content-view d-none">
 
-                <div class="page-header">
+    <div class="page-header">
 
-                    <div>
+        <div>
 
-                        <p class="page-label">
-                            MY ACCOUNT
-                        </p>
+            <p class="page-label">
+                MY ACCOUNT
+            </p>
 
-                        <h1>
-                            My Profile
-                        </h1>
+            <h1>
+                My Profile
+            </h1>
 
-                        <p>
-                            View your account information and assigned access.
-                        </p>
+            <p>
+                View your account information and assigned access.
+            </p>
 
-                    </div>
+        </div>
 
-                    <!-- Session Button -->
-                    <button type="button" id="sessionsButton" class="sessions-icon-btn" title="Session Management">
+    </div>
 
-                        ◷
 
-                    </button>
+    <!-- ADMIN PROFILE CARD -->
+    <div class="admin-profile-page-card">
+
+
+        <!-- PROFILE HEADER -->
+        <div class="profile-header">
+
+            <div class="profile-avatar">
+                <span id="profileInitials">
+                    AD
+                </span>
+            </div>
+
+
+            <div class="profile-main-info">
+
+                <h2 id="profileName">
+                    System Admin
+                </h2>
+
+                <p id="profileRole">
+                    ADMIN
+                </p>
+
+                <span class="profile-status">
+                    <span class="status-dot"></span>
+                    Active Administrator
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- BASIC INFORMATION -->
+        <div class="profile-section">
+
+            <div class="profile-section-title">
+
+                <span class="profile-section-icon">
+                    👤
+                </span>
+
+                <div>
+
+                    <h4>
+                        Basic Information
+                    </h4>
+
+                    <p>
+                        Administrator account details
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="profile-info-grid">
+
+                <div class="profile-info-item">
+
+                    <span class="profile-label">
+                        Full Name
+                    </span>
+
+                    <strong id="profileFullName">
+                        System Admin
+                    </strong>
 
                 </div>
 
 
-                <!-- Profile Information -->
-                <div class="management-card profile-card">
+                <div class="profile-info-item">
 
-                    <div class="profile-card-header">
+                    <span class="profile-label">
+                        Primary Role
+                    </span>
 
-                        <div class="profile-avatar" id="profileInitials">
+                    <strong id="profilePrimaryRole">
+                        ADMIN
+                    </strong>
 
-                            AD
+                </div>
 
-                        </div>
+            </div>
 
-
-                        <div>
-
-                            <h4 id="profileName">
-                                System Admin
-                            </h4>
-
-                        </div>
-
-                    </div>
+        </div>
 
 
-                    <div class="profile-details">
+        <!-- CONTACT INFORMATION -->
+        <div class="profile-section">
 
-                        <div class="profile-detail-item">
+            <div class="profile-section-title">
 
-                            <span class="profile-detail-label">
-                                Full Name
-                            </span>
+                <span class="profile-section-icon">
+                    📞
+                </span>
 
-                            <strong id="profileFullName">
-                                --
-                            </strong>
+                <div>
 
-                        </div>
+                    <h4>
+                        Contact Information
+                    </h4>
 
+                    <p>
+                        Your registered account details
+                    </p>
 
-                        <div class="profile-detail-item">
+                </div>
 
-                            <span class="profile-detail-label">
-                                Email Address
-                            </span>
-
-                            <strong id="profileEmailAddress">
-                                --
-                            </strong>
-
-                        </div>
+            </div>
 
 
-                        <div class="profile-detail-item">
+            <div class="profile-info-grid">
 
-                            <span class="profile-detail-label">
-                                Assigned Role
-                            </span>
+                <div class="profile-info-item">
 
-                            <strong id="profileRole">
-                                --
-                            </strong>
+                    <span class="profile-label">
+                        Email Address
+                    </span>
 
-                        </div>
-
-                    </div>
+                    <strong id="profileEmail">
+                        --
+                    </strong>
 
                 </div>
 
 
-                <!-- Profile Access -->
-                <section class="dashboard-section">
+                <div class="profile-info-item profile-password-card">
 
-                    <div class="section-heading">
+    <span class="profile-label">
+        Password
+    </span>
 
-                        <div>
+    <button
+        type="button"
+        id="resetPasswordToggleButton"
+        class="btn-reset-password">
 
-                            <h3>
-                                My Access
-                            </h3>
+        Reset Password
 
-                            <p>
-                                Roles and permissions assigned to your account.
-                            </p>
+    </button>
 
-                        </div>
-
-                    </div>
+</div>
 
 
-                    <div class="access-card">
+<!-- RESET PASSWORD FORM -->
+<div
+    id="resetPasswordFormWrapper"
+    class="reset-password-form-wrapper d-none">
 
-                        <span class="access-title">
-                            Assigned Roles
-                        </span>
+    <form id="resetPasswordForm">
 
-
-                        <div id="profileRoles" class="role-badges">
-
-                        </div>
+        <div id="resetPasswordMessage"></div>
 
 
-                        <div class="permissions-preview">
+        <div class="form-group">
 
-                            <div class="permissions-preview-header">
+            <label for="currentPasswordField">
+                Current Password
+            </label>
 
-                                <span>
-                                    Permissions
-                                </span>
+            <input
+                type="password"
+                id="currentPasswordField"
+                class="form-control"
+                autocomplete="current-password">
 
-                                <span id="profilePermissionCount" class="permission-count">
-
-                                    0
-
-                                </span>
-
-                            </div>
+        </div>
 
 
-                            <div id="profilePermissions" class="permission-tags">
+        <div class="form-group">
 
-                            </div>
+            <label for="newPasswordField">
+                New Password
+            </label>
 
-                        </div>
+            <input
+                type="password"
+                id="newPasswordField"
+                class="form-control"
+                autocomplete="new-password">
 
-                    </div>
-
-                </section>
-
-            </section>
+        </div>
 
 
+        <div class="form-group">
+
+            <label for="confirmPasswordField">
+                Confirm New Password
+            </label>
+
+            <input
+                type="password"
+                id="confirmPasswordField"
+                class="form-control"
+                autocomplete="new-password">
+
+        </div>
+
+
+        <div class="reset-password-actions">
+
+            <button
+                type="submit"
+                class="btn btn-primary">
+
+                Update Password
+
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ROLE INFORMATION -->
+        <div class="profile-section">
+
+            <div class="profile-section-title">
+
+                <span class="profile-section-icon">
+                    🛡️
+                </span>
+
+                <div>
+
+                    <h4>
+                        Assigned Roles
+                    </h4>
+
+                    <p>
+                        Roles assigned to your account
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div id="profileRoles"
+                class="profile-access-tags">
+
+            </div>
+
+        </div>
+
+
+        <!-- PERMISSIONS -->
+        <div class="profile-section">
+
+            <div class="profile-section-title">
+
+                <span class="profile-section-icon">
+                    🔐
+                </span>
+
+                <div>
+
+                    <h4>
+                        Assigned Permissions
+                    </h4>
+
+                    <p>
+                        Access permissions available to your account
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="profile-permission-heading">
+
+                <span>
+                    Permissions
+                </span>
+
+                <span id="profilePermissionCount"
+                    class="profile-permission-count">
+
+                    0
+
+                </span>
+
+            </div>
+
+
+            <div id="profilePermissions"
+                class="profile-access-tags">
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- RESET PASSWORD -->
+    <div id="resetPasswordFormWrapper"
+        class="d-none management-card admin-reset-password-card">
+
+        <div class="admin-reset-password-header">
+
+            <div>
+
+                <h4>
+                    Reset Password
+                </h4>
+
+                <p>
+                    Update your account password securely.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div id="resetPasswordMessage"></div>
+
+
+        <form id="resetPasswordForm">
+
+            <div class="row g-3">
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+                        Current Password
+                        <span class="required-star">*</span>
+                    </label>
+
+                    <input type="password"
+                        id="currentPasswordField"
+                        class="form-control"
+                        required>
+
+                </div>
+
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+                        New Password
+                        <span class="required-star">*</span>
+                    </label>
+
+                    <input type="password"
+                        id="newPasswordField"
+                        class="form-control"
+                        minlength="6"
+                        required>
+
+                </div>
+
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+                        Confirm New Password
+                        <span class="required-star">*</span>
+                    </label>
+
+                    <input type="password"
+                        id="confirmPasswordField"
+                        class="form-control"
+                        minlength="6"
+                        required>
+
+                </div>
+
+            </div>
+
+
+            <div class="admin-password-action-row">
+
+                <button type="submit"
+                    class="primary-action-btn">
+
+                    Update Password
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</section>
  <!-- =========================
      SESSION MANAGEMENT PANEL
 ========================= -->
