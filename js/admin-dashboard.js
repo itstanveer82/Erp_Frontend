@@ -1042,7 +1042,93 @@ if (profileViewButton) {
 
     }
 
+// =========================================
+// ADD ROLE
+// =========================================
 
+const addRoleModal = new bootstrap.Modal(
+    document.getElementById("addRoleModal")
+);
+
+
+document.getElementById("addRoleButton")
+    .addEventListener("click", function () {
+
+        document.getElementById("addRoleForm").reset();
+
+        document.getElementById("addRoleMessage").innerHTML = "";
+
+        addRoleModal.show();
+
+    });
+
+
+document.getElementById("addRoleForm")
+    .addEventListener("submit", async function (event) {
+
+        event.preventDefault();
+
+
+        const name =
+            document.getElementById("roleName")
+                .value.trim();
+
+        const description =
+            document.getElementById("roleDescription")
+                .value.trim();
+
+
+        if (!name || !description) {
+
+            document.getElementById("addRoleMessage").innerHTML =
+                `<div class="custom-alert error">
+                    Please fill all fields.
+                </div>`;
+
+            return;
+
+        }
+
+
+        try {
+
+            const response =
+                await apiRequest("/api/roles", {
+
+                    method: "POST",
+
+                    body: JSON.stringify({
+                        name: name,
+                        description: description
+                    })
+
+                });
+
+
+            if (response.success === false) {
+
+                throw new Error(
+                    response.message || "Failed to add role"
+                );
+
+            }
+
+
+            await loadRoles();
+
+            addRoleModal.hide();
+
+
+        } catch (error) {
+
+            document.getElementById("addRoleMessage").innerHTML =
+                `<div class="custom-alert error">
+                    ${escapeHtml(error.message)}
+                </div>`;
+
+        }
+
+    });
     // ==============================
     // LOAD ALL PERMISSIONS
     // GET /api/permissions

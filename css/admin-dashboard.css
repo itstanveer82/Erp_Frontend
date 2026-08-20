@@ -2151,8 +2151,7 @@ body {
 
 
 
-   RESPONSIVE
-========================================= */
+
 
 @media (max-width: 767.98px) {
 
@@ -2187,4 +2186,10 @@ body {
         grid-template-columns: 1fr;
     }
 
+     /* Menu sidebar: full width only when opened */
+    #dashboardSidebar.collapse.show {
+        width: 100% !important;
+        max-width: none !important;
+        min-width: 0 !important;
+    }
 }
