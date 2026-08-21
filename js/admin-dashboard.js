@@ -38,8 +38,8 @@ document.addEventListener("DOMContentLoaded", function () {
         authData.email ||
         localStorage.getItem("email") ||
         "";
-    console.log("email:",email);
-    console.log("authdataaaaaaa:",authData);
+    console.log("email:", email);
+    console.log("authdataaaaaaa:", authData);
 
     const fullName =
         user.name ||
@@ -238,7 +238,101 @@ document.addEventListener("DOMContentLoaded", function () {
 
     initials = initials.toUpperCase();
 
+    // ==============================
+    // ADMIN PROFILE DROPDOWN
+    // ==============================
 
+    const adminProfileButton =
+        document.getElementById("adminProfileButton");
+
+    const adminProfileDropdown =
+        document.getElementById("adminProfileDropdown");
+
+    const headerAdminInitials =
+        document.getElementById("headerAdminInitials");
+
+    const headerAdminName =
+        document.getElementById("headerAdminName");
+
+    const headerAdminRole =
+        document.getElementById("headerAdminRole");
+
+    const dropdownAdminInitials =
+        document.getElementById("dropdownAdminInitials");
+
+    const dropdownAdminName =
+        document.getElementById("dropdownAdminName");
+
+    const dropdownAdminRole =
+        document.getElementById("dropdownAdminRole");
+
+
+    const displayRole =
+        userRoles.length > 0
+            ? userRoles.map(getDisplayName).join(", ")
+            : "ADMIN";
+
+
+    // Header profile data
+
+    if (headerAdminInitials) {
+        headerAdminInitials.textContent = initials;
+    }
+
+    if (headerAdminName) {
+        headerAdminName.textContent = fullName;
+    }
+
+    if (headerAdminRole) {
+        headerAdminRole.textContent = displayRole;
+    }
+
+
+    // Dropdown profile data
+
+    if (dropdownAdminInitials) {
+        dropdownAdminInitials.textContent = initials;
+    }
+
+    if (dropdownAdminName) {
+        dropdownAdminName.textContent = fullName;
+    }
+
+    if (dropdownAdminRole) {
+        dropdownAdminRole.textContent = displayRole;
+    }
+
+
+    // Open / close dropdown
+
+    if (adminProfileButton && adminProfileDropdown) {
+
+        adminProfileButton.addEventListener("click", function (event) {
+
+            event.stopPropagation();
+
+            adminProfileDropdown.classList.toggle("show");
+
+        });
+
+
+        document.addEventListener("click", function () {
+
+            adminProfileDropdown.classList.remove("show");
+
+        });
+
+
+        adminProfileDropdown.addEventListener(
+            "click",
+            function (event) {
+
+                event.stopPropagation();
+
+            }
+        );
+
+    }
     // ==============================
     // DASHBOARD ROLES
     // ==============================
@@ -396,6 +490,8 @@ document.addEventListener("DOMContentLoaded", function () {
             "profilePermissionCount"
         );
 
+    const profilePrimaryRole =
+        document.getElementById("profilePrimaryRole");
 
     if (profileName) {
 
@@ -440,7 +536,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     }
 
-
+    if (profilePrimaryRole) {
+        profilePrimaryRole.textContent = displayRole;
+    }
     if (profileInitials) {
 
         profileInitials.textContent =
@@ -720,6 +818,27 @@ document.addEventListener("DOMContentLoaded", function () {
 
     }
 
+    // ==============================
+// OPEN MY PROFILE
+// ==============================
+
+const profileViewButton =
+    document.getElementById("profileViewButton");
+
+
+if (profileViewButton) {
+
+    profileViewButton.addEventListener("click", function () {
+
+        showView("profile");
+
+        if (adminProfileDropdown) {
+            adminProfileDropdown.classList.remove("show");
+        }
+
+    });
+
+}
 
     // ==============================
     // SIDEBAR + QUICK ACTIONS +
@@ -843,8 +962,8 @@ document.addEventListener("DOMContentLoaded", function () {
                                 return `
                                     <span class="small-permission-tag">
                                         ${escapeHtml(
-                                            getDisplayName(permission)
-                                        )}
+                                    getDisplayName(permission)
+                                )}
                                     </span>
                                 `;
 
@@ -869,14 +988,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     <td class="table-role-name">
                         ${escapeHtml(
-                            getDisplayName(role)
-                        )}
+                    getDisplayName(role)
+                )}
                     </td>
 
                     <td class="table-description">
                         ${escapeHtml(
-                            role.description || "--"
-                        )}
+                    role.description || "--"
+                )}
                     </td>
 
                     <td class="table-permissions">
@@ -911,9 +1030,9 @@ document.addEventListener("DOMContentLoaded", function () {
                         class="text-center py-4 text-danger">
 
                         ${escapeHtml(
-                            error.message ||
-                            "Failed to load roles"
-                        )}
+                error.message ||
+                "Failed to load roles"
+            )}
 
                     </td>
                 </tr>
@@ -1012,23 +1131,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
                         <td>
                             ${escapeHtml(
-                                permission.id
-                            )}
+                        permission.id
+                    )}
                         </td>
 
                         <td class="table-permission-name">
                             ${escapeHtml(
-                                getDisplayName(
-                                    permission
-                                )
-                            )}
+                        getDisplayName(
+                            permission
+                        )
+                    )}
                         </td>
 
                         <td class="table-description">
                             ${escapeHtml(
-                                permission.description ||
-                                "--"
-                            )}
+                        permission.description ||
+                        "--"
+                    )}
                         </td>
 
                     `;
@@ -1054,9 +1173,9 @@ document.addEventListener("DOMContentLoaded", function () {
                         class="text-center py-4 text-danger">
 
                         ${escapeHtml(
-                            error.message ||
-                            "Failed to load permissions"
-                        )}
+                error.message ||
+                "Failed to load permissions"
+            )}
 
                     </td>
                 </tr>
@@ -1068,107 +1187,107 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // ==============================
-// SESSION MANAGEMENT
-// ==============================
+    // SESSION MANAGEMENT
+    // ==============================
 
-const sessionsButton =
-    document.getElementById(
-        "sessionsButton"
-    );
-
-
-const sessionsList =
-    document.getElementById(
-        "sessionsList"
-    );
-
-
-const sessionsMessage =
-    document.getElementById(
-        "sessionsMessage"
-    );
-
-
-const sessionsModalElement =
-    document.getElementById(
-        "sessionsModal"
-    );
-
-
-let sessionsModal = null;
-
-
-// ==============================
-// INITIALIZE SESSION MODAL
-// ==============================
-
-if (sessionsModalElement) {
-
-    sessionsModal =
-        new bootstrap.Modal(
-            sessionsModalElement
+    const sessionsButton =
+        document.getElementById(
+            "sessionsButton"
         );
 
-}
 
-
-// ==============================
-// OPEN SESSION MODAL
-// ==============================
-
-if (sessionsButton) {
-
-    sessionsButton.addEventListener(
-        "click",
-        async function () {
-
-            if (!sessionsModal) {
-
-                console.error(
-                    "sessionsModal not found"
-                );
-
-                return;
-
-            }
-
-
-            // Open modal first
-
-            sessionsModal.show();
-
-
-            // Then load API data
-
-            await loadSessions();
-
-        }
-    );
-
-}
-
-
-// ==============================
-// LOAD SESSIONS
-// GET /api/sessions
-// ==============================
-
-async function loadSessions() {
-
-    if (!sessionsList) {
-
-        console.error(
-            "sessionsList not found"
+    const sessionsList =
+        document.getElementById(
+            "sessionsList"
         );
 
-        return;
+
+    const sessionsMessage =
+        document.getElementById(
+            "sessionsMessage"
+        );
+
+
+    const sessionsModalElement =
+        document.getElementById(
+            "sessionsModal"
+        );
+
+
+    let sessionsModal = null;
+
+
+    // ==============================
+    // INITIALIZE SESSION MODAL
+    // ==============================
+
+    if (sessionsModalElement) {
+
+        sessionsModal =
+            new bootstrap.Modal(
+                sessionsModalElement
+            );
 
     }
 
 
-    // Loading state
+    // ==============================
+    // OPEN SESSION MODAL
+    // ==============================
 
-    sessionsList.innerHTML = `
+    if (sessionsButton) {
+
+        sessionsButton.addEventListener(
+            "click",
+            async function () {
+
+                if (!sessionsModal) {
+
+                    console.error(
+                        "sessionsModal not found"
+                    );
+
+                    return;
+
+                }
+
+
+                // Open modal first
+
+                sessionsModal.show();
+
+
+                // Then load API data
+
+                await loadSessions();
+
+            }
+        );
+
+    }
+
+
+    // ==============================
+    // LOAD SESSIONS
+    // GET /api/sessions
+    // ==============================
+
+    async function loadSessions() {
+
+        if (!sessionsList) {
+
+            console.error(
+                "sessionsList not found"
+            );
+
+            return;
+
+        }
+
+
+        // Loading state
+
+        sessionsList.innerHTML = `
         <div class="text-center py-5">
 
             <div
@@ -1188,46 +1307,46 @@ async function loadSessions() {
     `;
 
 
-    if (sessionsMessage) {
+        if (sessionsMessage) {
 
-        sessionsMessage.innerHTML = "";
+            sessionsMessage.innerHTML = "";
 
-    }
+        }
 
 
-    try {
+        try {
 
-        const response =
-            await apiRequest(
-                "/api/sessions"
+            const response =
+                await apiRequest(
+                    "/api/sessions"
+                );
+
+
+            console.log(
+                "Sessions API Response:",
+                response
             );
 
 
-        console.log(
-            "Sessions API Response:",
-            response
-        );
+            const sessions =
+                Array.isArray(response.data)
+                    ? response.data
+                    : [];
 
 
-        const sessions =
-            Array.isArray(response.data)
-                ? response.data
-                : [];
+            console.log(
+                "Total Sessions:",
+                sessions.length
+            );
 
 
-        console.log(
-            "Total Sessions:",
-            sessions.length
-        );
+            // ==========================
+            // NO SESSIONS
+            // ==========================
 
+            if (sessions.length === 0) {
 
-        // ==========================
-        // NO SESSIONS
-        // ==========================
-
-        if (sessions.length === 0) {
-
-            sessionsList.innerHTML = `
+                sessionsList.innerHTML = `
 
                 <div
                     class="text-center py-5 text-muted">
@@ -1238,50 +1357,50 @@ async function loadSessions() {
 
             `;
 
-            return;
+                return;
 
-        }
-
-
-        // ==========================
-        // CLEAR LOADING
-        // ==========================
-
-        sessionsList.innerHTML = "";
+            }
 
 
-        // ==========================
-        // DISPLAY SESSIONS
-        // ==========================
+            // ==========================
+            // CLEAR LOADING
+            // ==========================
 
-        sessions.forEach(
-            function (session) {
-
-                const sessionCard =
-                    document.createElement(
-                        "div"
-                    );
+            sessionsList.innerHTML = "";
 
 
-                sessionCard.className =
-                    "card mb-3 shadow-sm";
+            // ==========================
+            // DISPLAY SESSIONS
+            // ==========================
+
+            sessions.forEach(
+                function (session) {
+
+                    const sessionCard =
+                        document.createElement(
+                            "div"
+                        );
 
 
-                const isCurrent =
-                    session.current === true;
+                    sessionCard.className =
+                        "card mb-3 shadow-sm";
 
 
-                const deviceInfo =
-                    session.deviceInfo ||
-                    "Unknown Device";
+                    const isCurrent =
+                        session.current === true;
 
 
-                const ipAddress =
-                    session.ipAddress ||
-                    "--";
+                    const deviceInfo =
+                        session.deviceInfo ||
+                        "Unknown Device";
 
 
-                sessionCard.innerHTML = `
+                    const ipAddress =
+                        session.ipAddress ||
+                        "--";
+
+
+                    sessionCard.innerHTML = `
 
                     <div class="card-body">
 
@@ -1301,8 +1420,8 @@ async function loadSessions() {
 
                                     💻
                                     ${escapeHtml(
-                                        deviceInfo
-                                    )}
+                        deviceInfo
+                    )}
 
                                 </h6>
 
@@ -1315,8 +1434,8 @@ async function loadSessions() {
                                     </strong>
 
                                     ${escapeHtml(
-                                        ipAddress
-                                    )}
+                        ipAddress
+                    )}
 
                                 </p>
 
@@ -1329,7 +1448,7 @@ async function loadSessions() {
 
                                 ${isCurrent
 
-                                    ? `
+                            ? `
 
                                         <span
                                             class="badge text-bg-success">
@@ -1340,14 +1459,14 @@ async function loadSessions() {
 
                                     `
 
-                                    : `
+                            : `
 
                                         <button
                                             type="button"
                                             class="btn btn-outline-danger btn-sm revoke-session-btn"
                                             data-session-id="${escapeHtml(
-                                                session.id
-                                            )}">
+                                session.id
+                            )}">
 
                                             Revoke
 
@@ -1355,7 +1474,7 @@ async function loadSessions() {
 
                                     `
 
-                                }
+                        }
 
                             </div>
 
@@ -1386,8 +1505,8 @@ async function loadSessions() {
                                 <strong>
 
                                     ${formatSessionDate(
-                                        session.createdAt
-                                    )}
+                            session.createdAt
+                        )}
 
                                 </strong>
 
@@ -1408,8 +1527,8 @@ async function loadSessions() {
                                 <strong>
 
                                     ${formatSessionDate(
-                                        session.lastUsedAt
-                                    )}
+                            session.lastUsedAt
+                        )}
 
                                 </strong>
 
@@ -1430,8 +1549,8 @@ async function loadSessions() {
                                 <strong>
 
                                     ${formatSessionDate(
-                                        session.expiryDate
-                                    )}
+                            session.expiryDate
+                        )}
 
                                 </strong>
 
@@ -1446,122 +1565,122 @@ async function loadSessions() {
                 `;
 
 
-                sessionsList.appendChild(
-                    sessionCard
-                );
-
-            }
-        );
-
-
-        // ==========================
-        // REVOKE BUTTON EVENTS
-        // ==========================
-
-        sessionsList
-            .querySelectorAll(
-                ".revoke-session-btn"
-            )
-            .forEach(
-                function (button) {
-
-                    button.addEventListener(
-                        "click",
-                        async function () {
-
-                            const sessionId =
-                                this.dataset.sessionId;
-
-
-                            await revokeSession(
-                                sessionId
-                            );
-
-                        }
+                    sessionsList.appendChild(
+                        sessionCard
                     );
 
                 }
             );
 
 
-    } catch (error) {
+            // ==========================
+            // REVOKE BUTTON EVENTS
+            // ==========================
 
-        console.error(
-            "Failed to load sessions:",
-            error
-        );
+            sessionsList
+                .querySelectorAll(
+                    ".revoke-session-btn"
+                )
+                .forEach(
+                    function (button) {
+
+                        button.addEventListener(
+                            "click",
+                            async function () {
+
+                                const sessionId =
+                                    this.dataset.sessionId;
 
 
-        sessionsList.innerHTML = `
+                                await revokeSession(
+                                    sessionId
+                                );
+
+                            }
+                        );
+
+                    }
+                );
+
+
+        } catch (error) {
+
+            console.error(
+                "Failed to load sessions:",
+                error
+            );
+
+
+            sessionsList.innerHTML = `
 
             <div
                 class="alert alert-danger">
 
                 ${escapeHtml(
-                    error.message ||
-                    "Failed to load sessions"
-                )}
+                error.message ||
+                "Failed to load sessions"
+            )}
 
             </div>
 
         `;
 
-    }
-
-}
-
-
-// ==============================
-// REVOKE SESSION
-// DELETE /api/sessions/{sessionId}
-// ==============================
-
-async function revokeSession(sessionId) {
-
-    if (
-        sessionId === null ||
-        sessionId === undefined ||
-        sessionId === ""
-    ) {
-
-        return;
+        }
 
     }
 
 
-    const confirmed =
-        confirm(
-            "Are you sure you want to revoke this session?"
-        );
+    // ==============================
+    // REVOKE SESSION
+    // DELETE /api/sessions/{sessionId}
+    // ==============================
+
+    async function revokeSession(sessionId) {
+
+        if (
+            sessionId === null ||
+            sessionId === undefined ||
+            sessionId === ""
+        ) {
+
+            return;
+
+        }
 
 
-    if (!confirmed) {
-
-        return;
-
-    }
-
-
-    try {
-
-        const response =
-            await apiRequest(
-                `/api/sessions/${sessionId}`,
-                {
-                    method: "DELETE"
-                }
+        const confirmed =
+            confirm(
+                "Are you sure you want to revoke this session?"
             );
 
 
-        console.log(
-            "Revoke Session Response:",
-            response
-        );
+        if (!confirmed) {
+
+            return;
+
+        }
 
 
-        if (sessionsMessage) {
+        try {
 
-            sessionsMessage.innerHTML = `
+            const response =
+                await apiRequest(
+                    `/api/sessions/${sessionId}`,
+                    {
+                        method: "DELETE"
+                    }
+                );
+
+
+            console.log(
+                "Revoke Session Response:",
+                response
+            );
+
+
+            if (sessionsMessage) {
+
+                sessionsMessage.innerHTML = `
 
                 <div
                     class="alert alert-success">
@@ -1572,43 +1691,43 @@ async function revokeSession(sessionId) {
 
             `;
 
-        }
+            }
 
 
-        // Reload updated session list
+            // Reload updated session list
 
-        await loadSessions();
-
-
-    } catch (error) {
-
-        console.error(
-            "Failed to revoke session:",
-            error
-        );
+            await loadSessions();
 
 
-        if (sessionsMessage) {
+        } catch (error) {
 
-            sessionsMessage.innerHTML = `
+            console.error(
+                "Failed to revoke session:",
+                error
+            );
+
+
+            if (sessionsMessage) {
+
+                sessionsMessage.innerHTML = `
 
                 <div
                     class="alert alert-danger">
 
                     ${escapeHtml(
-                        error.message ||
-                        "Failed to revoke session"
-                    )}
+                    error.message ||
+                    "Failed to revoke session"
+                )}
 
                 </div>
 
             `;
 
+            }
+
         }
 
     }
-
-}
 
     // ==============================
     // LOGOUT
@@ -1654,6 +1773,418 @@ async function revokeSession(sessionId) {
         );
 
     }
+
+
+    // ==============================
+// DROPDOWN LOGOUT
+// ==============================
+
+const dropdownLogoutButton =
+    document.getElementById("dropdownLogoutButton");
+
+
+if (dropdownLogoutButton) {
+
+    dropdownLogoutButton.addEventListener("click", function () {
+
+        if (typeof logout === "function") {
+
+            logout();
+            return;
+
+        }
+
+        localStorage.clear();
+        sessionStorage.clear();
+
+        window.location.href =
+            "../auth/login.html";
+
+    });
+
+}
+
+
+// =========================================
+// ADMIN DASHBOARD - RESET PASSWORD
+// Uses ACTUAL API
+// POST /api/auth/change-password
+// =========================================
+
+
+// =========================================
+// CLICK HANDLER
+// Handles:
+// 1. Reset Password button
+// 2. Reset Password form submit
+// =========================================
+
+document.addEventListener("click", function (event) {
+
+    // =====================================
+    // OPEN / CLOSE RESET PASSWORD FORM
+    // =====================================
+
+    const resetButton =
+        event.target.closest("#resetPasswordToggleButton");
+
+
+    if (!resetButton) {
+        return;
+    }
+
+
+    event.preventDefault();
+
+
+    console.log("Reset Password button clicked");
+
+
+    const resetPasswordFormWrapper =
+        document.getElementById(
+            "resetPasswordFormWrapper"
+        );
+
+
+    const resetPasswordMessage =
+        document.getElementById(
+            "resetPasswordMessage"
+        );
+
+
+    if (!resetPasswordFormWrapper) {
+
+        console.error(
+            "ERROR: resetPasswordFormWrapper not found"
+        );
+
+        return;
+    }
+
+
+    resetPasswordFormWrapper.classList.toggle(
+        "d-none"
+    );
+
+
+    console.log(
+        "Reset password form toggled"
+    );
+
+
+    if (resetPasswordMessage) {
+
+        resetPasswordMessage.innerHTML = "";
+
+    }
+
+});
+
+
+// =========================================
+// FORM SUBMIT
+// Event delegation
+// =========================================
+
+document.addEventListener(
+    "submit",
+    async function (event) {
+
+        const form =
+            event.target.closest(
+                "#resetPasswordForm"
+            );
+
+
+        // Not our reset password form
+
+        if (!form) {
+            return;
+        }
+
+
+        event.preventDefault();
+
+
+        console.log(
+            "Reset Password form submitted"
+        );
+
+
+        // =====================================
+        // GET ELEMENTS
+        // =====================================
+
+        const resetPasswordMessage =
+            document.getElementById(
+                "resetPasswordMessage"
+            );
+
+
+        const currentPasswordField =
+            document.getElementById(
+                "currentPasswordField"
+            );
+
+
+        const newPasswordField =
+            document.getElementById(
+                "newPasswordField"
+            );
+
+
+        const confirmPasswordField =
+            document.getElementById(
+                "confirmPasswordField"
+            );
+
+
+        // =====================================
+        // CHECK ELEMENTS
+        // =====================================
+
+        if (
+            !resetPasswordMessage ||
+            !currentPasswordField ||
+            !newPasswordField ||
+            !confirmPasswordField
+        ) {
+
+            console.error(
+                "ERROR: Reset password elements not found"
+            );
+
+            return;
+        }
+
+
+        // =====================================
+        // GET VALUES
+        // Don't trim passwords
+        // =====================================
+
+        const oldPassword =
+            currentPasswordField.value;
+
+
+        const newPassword =
+            newPasswordField.value;
+
+
+        const confirmPassword =
+            confirmPasswordField.value;
+
+
+        console.log(
+            "Password fields received"
+        );
+
+
+        // =====================================
+        // VALIDATION
+        // =====================================
+
+        resetPasswordMessage.innerHTML = "";
+
+
+        if (
+            !oldPassword ||
+            !newPassword ||
+            !confirmPassword
+        ) {
+
+            resetPasswordMessage.innerHTML =
+                `<div class="custom-alert error">
+                    Please fill in all password fields.
+                </div>`;
+
+            return;
+        }
+
+
+        if (
+            newPassword !== confirmPassword
+        ) {
+
+            resetPasswordMessage.innerHTML =
+                `<div class="custom-alert error">
+                    New password and confirm password do not match.
+                </div>`;
+
+            return;
+        }
+
+
+        if (newPassword.length < 6) {
+
+            resetPasswordMessage.innerHTML =
+                `<div class="custom-alert error">
+                    Password must be at least 6 characters.
+                </div>`;
+
+            return;
+        }
+
+
+        // =====================================
+        // SUBMIT BUTTON
+        // =====================================
+
+        const submitButton =
+            form.querySelector(
+                'button[type="submit"]'
+            );
+
+
+        const originalButtonText =
+            submitButton
+                ? submitButton.textContent
+                : "Update Password";
+
+
+        if (submitButton) {
+
+            submitButton.disabled = true;
+
+            submitButton.textContent =
+                "Updating...";
+
+        }
+
+
+        // =====================================
+        // ACTUAL API CALL
+        // =====================================
+
+        try {
+
+            const payload = {
+
+                oldPassword: oldPassword,
+
+                newPassword: newPassword
+
+            };
+
+
+            console.log(
+                "Change Password Request:",
+                payload
+            );
+
+
+            const response =
+                await apiRequest(
+                    "/api/auth/change-password",
+                    {
+
+                        method: "POST",
+
+                        body: JSON.stringify(
+                            payload
+                        )
+
+                    }
+                );
+
+
+            console.log(
+                "Change Password Response:",
+                response
+            );
+
+
+            // =================================
+            // BACKEND RETURNED FAILURE
+            // =================================
+
+            if (
+                response &&
+                response.success === false
+            ) {
+
+                resetPasswordMessage.innerHTML =
+                    `<div class="custom-alert error">
+                        ${escapeHtml(
+                            response.message ||
+                            "Password update failed."
+                        )}
+                    </div>`;
+
+                return;
+            }
+
+
+            // =================================
+            // SUCCESS
+            // =================================
+
+            resetPasswordMessage.innerHTML =
+                `<div class="custom-alert success">
+                    ${escapeHtml(
+                        response.message ||
+                        "Password updated successfully."
+                    )}
+                </div>`;
+
+
+            form.reset();
+
+
+            setTimeout(function () {
+
+                const wrapper =
+                    document.getElementById(
+                        "resetPasswordFormWrapper"
+                    );
+
+
+                if (wrapper) {
+
+                    wrapper.classList.add(
+                        "d-none"
+                    );
+
+                }
+
+
+                resetPasswordMessage.innerHTML = "";
+
+            }, 1500);
+
+
+        } catch (error) {
+
+            console.error(
+                "Change Password API Error:",
+                error
+            );
+
+
+            resetPasswordMessage.innerHTML =
+                `<div class="custom-alert error">
+                    ${escapeHtml(
+                        error.message ||
+                        "Something went wrong. Please try again."
+                    )}
+                </div>`;
+
+
+        } finally {
+
+            if (submitButton) {
+
+                submitButton.disabled = false;
+
+                submitButton.textContent =
+                    originalButtonText;
+
+            }
+
+        }
+
+    }
+);
 
 
     // ==============================
@@ -1765,4 +2296,75 @@ async function revokeSession(sessionId) {
 
     }
 
+});
+
+
+// ==============================
+
+document.getElementById("addEmployeeForm").addEventListener("submit", async function (event) {
+
+    event.preventDefault();
+
+    const selectedRms = Array.from(
+        document.getElementById("rms").selectedOptions
+    ).map(option => option.value);
+
+    const request = {
+        empName: document.getElementById("empName").value.trim(),
+        empEmail: document.getElementById("empEmail").value.trim(),
+        dateOfBirth: document.getElementById("dateOfBirth").value,
+        phone: document.getElementById("phone").value.trim(),
+        gender: document.getElementById("gender").value,
+        shift: document.getElementById("shift").value,
+        rms: selectedRms,
+        address: document.getElementById("address").value.trim(),
+        salary: Number(document.getElementById("salary").value)
+    };
+
+    try {
+
+        const response = await fetch("/api/employees", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(request)
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || "Failed to create employee");
+        }
+
+        const employee = await response.json();
+
+        console.log("Employee created:", employee);
+
+        alert(
+            "Employee created successfully!\nEmployee Code: "
+            + employee.empCode
+        );
+
+        // Close modal
+        const modalElement =
+            document.getElementById("addEmployeeModal");
+
+        const modal =
+            bootstrap.Modal.getInstance(modalElement);
+
+        modal.hide();
+
+        // Reset form
+        document.getElementById("addEmployeeForm").reset();
+
+        // Optional: reload employee table
+        // loadEmployees();
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(error.message);
+
+    }
 });
