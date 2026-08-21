@@ -2297,3 +2297,74 @@ document.addEventListener(
     }
 
 });
+
+
+// ==============================
+
+document.getElementById("addEmployeeForm").addEventListener("submit", async function (event) {
+
+    event.preventDefault();
+
+    const selectedRms = Array.from(
+        document.getElementById("rms").selectedOptions
+    ).map(option => option.value);
+
+    const request = {
+        empName: document.getElementById("empName").value.trim(),
+        empEmail: document.getElementById("empEmail").value.trim(),
+        dateOfBirth: document.getElementById("dateOfBirth").value,
+        phone: document.getElementById("phone").value.trim(),
+        gender: document.getElementById("gender").value,
+        shift: document.getElementById("shift").value,
+        rms: selectedRms,
+        address: document.getElementById("address").value.trim(),
+        salary: Number(document.getElementById("salary").value)
+    };
+
+    try {
+
+        const response = await fetch("/api/employees", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(request)
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || "Failed to create employee");
+        }
+
+        const employee = await response.json();
+
+        console.log("Employee created:", employee);
+
+        alert(
+            "Employee created successfully!\nEmployee Code: "
+            + employee.empCode
+        );
+
+        // Close modal
+        const modalElement =
+            document.getElementById("addEmployeeModal");
+
+        const modal =
+            bootstrap.Modal.getInstance(modalElement);
+
+        modal.hide();
+
+        // Reset form
+        document.getElementById("addEmployeeForm").reset();
+
+        // Optional: reload employee table
+        // loadEmployees();
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(error.message);
+
+    }
+});
