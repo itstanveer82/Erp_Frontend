@@ -1,28 +1,23 @@
 document.addEventListener("DOMContentLoaded", function () {
-
     // =========================
     // AUTH CHECK
     // =========================
-
     const authData = getAuthData();
-
     if (!authData || !authData.token) {
         window.location.href = "../auth/login.html";
         return;
     }
-
     // =========================
     // NAVBAR / SIDEBAR USER INFO
     // (demo profile se bharenge; real backend aane par
     //  authData.user se bhi le sakte ho, admin-dashboard.js jaisa)
     // =========================
-
     const userNameEl = document.getElementById("userName");
     const userRoleEl = document.getElementById("userRole");
     const sidebarUserNameEl = document.getElementById("sidebarUserName");
     const sidebarUserEmailEl = document.getElementById("sidebarUserEmail");
-    const userInitialsEl = document.getElementById("userInitials");
     const dashboardWelcomeEl = document.getElementById("dashboardWelcome");
+    const userInitialsEl = document.getElementById("userInitials");
     const leavePolicyToggle = document.getElementById("leavePolicyToggle");
     const leavePolicyDropdown = document.querySelector(".leave-policy-dropdown");
 
@@ -35,7 +30,6 @@ document.addEventListener("DOMContentLoaded", function () {
     // =========================
     // HTML SECURITY HELPER
     // =========================
-
     function escapeHtml(value) {
         const div = document.createElement("div");
         div.textContent = value === null || value === undefined ? "" : String(value);
@@ -45,7 +39,6 @@ document.addEventListener("DOMContentLoaded", function () {
     // =========================
     // VIEW SWITCHING
     // =========================
-
     const viewNames = [
         "dashboard", "my-attendance", "attendance-calendar",
         "my-leaves", "apply-leave", "leave-balance",
@@ -85,10 +78,8 @@ document.addEventListener("DOMContentLoaded", function () {
             viewLoaders[viewName]();
         }
     }
-
-    // EMPLOYEE PROFILE CLICK
-
     // =========================================
+    // EMPLOYEE PROFILE CLICK
     // EMPLOYEE PROFILE DROPDOWN
     // =========================================
 
@@ -115,45 +106,101 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const profileDropdownId =
         document.getElementById("profileDropdownId");
-
-
     // Open / close profile dropdown
 
     employeeProfileButton.addEventListener("click", function (event) {
-
         event.stopPropagation();
-
         employeeProfileDropdown.classList.toggle("show");
-
     });
-
 
     // Outside click
-
     document.addEventListener("click", function () {
-
         employeeProfileDropdown.classList.remove("show");
-
     });
-
 
     // Prevent dropdown from closing when clicking inside
-
     employeeProfileDropdown.addEventListener("click", function (event) {
-
         event.stopPropagation();
-
     });
 
+    // =========================================
+    // REAL PROFILE API (demoGetProfile ki jagah)
+    // Real endpoint: GET /api/users/me
+    // Jo fields backend abhi nahi bhej raha, unke liye
+    // placeholder rakha hai. Jab backend developer wo
+    // fields add karega, to yahan sirf fallback values
+    // hata dena — baaki poore project me kuch change
+    // nahi karna padega.
+    // =========================================
+
+    function fetchCurrentUserProfile() {
+        return apiRequest("/api/users/me")
+            .then(function (res) {
+                const u = res.data || {};
+                return demoGetProfile().then(function (demoRes) {
+                    const d = demoRes.data || {};
+                    return {
+                        success: true,
+                        data: {
+                            employeeCode: u.employeeCode || d.employeeCode || "--",
+                            firstName: u.firstName || d.firstName || "",
+                            lastName: u.lastName || d.lastName || "",
+                            email: u.email || d.email || "--",
+                            phone: u.phone || d.phone || "--",
+
+                            departmentName:
+                                u.departmentName ||
+                                d.departmentName ||
+                                "Not available",
+
+                            designation:
+                                u.designation ||
+                                d.designation ||
+                                "Not available",
+
+                            joiningDate:
+                                u.joiningDate ||
+                                d.joiningDate ||
+                                "Not available",
+
+                            reportingManager:
+                                u.reportingManager ||
+                                d.reportingManager ||
+                                "Not available",
+
+                            profileImage:
+                                u.profileImage ||
+                                d.profileImage ||
+                                null,
+
+                            dateOfBirth:
+                                u.dateOfBirth ||
+                                d.dateOfBirth ||
+                                "Not available",
+
+                            gender:
+                                u.gender ||
+                                d.gender ||
+                                "Not available"
+                        }
+                    };
+                });
+            })
+            .catch(function (error) {
+
+                console.warn(
+                    "Profile API failed, using demo profile.",
+                    error
+                );
+                return demoGetProfile();
+            });
+    }
 
     // =========================================
     // LOAD EMPLOYEE PROFILE
     // =========================================
-
     function loadHeaderEmployeeProfile() {
-
-        demoGetProfile().then(function (res) {
-
+        fetchCurrentUserProfile().then(function (res) {
             const p = res.data;
 
             const fullName =
@@ -176,9 +223,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             profileDropdownImage.src =
                 employeeImage;
-
         });
-
     }
     loadHeaderEmployeeProfile();
 
@@ -210,14 +255,11 @@ document.addEventListener("DOMContentLoaded", function () {
     // =========================
 
     function loadDashboardSummary() {
-        demoGetProfile().then(function (res) {
+        // demoGetProfile().then(function (res) {
+        fetchCurrentUserProfile().then(function (res) {
             const p = res.data;
             const fullName = `${p.firstName} ${p.lastName}`.trim();
 
-            userNameEl.textContent = fullName;
-            userRoleEl.textContent = "EMPLOYEE";
-            sidebarUserNameEl.textContent = fullName;
-            sidebarUserEmailEl.textContent = p.email;
             dashboardWelcomeEl.textContent = `Welcome back, ${p.firstName}!`;
 
             const initials = `${p.firstName.charAt(0)}${p.lastName.charAt(0)}`.toUpperCase();
@@ -236,11 +278,6 @@ document.addEventListener("DOMContentLoaded", function () {
     // =========================
     // MY ATTENDANCE
     // =========================
-
-    // =========================
-    // MY ATTENDANCE
-    // =========================
-
     let myAttendanceData = [];
 
     function loadMyAttendance() {
@@ -304,7 +341,6 @@ document.addEventListener("DOMContentLoaded", function () {
     // =========================
     // ATTENDANCE CALENDAR
     // =========================
-
     function loadAttendanceCalendar() {
         const container = document.getElementById("attendanceCalendar");
         container.innerHTML = `<p class="text-muted">Loading calendar...</p>`;
@@ -333,7 +369,6 @@ document.addEventListener("DOMContentLoaded", function () {
     // =========================
     // MY LEAVES
     // =========================
-
     function loadMyLeaves() {
         const tbody = document.getElementById("myLeavesTableBody");
         tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4">Loading...</td></tr>`;
@@ -364,7 +399,6 @@ document.addEventListener("DOMContentLoaded", function () {
     // =========================
     // APPLY LEAVE
     // =========================
-
     let ccSelectedList = [];
 
     function loadApplyLeaveForm() {
@@ -432,10 +466,6 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("leaveFromDate").addEventListener("change", calculateLeaveDays);
     document.getElementById("leaveToDate").addEventListener("change", calculateLeaveDays);
 
-
-    // const applyLeaveForm = document.getElementById("applyLeaveForm");
-    // const applyLeaveMessage = document.getElementById("applyLeaveMessage");
-
     document.getElementById("leaveType").addEventListener("change", function () {
         const selectedType = this.value;
         const balanceField = document.getElementById("leaveBalanceField");
@@ -453,8 +483,9 @@ document.addEventListener("DOMContentLoaded", function () {
             balanceField.value = match ? `${match.remainingDays} / ${match.totalDays} days` : "N/A";
         });
     });
-
+    //=============================
     // CC To — add / remove chips
+    //=============================
     document.getElementById("addCcButton").addEventListener("click", function () {
         const ccSelect = document.getElementById("ccSelect");
 
@@ -538,7 +569,6 @@ document.addEventListener("DOMContentLoaded", function () {
     // =========================
     // LEAVE BALANCE
     // =========================
-
     function loadLeaveBalance() {
         const container = document.getElementById("leaveBalanceCards");
         container.innerHTML = `<p class="text-muted">Loading...</p>`;
@@ -560,55 +590,109 @@ document.addEventListener("DOMContentLoaded", function () {
     // =========================
     // MY PAYROLL
     // =========================
+    let myPayrollData = [];
 
     function loadPayroll() {
-        const container = document.getElementById("myPayrollSummary");
-        container.innerHTML = `<p class="text-muted">Loading...</p>`;
+        const tbody = document.getElementById("myPayrollTableBody");
+        tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4">Loading...</td></tr>`;
 
-        demoGetPayroll().then(function (res) {
-            const p = res.data;
+        demoGetPayrollHistory().then(function (res) {
+            myPayrollData = res.data;
 
-            container.innerHTML = `
-                <div class="col-12">
-                    <div class="erp-form-card">
-                        <h5>${escapeHtml(p.month)}</h5>
-                        <p>Basic: ₹${p.basic.toLocaleString()}</p>
-                        <p>Allowances: ₹${p.allowances.toLocaleString()}</p>
-                        <p>Deductions: ₹${p.deductions.toLocaleString()}</p>
-                        <hr>
-                        <strong>Net Pay: ₹${p.netPay.toLocaleString()}</strong>
-                    </div>
-                </div>
+            if (myPayrollData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-muted">No payroll records found.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = myPayrollData.map(function (p, index) {
+                const statusBadge = p.status === "PAID" ? "success" : "warning";
+
+                return `
+                <tr>
+                    <td>${escapeHtml(p.month)}</td>
+                    <td>₹${p.netPay.toLocaleString()}</td>
+                    <td><span class="badge text-bg-${statusBadge}">${escapeHtml(p.status)}</span></td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-outline-primary"
+                            data-payroll-index="${index}">
+                            View Slip
+                        </button>
+                    </td>
+                    <td>
+                        <button type="button"
+                            class="btn btn-sm btn-outline-primary"
+                            onclick='Swal.fire({
+                                icon: "success",
+                                title: "Try Again.....",
+                                confirmButtonColor: "#17a2b8",
+                                timer: 2000,
+                                timerProgressBar: true,
+                                showConfirmButton: false,
+                                customClass: {
+                                    title: "small-swal-title"
+                                }
+                            });'>
+                            Download
+                        </button>
+                    </td>
+                </tr>
+
             `;
+            }).join("");
+
+            tbody.querySelectorAll("[data-payroll-index]").forEach(function (btn) {
+                btn.addEventListener("click", function () {
+                    const record = myPayrollData[this.dataset.payrollIndex];
+                    openPayrollSlipModal(record);
+                });
+            });
         });
+    }
+
+    function openPayrollSlipModal(p) {
+        document.getElementById("payrollSlipModalTitle").textContent =
+            `Payslip — ${p.month}`;
+
+        document.getElementById("payrollSlipModalBody").innerHTML = `
+        <p><strong>Month:</strong> ${escapeHtml(p.month)}</p>
+        <p><strong>Basic:</strong> ₹${p.basic.toLocaleString()}</p>
+        <p><strong>Allowances:</strong> ₹${p.allowances.toLocaleString()}</p>
+        <p><strong>Deductions:</strong> ₹${p.deductions.toLocaleString()}</p>
+        <hr>
+        <p><strong>Net Pay:</strong> ₹${p.netPay.toLocaleString()}</p>
+        <p><strong>Status:</strong> ${escapeHtml(p.status)}</p>
+    `;
+
+        const modal = new bootstrap.Modal(
+            document.getElementById("payrollSlipModal")
+        );
+        modal.show();
     }
 
     // =========================
     // PAYSLIPS
     // =========================
-
     function loadPayslips() {
         const tbody = document.getElementById("payslipsTableBody");
         tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4">Loading...</td></tr>`;
 
-        demoGetPayslips().then(function (res) {
-            tbody.innerHTML = res.data.map(function (p) {
-                return `
-                    <tr>
-                        <td>${escapeHtml(p.month)}</td>
-                        <td>₹${p.netPay.toLocaleString()}</td>
-                        <td><span class="badge text-bg-success">${escapeHtml(p.status)}</span></td>
-                        <td><button type="button" class="btn btn-sm btn-outline-primary" onclick="alert('Demo only — real download backend se aayega')">Download</button></td>
-                    </tr>
-                `;
-            }).join("");
-        });
+        // demoGetPayslips().then(function (res) {
+        //     tbody.innerHTML = res.data.map(function (p) {
+        //         return `
+        //             <tr>
+        //                 <td>${escapeHtml(p.month)}</td>
+        //                 <td>₹${p.netPay.toLocaleString()}</td>
+        //                 <td><span class="badge text-bg-success">${escapeHtml(p.status)}</span></td>
+        //                 <td><button type="button" class="btn btn-sm btn-outline-primary" onclick="alert('Demo only — real download backend se aayega')">Download</button></td>
+        //             </tr>
+        //         `;
+        //     }).join("");
+        // });
     }
 
     // =========================
     // ATTENDANCE CORRECTIONS
     // =========================
-
     const newCorrectionButton = document.getElementById("newCorrectionButton");
     const correctionFormWrapper = document.getElementById("correctionFormWrapper");
     const correctionForm = document.getElementById("correctionForm");
@@ -665,7 +749,6 @@ document.addEventListener("DOMContentLoaded", function () {
     // =========================
     // PROFILE
     // =========================
-
     const profileViewButton =
         document.getElementById("profileViewButton");
 
@@ -682,9 +765,9 @@ document.addEventListener("DOMContentLoaded", function () {
         <div class="profile-loading">
             Loading profile...
         </div>
-    `;
+         `;
 
-        demoGetProfile().then(function (res) {
+        fetchCurrentUserProfile().then(function (res) {
             const p = res.data;
 
             const fullName = `${p.firstName} ${p.lastName}`.trim();
@@ -707,13 +790,11 @@ document.addEventListener("DOMContentLoaded", function () {
                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">`
                     : ""
                 }
-
                    <span class="profile-avatar-fallback"
                         style="${p.profileImage ? 'display:none;' : 'display:flex;'}">
                     ${escapeHtml(initials)}
                 </span>
             </div>
-
                     <div class="profile-main-info">
                         <h2>${escapeHtml(fullName)}</h2>
                         <p>${escapeHtml(p.designation)}</p>
@@ -725,7 +806,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     </div>
 
                 </div>
-
 
                 <!-- BASIC INFORMATION -->
                 <div class="profile-section">
@@ -776,10 +856,27 @@ document.addEventListener("DOMContentLoaded", function () {
                             </strong>
                         </div>
 
+                          <div class="profile-info-item">
+                            <span class="profile-label">
+                                Birthday
+                            </span>
+                            <strong>
+                                ${escapeHtml(p.dateOfBirth)}
+                            </strong>
+                        </div>
+
+                        <div class="profile-info-item">
+                            <span class="profile-label">
+                                Gender
+                            </span>
+                            <strong>
+                                ${escapeHtml(p.gender)}
+                            </strong>
+                        </div>
+
                     </div>
 
                 </div>
-
 
                 <!-- CONTACT INFORMATION -->
                 <div class="profile-section">
@@ -825,7 +922,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 </div>
 
-
                 <!-- WORK INFORMATION -->
                 <div class="profile-section">
 
@@ -860,39 +956,42 @@ document.addEventListener("DOMContentLoaded", function () {
                     </div>
 
                 </div>
-
             </div>
         `;
+
+            const resetPasswordToggleButton =
+                document.getElementById("resetPasswordToggleButton");
+
+            const resetPasswordMessage =
+                document.getElementById("resetPasswordMessage");
+
+            if (resetPasswordToggleButton) {
+                resetPasswordToggleButton.addEventListener("click", function () {
+                    resetPasswordMessage.innerHTML = "";
+
+                    const modal = new bootstrap.Modal(
+                        document.getElementById("resetPasswordModal")
+                    );
+                    modal.show();
+                });
+            }
         });
     }
-
 
     // =========================
     // RESET PASSWORD (from Profile)
+    // RESET PASSWORD — SUBMIT (modal se)
+    // Toggle-button ka listener loadProfile() ke andar hai
     // =========================
-
-    const resetPasswordToggleButton =
-        document.getElementById("resetPasswordToggleButton");
-
-    const resetPasswordFormWrapper =
-        document.getElementById("resetPasswordFormWrapper");
-
     const resetPasswordForm =
         document.getElementById("resetPasswordForm");
-
-    const resetPasswordMessage =
-        document.getElementById("resetPasswordMessage");
-
-    if (resetPasswordToggleButton) {
-        resetPasswordToggleButton.addEventListener("click", function () {
-            resetPasswordFormWrapper.classList.toggle("d-none");
-            resetPasswordMessage.innerHTML = "";
-        });
-    }
 
     if (resetPasswordForm) {
         resetPasswordForm.addEventListener("submit", function (e) {
             e.preventDefault();
+
+            const resetPasswordMessage =
+                document.getElementById("resetPasswordMessage");
 
             resetPasswordMessage.innerHTML = "";
 
@@ -912,27 +1011,85 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-            demoChangePassword({
-                currentPassword: currentPassword,
-                newPassword: newPassword
+            apiRequest("/api/auth/change-password", {
+                method: "POST",
+                body: JSON.stringify({
+                    oldPassword: currentPassword,
+                    newPassword: newPassword
+                })
+
             }).then(function (res) {
-                resetPasswordMessage.innerHTML =
-                    `<div class="custom-alert success">${escapeHtml(res.data.message)}</div>`;
+
+                const modalEl = document.getElementById("resetPasswordModal");
+                const modal = bootstrap.Modal.getInstance(modalEl);
+
+                if (modal) {
+                    modal.hide();
+                }
 
                 resetPasswordForm.reset();
+                resetPasswordMessage.innerHTML = "";
 
-                setTimeout(function () {
-                    resetPasswordFormWrapper.classList.add("d-none");
-                    resetPasswordMessage.innerHTML = "";
-                }, 1500);
+                document.getElementById("confirmPasswordFeedback").textContent = "";
+                document.getElementById("confirmPasswordField").classList.remove("is-valid", "is-invalid");
+
+                Swal.fire({
+                    icon: "success",
+                    title: escapeHtml(res.message),
+                    confirmButtonColor: "#17a2b8",
+                    timer: 2000,
+                    timerProgressBar: true,
+                    showConfirmButton: false
+                });
+
+            }).catch(function (error) {
+                resetPasswordMessage.innerHTML =
+                    `<div class="custom-alert error">${escapeHtml(error.message)}</div>`;
             });
+
         });
+    }
+
+    // =========================
+    // LIVE PASSWORD MATCH CHECK
+    // =========================
+
+    function checkPasswordMatchLive() {
+        const newPasswordField = document.getElementById("newPasswordField");
+        const confirmPasswordField = document.getElementById("confirmPasswordField");
+        const feedback = document.getElementById("confirmPasswordFeedback");
+
+        if (!confirmPasswordField.value) {
+            feedback.textContent = "";
+            feedback.className = "password-match-feedback";
+            confirmPasswordField.classList.remove("is-valid", "is-invalid");
+            return;
+        }
+
+        if (newPasswordField.value === confirmPasswordField.value) {
+            feedback.textContent = "✔ Passwords match";
+            feedback.className = "password-match-feedback match";
+            confirmPasswordField.classList.remove("is-invalid");
+            confirmPasswordField.classList.add("is-valid");
+        } else {
+            feedback.textContent = "✘ Passwords do not match";
+            feedback.className = "password-match-feedback mismatch";
+            confirmPasswordField.classList.remove("is-valid");
+            confirmPasswordField.classList.add("is-invalid");
+        }
+    }
+
+    const newPasswordFieldForLiveCheck = document.getElementById("newPasswordField");
+    const confirmPasswordFieldForLiveCheck = document.getElementById("confirmPasswordField");
+
+    if (newPasswordFieldForLiveCheck && confirmPasswordFieldForLiveCheck) {
+        newPasswordFieldForLiveCheck.addEventListener("input", checkPasswordMatchLive);
+        confirmPasswordFieldForLiveCheck.addEventListener("input", checkPasswordMatchLive);
     }
 
     // =========================
     // INITIAL VIEW
     // =========================
-
     showView("dashboard");
 
     const sidebarImage =
@@ -941,23 +1098,21 @@ document.addEventListener("DOMContentLoaded", function () {
     const sidebarInitials =
         document.getElementById("sidebarInitials");
 
-    if (p.profileImage) {
-        sidebarImage.src = p.profileImage;
+    fetchCurrentUserProfile().then(function (res) {
 
-        sidebarImage.style.display = "block";
-        sidebarInitials.style.display = "none";
+        const p = res.data;
 
-        sidebarImage.onerror = function () {
-            this.style.display = "none";
+        if (p.profileImage) {
+            sidebarImage.src = p.profileImage;
+            sidebarImage.style.display = "block";
+            sidebarInitials.style.display = "none";
+        } else {
+            sidebarImage.style.display = "none";
             sidebarInitials.style.display = "flex";
-        };
-    } else {
-        sidebarImage.style.display = "none";
-        sidebarInitials.style.display = "flex";
-    }
+        }
+    });
 
 });
-
 
 const logoutPanel = document.getElementById("logoutPanel");
 
@@ -969,7 +1124,6 @@ if (logoutPanel) {
             logout();
             return;
         }
-
         // Fallback
         localStorage.clear();
         sessionStorage.clear();

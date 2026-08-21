@@ -1,12 +1,6 @@
 async function apiRequest(endpoint, options = {}) {
-
     try {
-
-
-        
         let authData = null;
-
-
         // Only call getAuthData if the function exists
         if (typeof getAuthData === "function") {
             authData = getAuthData();
@@ -14,14 +8,10 @@ async function apiRequest(endpoint, options = {}) {
 
         const token = authData ? authData.token : null;
 
-
-
         const headers = {
             "Content-Type": "application/json",
             ...(options.headers || {})
         };
-
-
 
         // Add JWT only when a token exists
         // and this is NOT the login request
@@ -50,11 +40,22 @@ async function apiRequest(endpoint, options = {}) {
         console.log("API Status:", response.status);
         console.log("API Response:", data);
 
+        // if (!response.ok) {
+        //     throw new Error(
+        //         data.message ||
+        //         `Request failed with status ${response.status}`
+        //     );
+        // }
+
+        // Edit by Araj 
+
         if (!response.ok) {
-            throw new Error(
+            const apiError = new Error(
                 data.message ||
                 `Request failed with status ${response.status}`
             );
+            apiError.responseData = data;
+            throw apiError;
         }
 
         return data;

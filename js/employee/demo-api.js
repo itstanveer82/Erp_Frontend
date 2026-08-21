@@ -27,7 +27,9 @@ function demoGetProfile() {
         designation: "Software Developer",
         joiningDate: "2026-08-01",
         reportingManager: "Manmohan Pathak",
-        systemStatus: "OUT"
+        systemStatus: "OUT",
+        dateOfBirth: "1998-04-15",
+        gender: "Male"
 
     });
 }
@@ -58,63 +60,46 @@ function demoGetMyAttendance() {
 // RESET PASSWORD (from Profile)
 // =========================
 
-const resetPasswordToggleButton =
-    document.getElementById("resetPasswordToggleButton");
 
-const resetPasswordFormWrapper =
-    document.getElementById("resetPasswordFormWrapper");
 
-const resetPasswordForm =
-    document.getElementById("resetPasswordForm");
+// if (resetPasswordForm) {
+//     resetPasswordForm.addEventListener("submit", function (e) {
+//         e.preventDefault();
 
-const resetPasswordMessage =
-    document.getElementById("resetPasswordMessage");
+//         resetPasswordMessage.innerHTML = "";
 
-if (resetPasswordToggleButton) {
-    resetPasswordToggleButton.addEventListener("click", function () {
-        resetPasswordFormWrapper.classList.toggle("d-none");
-        resetPasswordMessage.innerHTML = "";
-    });
-}
+//         const currentPassword = document.getElementById("currentPasswordField").value;
+//         const newPassword = document.getElementById("newPasswordField").value;
+//         const confirmPassword = document.getElementById("confirmPasswordField").value;
 
-if (resetPasswordForm) {
-    resetPasswordForm.addEventListener("submit", function (e) {
-        e.preventDefault();
+//         if (newPassword !== confirmPassword) {
+//             resetPasswordMessage.innerHTML =
+//                 `<div class="custom-alert error">New password and confirm password do not match.</div>`;
+//             return;
+//         }
 
-        resetPasswordMessage.innerHTML = "";
+//         if (newPassword.length < 6) {
+//             resetPasswordMessage.innerHTML =
+//                 `<div class="custom-alert error">Password must be at least 6 characters.</div>`;
+//             return;
+//         }
 
-        const currentPassword = document.getElementById("currentPasswordField").value;
-        const newPassword = document.getElementById("newPasswordField").value;
-        const confirmPassword = document.getElementById("confirmPasswordField").value;
+//         demoChangePassword({
+//             currentPassword: currentPassword,
+//             newPassword: newPassword
+//         }).then(function (res) {
+//             resetPasswordMessage.innerHTML =
+//                 `<div class="custom-alert success">${escapeHtml(res.data.message)}</div>`;
 
-        if (newPassword !== confirmPassword) {
-            resetPasswordMessage.innerHTML =
-                `<div class="custom-alert error">New password and confirm password do not match.</div>`;
-            return;
-        }
+//             resetPasswordForm.reset();
 
-        if (newPassword.length < 6) {
-            resetPasswordMessage.innerHTML =
-                `<div class="custom-alert error">Password must be at least 6 characters.</div>`;
-            return;
-        }
-
-        demoChangePassword({
-            currentPassword: currentPassword,
-            newPassword: newPassword
-        }).then(function (res) {
-            resetPasswordMessage.innerHTML =
-                `<div class="custom-alert success">${escapeHtml(res.data.message)}</div>`;
-
-            resetPasswordForm.reset();
-
-            setTimeout(function () {
-                resetPasswordFormWrapper.classList.add("d-none");
-                resetPasswordMessage.innerHTML = "";
-            }, 1500);
-        });
-    });
-}
+//             setTimeout(function () {
+//                 resetPasswordFormWrapper.classList.add("d-none");
+//                 resetPasswordMessage.innerHTML = "";
+//             }, 1500);
+//         });
+//     });
+// }
 
 // Suggested real endpoint: POST /api/employee/me/change-password
 function demoChangePassword(payload) {
@@ -174,6 +159,16 @@ function demoGetPayroll() {
         deductions: 3200,
         netPay: 49800
     });
+}
+
+// Suggested real endpoint: GET /api/employee/me/payroll/history
+function demoGetPayrollHistory() {
+    return demoDelay([
+        { month: "August 2026", basic: 45000, allowances: 8000, deductions: 3200, netPay: 49800, status: "PENDING" },
+        { month: "July 2026", basic: 45000, allowances: 7500, deductions: 3000, netPay: 49500, status: "PAID" },
+        { month: "June 2026", basic: 45000, allowances: 7500, deductions: 3000, netPay: 49500, status: "PAID" },
+        { month: "May 2026", basic: 44000, allowances: 7300, deductions: 2500, netPay: 48800, status: "PAID" }
+    ]);
 }
 
 // Suggested real endpoint: GET /api/employee/me/payslips
