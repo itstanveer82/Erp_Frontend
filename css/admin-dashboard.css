@@ -321,7 +321,11 @@ body {
     color: #ffffff;
 }
 
-
+.administration-label {
+    cursor: default;
+    background: transparent;
+    color: #d7e0f2;
+}
 /* =========================
    MAIN CONTENT
 ========================= */

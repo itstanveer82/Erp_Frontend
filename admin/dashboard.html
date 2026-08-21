@@ -62,7 +62,6 @@
 
                 </button>
 
-                <!-- PROFILE DROPDOWN -->
                 <div id="adminProfileDropdown" class="admin-profile-dropdown">
 
                     <div class="admin-dropdown-header">
@@ -86,6 +85,12 @@
                     <button type="button" id="profileViewButton" class="admin-profile-menu-btn">
 
                         ◍ &nbsp; My Profile
+
+                    </button>
+
+                    <button type="button" id="sessionsButton" class="admin-profile-menu-btn">
+
+                        ◷ &nbsp; Session Management
 
                     </button>
 
@@ -177,30 +182,6 @@
                 </button>
 
 
-                <!-- Roles -->
-                <button class="sidebar-item" id="rolesMenuButton" type="button" data-view="roles">
-
-                    <span class="menu-icon">
-                        ◉
-                    </span>
-
-                    Roles
-
-                </button>
-
-
-                <!-- Permissions -->
-                <button class="sidebar-item" id="permissionsMenuButton" type="button" data-view="permissions">
-
-                    <span class="menu-icon">
-                        ⚿
-                    </span>
-
-                    Permissions
-
-                </button>
-
-
                 <!-- Payroll -->
                 <button class="sidebar-item" type="button" data-view="payroll">
 
@@ -224,6 +205,57 @@
 
                 </button>
 
+               <!-- ADMINISTRATION HEADER -->
+<div class="sidebar-section-title">
+
+    ADMINISTRATION
+
+</div>
+
+
+<!-- Users -->
+<button class="sidebar-item administration-item"
+    id="usersMenuButton"
+    type="button"
+    data-view="users">
+
+    <span class="menu-icon">
+        ♙
+    </span>
+
+    Users
+
+</button>
+
+
+<!-- Roles -->
+<button class="sidebar-item administration-item"
+    id="rolesMenuButton"
+    type="button"
+    data-view="roles">
+
+    <span class="menu-icon">
+        ◉
+    </span>
+
+    Roles
+
+</button>
+
+
+<!-- Permissions -->
+<button class="sidebar-item administration-item"
+    id="permissionsMenuButton"
+    type="button"
+    data-view="permissions">
+
+    <span class="menu-icon">
+        ⚿
+    </span>
+
+    Permissions
+
+</button>
             </div>
 
 
@@ -243,7 +275,6 @@
             </div>
 
         </aside>
-
 
         <!-- =========================
              MAIN CONTENT

@@ -1128,7 +1128,7 @@ document.getElementById("addRoleForm")
 
         }
 
-    });
+    });        
     // ==============================
     // LOAD ALL PERMISSIONS
     // GET /api/permissions
