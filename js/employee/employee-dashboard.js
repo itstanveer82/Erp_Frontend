@@ -40,11 +40,16 @@ document.addEventListener("DOMContentLoaded", function () {
     // VIEW SWITCHING
     // =========================
     const viewNames = [
-        "dashboard", "my-attendance", "attendance-calendar",
+        "dashboard",
+        "personal-information", "emergency-information", "bank-information",
+        "family-information", "education-information", "experience-information",
+        "joining-details", "work-position", "exit-details",
+        "nomination-information", "skills",
+        "my-attendance", "attendance-calendar", "attendance-corrections",
         "my-leaves", "apply-leave", "leave-balance",
-        "my-payroll", "payslips", "attendance-corrections", "profile"
+        "my-payroll", "payslips",
+        "profile", "profile-overview"
     ];
-
     const views = {};
     viewNames.forEach(function (name) {
         views[name] = document.getElementById(name + "View");
@@ -52,6 +57,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const viewLoaders = {
         "dashboard": loadDashboardSummary,
+        "personal-information": loadPersonalInformation,
+        "emergency-information": loadEmergencyInformation,
+        "education-information": loadEducationInformation,
+        "experience-information": loadExperienceInformation,
+        "joining-details": loadJoiningDetails,
+        "work-position": loadWorkPosition,
+        "exit-details": loadExitDetails,
+        "nomination-information": loadNominationInformation,
+        "skills": loadSkills,
+
+        "family-information": loadFamilyInformation,
         "my-attendance": loadMyAttendance,
         "attendance-calendar": loadAttendanceCalendar,
         "my-leaves": loadMyLeaves,
@@ -60,7 +76,8 @@ document.addEventListener("DOMContentLoaded", function () {
         "my-payroll": loadPayroll,
         "payslips": loadPayslips,
         "attendance-corrections": loadCorrections,
-        "profile": loadProfile
+        "profile": loadProfile,
+        "profile-overview": loadProfileOverview,
     };
 
     function showView(viewName) {
@@ -594,13 +611,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function loadPayroll() {
         const tbody = document.getElementById("myPayrollTableBody");
-        tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4">Loading...</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4">Loading...</td></tr>`;
+
+
 
         demoGetPayrollHistory().then(function (res) {
             myPayrollData = res.data;
 
             if (myPayrollData.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-muted">No payroll records found.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-muted">No payroll records found.</td></tr>`;
                 return;
             }
 
@@ -621,17 +640,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     <td>
                         <button type="button"
                             class="btn btn-sm btn-outline-primary"
-                            onclick='Swal.fire({
-                                icon: "success",
-                                title: "Try Again.....",
-                                confirmButtonColor: "#17a2b8",
-                                timer: 2000,
-                                timerProgressBar: true,
-                                showConfirmButton: false,
-                                customClass: {
-                                    title: "small-swal-title"
-                                }
-                            });'>
+                            data-payroll-download-index="${index}">
                             Download
                         </button>
                     </td>
@@ -644,6 +653,34 @@ document.addEventListener("DOMContentLoaded", function () {
                 btn.addEventListener("click", function () {
                     const record = myPayrollData[this.dataset.payrollIndex];
                     openPayrollSlipModal(record);
+                });
+            });
+
+            tbody.querySelectorAll("[data-payroll-download-index]").forEach(function (btn) {
+                btn.addEventListener("click", function () {
+                    const record = myPayrollData[this.dataset.payrollDownloadIndex];
+
+                    if (record.status !== "PAID") {
+                        Swal.fire({
+                            icon: "warning",
+                            title: "Payslip not available yet",
+                            text: `Payroll for ${record.month} is still ${record.status}. Download will be available once it is marked as Paid.`,
+                            confirmButtonColor: "#17a2b8"
+                        });
+                        return;
+                    }
+
+                    Swal.fire({
+                        icon: "success",
+                        title: "Try Again.....",
+                        confirmButtonColor: "#17a2b8",
+                        timer: 2000,
+                        timerProgressBar: true,
+                        showConfirmButton: false,
+                        customClass: {
+                            title: "small-swal-title"
+                        }
+                    });
                 });
             });
         });
@@ -795,17 +832,22 @@ document.addEventListener("DOMContentLoaded", function () {
                     ${escapeHtml(initials)}
                 </span>
             </div>
-                    <div class="profile-main-info">
-                        <h2>${escapeHtml(fullName)}</h2>
-                        <p>${escapeHtml(p.designation)}</p>
-
-                        <span class="profile-status">
-                            <span class="status-dot"></span>
+            <div class="profile-main-info">
+                    <h2>${escapeHtml(fullName)}</h2>
+                    <p>${escapeHtml(p.designation)}</p>
+                    <span class="profile-status">
+                    <span class="status-dot"></span>
                             Active Employee
-                        </span>
-                    </div>
+                    </span>
+            </div>
+            <button type="button" id="viewFullProfileButton"
+                class="btn btn-outline-primary profile-header-action-btn">
+                        Infomation
+            </button>
 
-                </div>
+        </div>
+
+    </div>
 
                 <!-- BASIC INFORMATION -->
                 <div class="profile-section">
@@ -975,6 +1017,186 @@ document.addEventListener("DOMContentLoaded", function () {
                     modal.show();
                 });
             }
+
+            const viewFullProfileButton =
+                document.getElementById("viewFullProfileButton");
+
+            if (viewFullProfileButton) {
+                viewFullProfileButton.addEventListener("click", function () {
+                    showView("profile-overview");
+                });
+            }
+        });
+    }
+
+    // =========================
+    // PROFILE OVERVIEW (all sections, one page)
+    // =========================
+
+    function loadProfileOverview() {
+        const grid = document.getElementById("profileOverviewGrid");
+        grid.innerHTML = `<p class="text-muted">Loading...</p>`;
+
+        Promise.all([
+            demoGetPersonalInformation(),
+            demoGetEmergencyContacts(),
+            demoGetFamilyMembers(),
+            demoGetEducation(),
+            demoGetExperience(),
+            demoGetJoiningDetails(),
+            demoGetWorkPosition(),
+            demoGetExitDetails(),
+            demoGetNominations(),
+            demoGetSkills()
+        ]).then(function (results) {
+
+            currentPersonalInfo = results[0].data;
+            const emergencyContacts = results[1].data;
+            const familyMembers = results[2].data;
+            const education = results[3].data;
+            const experience = results[4].data;
+            currentJoiningDetails = results[5].data;
+            const workPosition = results[6].data;
+            const exitDetails = results[7].data;
+            const nominations = results[8].data;
+            const skills = results[9].data;
+
+            grid.innerHTML = `
+
+                <div class="overview-card">
+                    <div class="overview-card-header">
+                        <h5>Personal Information</h5>
+                        <button type="button" class="overview-edit-btn" id="overviewEditPersonalInfo" title="Edit">✎</button>
+                    </div>
+                    <div class="overview-card-body overview-kv-grid">
+                        <div class="overview-kv"><span>Height</span><strong>${escapeHtml(currentPersonalInfo.height) || "--"}</strong></div>
+                        <div class="overview-kv"><span>Weight</span><strong>${escapeHtml(currentPersonalInfo.weight) || "--"}</strong></div>
+                        <div class="overview-kv"><span>Blood Group</span><strong>${escapeHtml(currentPersonalInfo.bloodGroup) || "--"}</strong></div>
+                        <div class="overview-kv"><span>Shift</span><strong>${escapeHtml(currentPersonalInfo.shift) || "--"}</strong></div>
+                    </div>
+                </div>
+
+                <div class="overview-card">
+                    <div class="overview-card-header">
+                        <h5>Emergency Information</h5>
+                        <button type="button" class="overview-nav-btn" data-goto-view="emergency-information" title="Manage">›</button>
+                    </div>
+                    <div class="overview-card-body">
+                        <p class="overview-summary-text">${emergencyContacts.length} contact(s) added${emergencyContacts.length ? " — " + escapeHtml(emergencyContacts[0].name) : ""}</p>
+                    </div>
+                </div>
+
+                <div class="overview-card">
+                    <div class="overview-card-header">
+                        <h5>Bank Information</h5>
+                    </div>
+                    <div class="overview-card-body">
+                        <p class="overview-summary-text text-muted">Coming soon.</p>
+                    </div>
+                </div>
+
+                <div class="overview-card">
+                    <div class="overview-card-header">
+                        <h5>Family Information</h5>
+                        <button type="button" class="overview-nav-btn" data-goto-view="family-information" title="Manage">›</button>
+                    </div>
+                    <div class="overview-card-body">
+                        <p class="overview-summary-text">${familyMembers.length} member(s) added${familyMembers.length ? " — " + escapeHtml(familyMembers[0].name) : ""}</p>
+                    </div>
+                </div>
+
+                <div class="overview-card">
+                    <div class="overview-card-header">
+                        <h5>Education Information</h5>
+                        <button type="button" class="overview-nav-btn" data-goto-view="education-information" title="Manage">›</button>
+                    </div>
+                    <div class="overview-card-body">
+                        <p class="overview-summary-text">${education.length} record(s)${education.length ? " — " + escapeHtml(education[0].qualification) : ""}</p>
+                    </div>
+                </div>
+
+                <div class="overview-card">
+                    <div class="overview-card-header">
+                        <h5>Experience Information</h5>
+                        <button type="button" class="overview-nav-btn" data-goto-view="experience-information" title="Manage">›</button>
+                    </div>
+                    <div class="overview-card-body">
+                        <p class="overview-summary-text">${experience.length} record(s)${experience.length ? " — " + escapeHtml(experience[0].organization) : ""}</p>
+                    </div>
+                </div>
+
+                <div class="overview-card">
+                    <div class="overview-card-header">
+                        <h5>Joining Details</h5>
+                        <button type="button" class="overview-edit-btn" id="overviewEditJoiningDetails" title="Edit">✎</button>
+                    </div>
+                    <div class="overview-card-body overview-kv-grid">
+                        <div class="overview-kv"><span>Date of Joining</span><strong>${escapeHtml(currentJoiningDetails.dateOfJoining) || "--"}</strong></div>
+                        <div class="overview-kv"><span>Status</span><strong>${escapeHtml(currentJoiningDetails.status) || "--"}</strong></div>
+                    </div>
+                </div>
+
+                <div class="overview-card">
+                    <div class="overview-card-header">
+                        <h5>Work Position</h5>
+                    </div>
+                    <div class="overview-card-body overview-kv-grid">
+                        <div class="overview-kv"><span>Department</span><strong>${escapeHtml(workPosition.departmentName) || "--"}</strong></div>
+                        <div class="overview-kv"><span>Grade Level</span><strong>${escapeHtml(workPosition.gradeLevel) || "--"}</strong></div>
+                    </div>
+                </div>
+
+                <div class="overview-card">
+                    <div class="overview-card-header">
+                        <h5>Exit Details</h5>
+                    </div>
+                    <div class="overview-card-body overview-kv-grid">
+                        <div class="overview-kv"><span>Separation Mode</span><strong>${escapeHtml(exitDetails.separationMode) || "--"}</strong></div>
+                        <div class="overview-kv"><span>Last Working Date</span><strong>${escapeHtml(exitDetails.lastWorkingDate) || "--"}</strong></div>
+                    </div>
+                </div>
+
+                <div class="overview-card">
+                    <div class="overview-card-header">
+                        <h5>Nomination Information</h5>
+                        <button type="button" class="overview-nav-btn" data-goto-view="nomination-information" title="Manage">›</button>
+                    </div>
+                    <div class="overview-card-body">
+                        <p class="overview-summary-text">${nominations.length} nomination(s) added</p>
+                    </div>
+                </div>
+
+                <div class="overview-card">
+                    <div class="overview-card-header">
+                        <h5>Skills</h5>
+                        <button type="button" class="overview-nav-btn" data-goto-view="skills" title="Manage">›</button>
+                    </div>
+                    <div class="overview-card-body">
+                        ${skills.length
+                    ? `<div class="cc-chips">${skills.map(function (s) { return `<span class="cc-chip">${escapeHtml(s)}</span>`; }).join("")}</div>`
+                    : `<p class="overview-summary-text text-muted">No skills added yet.</p>`
+                }
+                    </div>
+                </div>
+
+            `;
+
+            const overviewEditPersonalInfo = document.getElementById("overviewEditPersonalInfo");
+            if (overviewEditPersonalInfo) {
+                overviewEditPersonalInfo.addEventListener("click", openPersonalInfoModal);
+            }
+
+            const overviewEditJoiningDetails = document.getElementById("overviewEditJoiningDetails");
+            if (overviewEditJoiningDetails) {
+                overviewEditJoiningDetails.addEventListener("click", openJoiningDetailsModal);
+            }
+
+            grid.querySelectorAll("[data-goto-view]").forEach(function (btn) {
+                btn.addEventListener("click", function () {
+                    showView(this.dataset.gotoView);
+                });
+            });
+
         });
     }
 
@@ -1111,6 +1333,1042 @@ document.addEventListener("DOMContentLoaded", function () {
             sidebarInitials.style.display = "flex";
         }
     });
+
+
+
+    // =========================
+    // JOINING DETAILS
+    // =========================
+
+    let currentJoiningDetails = null;
+
+    function loadJoiningDetails() {
+        const card = document.getElementById("joiningDetailsCard");
+        card.innerHTML = `<p class="text-muted">Loading...</p>`;
+
+        demoGetJoiningDetails().then(function (res) {
+            currentJoiningDetails = res.data;
+            const d = currentJoiningDetails;
+
+            card.innerHTML = `
+                <div class="profile-info-grid">
+                    <div class="profile-info-item">
+                        <span class="profile-label">Date of Joining</span>
+                        <strong>${escapeHtml(d.dateOfJoining)}</strong>
+                    </div>
+                    <div class="profile-info-item">
+                        <span class="profile-label">Confirmation Date</span>
+                        <strong>${escapeHtml(d.confirmationDate)}</strong>
+                    </div>
+                    <div class="profile-info-item">
+                        <span class="profile-label">Status</span>
+                        <strong>${escapeHtml(d.status)}</strong>
+                    </div>
+                </div>
+            `;
+        });
+    }
+    // =====================
+    // Open Joining Model
+    // =====================
+
+    function openJoiningDetailsModal() {
+        if (!currentJoiningDetails) return;
+
+        document.getElementById("dateOfJoiningField").value = currentJoiningDetails.dateOfJoining || "";
+        document.getElementById("confirmationDateField").value = currentJoiningDetails.confirmationDate || "";
+        document.getElementById("joiningStatusField").value = currentJoiningDetails.status || "Active";
+        document.getElementById("joiningDetailsFormMessage").innerHTML = "";
+
+        const modal = new bootstrap.Modal(document.getElementById("joiningDetailsModal"));
+        modal.show();
+    }
+
+    const editJoiningDetailsButton = document.getElementById("editJoiningDetailsButton");
+    if (editJoiningDetailsButton) {
+        editJoiningDetailsButton.addEventListener("click", openJoiningDetailsModal);
+    }
+
+    const joiningDetailsForm = document.getElementById("joiningDetailsForm");
+    if (joiningDetailsForm) {
+        joiningDetailsForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const payload = {
+                dateOfJoining: document.getElementById("dateOfJoiningField").value,
+                confirmationDate: document.getElementById("confirmationDateField").value,
+                status: document.getElementById("joiningStatusField").value
+            };
+
+            demoUpdateJoiningDetails(payload).then(function (res) {
+                const modal = bootstrap.Modal.getInstance(document.getElementById("joiningDetailsModal"));
+                if (modal) modal.hide();
+
+                Swal.fire({
+                    icon: "success",
+                    title: res.data.message,
+                    confirmButtonColor: "#17a2b8"
+                });
+
+                loadJoiningDetails();
+            });
+        });
+    }
+
+    // =========================
+    // WORK POSITION (view-only)
+    // =========================
+
+    function loadWorkPosition() {
+        const card = document.getElementById("workPositionCard");
+        card.innerHTML = `<p class="text-muted">Loading...</p>`;
+
+        demoGetWorkPosition().then(function (res) {
+            const d = res.data;
+
+            card.innerHTML = `
+                <div class="profile-info-grid">
+                    <div class="profile-info-item">
+                        <span class="profile-label">Department</span>
+                        <strong>${escapeHtml(d.departmentName) || "--"}</strong>
+                    </div>
+                    <div class="profile-info-item">
+                        <span class="profile-label">Designation</span>
+                        <strong>${escapeHtml(d.designation) || "--"}</strong>
+                    </div>
+                    <div class="profile-info-item">
+                        <span class="profile-label">Grade Level</span>
+                        <strong>${escapeHtml(d.gradeLevel) || "--"}</strong>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+
+    // =========================
+    // EXIT DETAILS (view-only)
+    // =========================
+
+    function loadExitDetails() {
+        const card = document.getElementById("exitDetailsCard");
+        card.innerHTML = `<p class="text-muted">Loading...</p>`;
+
+        demoGetExitDetails().then(function (res) {
+            const d = res.data;
+
+            card.innerHTML = `
+                <div class="profile-info-grid">
+                    <div class="profile-info-item">
+                        <span class="profile-label">Separation Mode</span>
+                        <strong>${escapeHtml(d.separationMode) || "--"}</strong>
+                    </div>
+                    <div class="profile-info-item">
+                        <span class="profile-label">Last Working Date</span>
+                        <strong>${escapeHtml(d.lastWorkingDate) || "--"}</strong>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+
+    // =========================
+    // NOMINATION INFORMATION
+    // =========================
+
+    let nominationData = [];
+
+    function loadNominationInformation() {
+        const tbody = document.getElementById("nominationTableBody");
+        tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4">Loading...</td></tr>`;
+
+        demoGetNominations().then(function (res) {
+            nominationData = res.data;
+            renderNominationTable();
+        });
+    }
+
+    function renderNominationTable() {
+        const tbody = document.getElementById("nominationTableBody");
+
+        if (nominationData.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-muted">No nominations added yet.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = nominationData.map(function (n) {
+            return `
+                <tr>
+                    <td>${escapeHtml(n.nominationFor)}</td>
+                    <td>${escapeHtml(n.familyMember)}</td>
+                    <td>${n.percentage}%</td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-outline-primary" data-edit-nomination="${n.id}">Edit</button>
+                        <button type="button" class="btn btn-sm btn-outline-danger" data-delete-nomination="${n.id}">Delete</button>
+                    </td>
+                </tr>
+            `;
+        }).join("");
+
+        tbody.querySelectorAll("[data-edit-nomination]").forEach(function (btn) {
+            btn.addEventListener("click", function () {
+                openNominationModal(this.dataset.editNomination);
+            });
+        });
+
+        tbody.querySelectorAll("[data-delete-nomination]").forEach(function (btn) {
+            btn.addEventListener("click", function () {
+                const id = this.dataset.deleteNomination;
+
+                Swal.fire({
+                    icon: "warning",
+                    title: "Remove this nomination?",
+                    showCancelButton: true,
+                    confirmButtonText: "Yes, remove",
+                    confirmButtonColor: "#b3261e"
+                }).then(function (result) {
+                    if (result.isConfirmed) {
+                        demoDeleteNomination(id).then(function () {
+                            nominationData = nominationData.filter(function (n) {
+                                return String(n.id) !== String(id);
+                            });
+                            renderNominationTable();
+                        });
+                    }
+                });
+            });
+        });
+    }
+
+    function openNominationModal(id) {
+        const modalTitle = document.getElementById("nominationModalTitle");
+        document.getElementById("nominationFormMessage").innerHTML = "";
+
+        if (id) {
+            const record = nominationData.find(function (n) {
+                return String(n.id) === String(id);
+            });
+
+            modalTitle.textContent = "Edit Nomination";
+            document.getElementById("nominationId").value = record.id;
+            document.getElementById("nominationFor").value = record.nominationFor;
+            document.getElementById("nominationFamilyMember").value = record.familyMember;
+            document.getElementById("nominationPercentage").value = record.percentage;
+        } else {
+            modalTitle.textContent = "Add Nomination";
+            document.getElementById("nominationForm").reset();
+            document.getElementById("nominationId").value = "";
+        }
+
+        const modal = new bootstrap.Modal(document.getElementById("nominationModal"));
+        modal.show();
+    }
+
+    const addNominationButton = document.getElementById("addNominationButton");
+    if (addNominationButton) {
+        addNominationButton.addEventListener("click", function () {
+            openNominationModal(null);
+        });
+    }
+
+    const nominationForm = document.getElementById("nominationForm");
+    if (nominationForm) {
+        nominationForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const id = document.getElementById("nominationId").value;
+
+            const payload = {
+                nominationFor: document.getElementById("nominationFor").value,
+                familyMember: document.getElementById("nominationFamilyMember").value.trim(),
+                percentage: Number(document.getElementById("nominationPercentage").value)
+            };
+
+            const apiCall = id
+                ? demoUpdateNomination(id, payload)
+                : demoAddNomination(payload);
+
+            apiCall.then(function (res) {
+                const modal = bootstrap.Modal.getInstance(document.getElementById("nominationModal"));
+                if (modal) modal.hide();
+
+                Swal.fire({
+                    icon: "success",
+                    title: res.data.message,
+                    confirmButtonColor: "#17a2b8"
+                });
+
+                loadNominationInformation();
+            });
+        });
+    }
+
+
+    // =========================
+    // SKILLS
+    // =========================
+
+    let skillsList = [];
+
+    function loadSkills() {
+        const container = document.getElementById("skillsChipsList");
+        container.innerHTML = `<p class="text-muted">Loading...</p>`;
+
+        demoGetSkills().then(function (res) {
+            skillsList = res.data;
+            renderSkillsChips();
+        });
+    }
+
+    function renderSkillsChips() {
+        const container = document.getElementById("skillsChipsList");
+
+        if (skillsList.length === 0) {
+            container.innerHTML = `<p class="text-muted">No skills added yet.</p>`;
+            return;
+        }
+
+        container.innerHTML = skillsList.map(function (skill, index) {
+            return `
+                <span class="cc-chip">
+                    ${escapeHtml(skill)}
+                    <button type="button" data-remove-skill="${index}">&times;</button>
+                </span>
+            `;
+        }).join("");
+
+        container.querySelectorAll("[data-remove-skill]").forEach(function (btn) {
+            btn.addEventListener("click", function () {
+                const index = Number(this.dataset.removeSkill);
+                skillsList.splice(index, 1);
+                renderSkillsChips();
+                saveSkills();
+            });
+        });
+    }
+
+    function saveSkills() {
+        demoUpdateSkills(skillsList);
+    }
+
+    const addSkillButton = document.getElementById("addSkillButton");
+    if (addSkillButton) {
+        addSkillButton.addEventListener("click", function () {
+            const input = document.getElementById("newSkillInput");
+            const value = input.value.trim();
+
+            if (!value) return;
+
+            if (!skillsList.includes(value)) {
+                skillsList.push(value);
+                renderSkillsChips();
+                saveSkills();
+            }
+
+            input.value = "";
+        });
+    }
+
+
+    // =========================
+    // PERSONAL INFORMATION
+    // =========================
+
+    let currentPersonalInfo = null;
+
+    function loadPersonalInformation() {
+        const card = document.getElementById("personalInfoCard");
+        card.innerHTML = `<p class="text-muted">Loading...</p>`;
+
+        demoGetPersonalInformation().then(function (res) {
+            currentPersonalInfo = res.data;
+            const d = currentPersonalInfo;
+
+            card.innerHTML = `
+                <div class="profile-info-grid">
+                    <div class="profile-info-item">
+                        <span class="profile-label">Height</span>
+                        <strong>${escapeHtml(d.height) || "--"}</strong>
+                    </div>
+                    <div class="profile-info-item">
+                        <span class="profile-label">Weight</span>
+                        <strong>${escapeHtml(d.weight) || "--"}</strong>
+                    </div>
+                    <div class="profile-info-item">
+                        <span class="profile-label">Passport No</span>
+                        <strong>${escapeHtml(d.passportNo) || "--"}</strong>
+                    </div>
+                    <div class="profile-info-item">
+                        <span class="profile-label">PAN No</span>
+                        <strong>${escapeHtml(d.panNo) || "--"}</strong>
+                    </div>
+                    <div class="profile-info-item">
+                        <span class="profile-label">Aadhar No</span>
+                        <strong>${escapeHtml(d.aadharNo) || "--"}</strong>
+                    </div>
+                    <div class="profile-info-item">
+                        <span class="profile-label">Religion</span>
+                        <strong>${escapeHtml(d.religion) || "--"}</strong>
+                    </div>
+                    <div class="profile-info-item">
+                        <span class="profile-label">Marital Status</span>
+                        <strong>${escapeHtml(d.maritalStatus) || "--"}</strong>
+                    </div>
+                    <div class="profile-info-item">
+                        <span class="profile-label">Employee Blood Group</span>
+                        <strong>${escapeHtml(d.bloodGroup) || "--"}</strong>
+                    </div>
+                    <div class="profile-info-item">
+                        <span class="profile-label">Shift</span>
+                        <strong>${escapeHtml(d.shift) || "--"}</strong>
+                    </div>
+                </div>
+            `;
+        });
+    }
+    // ==============================
+    // Profile Infomation model Open
+    // ==============================
+
+    function openPersonalInfoModal() {
+        if (!currentPersonalInfo) return;
+
+        document.getElementById("heightField").value = currentPersonalInfo.height || "";
+        document.getElementById("weightField").value = currentPersonalInfo.weight || "";
+        document.getElementById("passportNoField").value = currentPersonalInfo.passportNo || "";
+        document.getElementById("panNoField").value = currentPersonalInfo.panNo || "";
+        document.getElementById("aadharNoField").value = currentPersonalInfo.aadharNo || "";
+        document.getElementById("religionField").value = currentPersonalInfo.religion || "";
+        document.getElementById("maritalStatusField").value = currentPersonalInfo.maritalStatus || "Single";
+        document.getElementById("bloodGroupField").value = currentPersonalInfo.bloodGroup || "O+";
+        document.getElementById("shiftField").value = currentPersonalInfo.shift || "Day";
+        document.getElementById("personalInfoFormMessage").innerHTML = "";
+
+        const modal = new bootstrap.Modal(document.getElementById("personalInfoModal"));
+        modal.show();
+    }
+
+    const editPersonalInfoButton = document.getElementById("editPersonalInfoButton");
+    if (editPersonalInfoButton) {
+        editPersonalInfoButton.addEventListener("click", openPersonalInfoModal);
+    }
+
+    const personalInfoForm = document.getElementById("personalInfoForm");
+    if (personalInfoForm) {
+        personalInfoForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const payload = {
+                height: document.getElementById("heightField").value.trim(),
+                weight: document.getElementById("weightField").value.trim(),
+                passportNo: document.getElementById("passportNoField").value.trim(),
+                panNo: document.getElementById("panNoField").value.trim(),
+                aadharNo: document.getElementById("aadharNoField").value.trim(),
+                religion: document.getElementById("religionField").value.trim(),
+                maritalStatus: document.getElementById("maritalStatusField").value,
+                bloodGroup: document.getElementById("bloodGroupField").value,
+                shift: document.getElementById("shiftField").value
+            };
+
+            demoUpdatePersonalInformation(payload).then(function (res) {
+                const modal = bootstrap.Modal.getInstance(document.getElementById("personalInfoModal"));
+                if (modal) modal.hide();
+
+                Swal.fire({
+                    icon: "success",
+                    title: res.data.message,
+                    confirmButtonColor: "#17a2b8"
+                });
+
+                loadPersonalInformation();
+            });
+        });
+    }
+
+
+    // =========================
+    // EMERGENCY INFORMATION
+    // =========================
+
+    let emergencyContactsData = [];
+
+    function loadEmergencyInformation() {
+        const tbody = document.getElementById("emergencyContactsTableBody");
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4">Loading...</td></tr>`;
+
+        demoGetEmergencyContacts().then(function (res) {
+            emergencyContactsData = res.data;
+            renderEmergencyContactsTable();
+        });
+    }
+
+    function renderEmergencyContactsTable() {
+        const tbody = document.getElementById("emergencyContactsTableBody");
+
+        if (emergencyContactsData.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-muted">No emergency contacts added yet.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = emergencyContactsData.map(function (c) {
+            return `
+                <tr>
+                    <td>${escapeHtml(c.name)}</td>
+                    <td>${escapeHtml(c.relationship)}</td>
+                    <td>${escapeHtml(c.phone)}</td>
+                    <td>${escapeHtml(c.address)}</td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-outline-primary" data-edit-emergency="${c.id}">Edit</button>
+                        <button type="button" class="btn btn-sm btn-outline-danger" data-delete-emergency="${c.id}">Delete</button>
+                    </td>
+                </tr>
+            `;
+        }).join("");
+
+        tbody.querySelectorAll("[data-edit-emergency]").forEach(function (btn) {
+            btn.addEventListener("click", function () {
+                openEmergencyContactModal(this.dataset.editEmergency);
+            });
+        });
+
+        tbody.querySelectorAll("[data-delete-emergency]").forEach(function (btn) {
+            btn.addEventListener("click", function () {
+                const id = this.dataset.deleteEmergency;
+
+                Swal.fire({
+                    icon: "warning",
+                    title: "Remove this contact?",
+                    showCancelButton: true,
+                    confirmButtonText: "Yes, remove",
+                    confirmButtonColor: "#b3261e"
+                }).then(function (result) {
+                    if (result.isConfirmed) {
+                        demoDeleteEmergencyContact(id).then(function () {
+                            emergencyContactsData = emergencyContactsData.filter(function (c) {
+                                return String(c.id) !== String(id);
+                            });
+                            renderEmergencyContactsTable();
+                        });
+                    }
+                });
+            });
+        });
+    }
+
+    function openEmergencyContactModal(id) {
+        const modalTitle = document.getElementById("emergencyContactModalTitle");
+        document.getElementById("emergencyContactFormMessage").innerHTML = "";
+
+        if (id) {
+            const contact = emergencyContactsData.find(function (c) {
+                return String(c.id) === String(id);
+            });
+
+            modalTitle.textContent = "Edit Emergency Contact";
+            document.getElementById("emergencyContactId").value = contact.id;
+            document.getElementById("emergencyContactName").value = contact.name;
+            document.getElementById("emergencyContactRelationship").value = contact.relationship;
+            document.getElementById("emergencyContactPhone").value = contact.phone;
+            document.getElementById("emergencyContactAddress").value = contact.address;
+        } else {
+            modalTitle.textContent = "Add Emergency Contact";
+            document.getElementById("emergencyContactForm").reset();
+            document.getElementById("emergencyContactId").value = "";
+        }
+
+        const modal = new bootstrap.Modal(document.getElementById("emergencyContactModal"));
+        modal.show();
+    }
+
+    const addEmergencyContactButton = document.getElementById("addEmergencyContactButton");
+    if (addEmergencyContactButton) {
+        addEmergencyContactButton.addEventListener("click", function () {
+            openEmergencyContactModal(null);
+        });
+    }
+
+    const emergencyContactForm = document.getElementById("emergencyContactForm");
+    if (emergencyContactForm) {
+        emergencyContactForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const id = document.getElementById("emergencyContactId").value;
+
+            const payload = {
+                name: document.getElementById("emergencyContactName").value.trim(),
+                relationship: document.getElementById("emergencyContactRelationship").value.trim(),
+                phone: document.getElementById("emergencyContactPhone").value.trim(),
+                address: document.getElementById("emergencyContactAddress").value.trim()
+            };
+
+            const apiCall = id
+                ? demoUpdateEmergencyContact(id, payload)
+                : demoAddEmergencyContact(payload);
+
+            apiCall.then(function (res) {
+                const modal = bootstrap.Modal.getInstance(document.getElementById("emergencyContactModal"));
+                if (modal) modal.hide();
+
+                Swal.fire({
+                    icon: "success",
+                    title: res.data.message,
+                    confirmButtonColor: "#17a2b8"
+                });
+
+                loadEmergencyInformation();
+            });
+        });
+    }
+
+
+    // =========================
+    // EDUCATION INFORMATION
+    // =========================
+
+    let educationData = [];
+    function loadEducationInformation() {
+        const container = document.getElementById("educationCardsList");
+        container.innerHTML = `<p class="text-muted">Loading...</p>`;
+
+        demoGetEducation().then(function (res) {
+            educationData = res.data;
+            renderEducationCards();
+        });
+    }
+
+    function renderEducationCards() {
+        const container = document.getElementById("educationCardsList");
+
+        if (educationData.length === 0) {
+            container.innerHTML = `<p class="text-muted">No education records added yet.</p>`;
+            return;
+        }
+
+        container.innerHTML = educationData.map(function (e) {
+            return `
+                <div class="education-card">
+
+                    <div class="education-card-actions">
+                        <button type="button" class="education-edit-btn" data-edit-education="${e.id}" title="Edit">✎</button>
+                        <button type="button" class="education-delete-btn" data-delete-education="${e.id}" title="Delete">🗑</button>
+                    </div>
+
+                    <div class="education-card-header">
+                        <div class="education-card-icon">🎓</div>
+                        <div class="education-card-title">
+                            <h5>${escapeHtml(e.qualification)}</h5>
+                            <p>${escapeHtml(e.institution)}</p>
+                        </div>
+                    </div>
+
+                    <div class="education-card-details">
+                        <div class="education-detail-item">
+                            <span>Roll Number</span>
+                            <strong>${escapeHtml(e.rollNumber) || "--"}</strong>
+                        </div>
+                        <div class="education-detail-item">
+                            <span>Year Of Passing</span>
+                            <strong>${escapeHtml(e.year) || "--"}</strong>
+                        </div>
+                        <div class="education-detail-item">
+                            <span>Subjects/Specialization</span>
+                            <strong>${escapeHtml(e.subjects) || "--"}</strong>
+                        </div>
+                        <div class="education-detail-item">
+                            <span>Percentage</span>
+                            <strong>${escapeHtml(e.percentage) || "--"}</strong>
+                        </div>
+                    </div>
+
+                </div>
+            `;
+        }).join("");
+
+        container.querySelectorAll("[data-edit-education]").forEach(function (btn) {
+            btn.addEventListener("click", function () {
+                openEducationModal(this.dataset.editEducation);
+            });
+        });
+
+        container.querySelectorAll("[data-delete-education]").forEach(function (btn) {
+            btn.addEventListener("click", function () {
+                const id = this.dataset.deleteEducation;
+
+                Swal.fire({
+                    icon: "warning",
+                    title: "Remove this education record?",
+                    showCancelButton: true,
+                    confirmButtonText: "Yes, remove",
+                    confirmButtonColor: "#b3261e"
+                }).then(function (result) {
+                    if (result.isConfirmed) {
+                        demoDeleteEducation(id).then(function () {
+                            educationData = educationData.filter(function (e) {
+                                return String(e.id) !== String(id);
+                            });
+                            renderEducationCards();
+                        });
+                    }
+                });
+            });
+        });
+    }
+    function openEducationModal(id) {
+        const modalTitle = document.getElementById("educationModalTitle");
+        document.getElementById("educationFormMessage").innerHTML = "";
+
+        if (id) {
+            const record = educationData.find(function (e) {
+                return String(e.id) === String(id);
+            });
+
+            modalTitle.textContent = "Edit Education";
+            document.getElementById("educationId").value = record.id;
+            document.getElementById("educationQualification").value = record.qualification;
+            document.getElementById("educationInstitution").value = record.institution;
+            document.getElementById("educationRollNumber").value = record.rollNumber;
+            document.getElementById("educationSubjects").value = record.subjects;
+            document.getElementById("educationYear").value = record.year;
+            document.getElementById("educationPercentage").value = record.percentage;
+        } else {
+            modalTitle.textContent = "Add Education";
+            document.getElementById("educationForm").reset();
+            document.getElementById("educationId").value = "";
+        }
+
+        const modal = new bootstrap.Modal(document.getElementById("educationModal"));
+        modal.show();
+    }
+
+    const addEducationButton = document.getElementById("addEducationButton");
+    if (addEducationButton) {
+        addEducationButton.addEventListener("click", function () {
+            openEducationModal(null);
+        });
+    }
+
+    const educationForm = document.getElementById("educationForm");
+    if (educationForm) {
+        educationForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const id = document.getElementById("educationId").value;
+
+            const payload = {
+                qualification: document.getElementById("educationQualification").value.trim(),
+                institution: document.getElementById("educationInstitution").value.trim(),
+                rollNumber: document.getElementById("educationRollNumber").value.trim(),
+                subjects: document.getElementById("educationSubjects").value.trim(),
+                year: document.getElementById("educationYear").value.trim(),
+                percentage: document.getElementById("educationPercentage").value.trim()
+            };
+
+            const apiCall = id
+                ? demoUpdateEducation(id, payload)
+                : demoAddEducation(payload);
+
+            apiCall.then(function (res) {
+                const modal = bootstrap.Modal.getInstance(document.getElementById("educationModal"));
+                if (modal) modal.hide();
+
+                Swal.fire({
+                    icon: "success",
+                    title: res.data.message,
+                    confirmButtonColor: "#17a2b8"
+                });
+
+                loadEducationInformation();
+            });
+        });
+    }
+
+
+    // =========================
+    // EXPERIENCE INFORMATION
+    // =========================
+
+    let experienceData = [];
+
+    function loadExperienceInformation() {
+        const tbody = document.getElementById("experienceTableBody");
+        tbody.innerHTML = `<tr><td colspan="10" class="text-center py-4">Loading...</td></tr>`;
+
+        demoGetExperience().then(function (res) {
+            experienceData = res.data;
+            renderExperienceTable();
+        });
+    }
+
+    function renderExperienceTable() {
+        const tbody = document.getElementById("experienceTableBody");
+
+        if (experienceData.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="10" class="text-center py-4 text-muted">No experience records added yet.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = experienceData.map(function (x) {
+            return `
+                <tr>
+                    <td>${escapeHtml(x.fromDate)}</td>
+                    <td>${escapeHtml(x.toDate)}</td>
+                    <td>${escapeHtml(x.organization)}</td>
+                    <td>${escapeHtml(x.position)}</td>
+                    <td>${escapeHtml(x.reasonOfLeaving)}</td>
+                    <td>${escapeHtml(x.lastCtc)}</td>
+                    <td>${escapeHtml(x.lastContactNo)}</td>
+                    <td>${escapeHtml(x.lastReferenceNo)}</td>
+                    <td>${escapeHtml(x.totalLength)}</td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-outline-primary" data-edit-experience="${x.id}">Edit</button>
+                        <button type="button" class="btn btn-sm btn-outline-danger" data-delete-experience="${x.id}">Delete</button>
+                    </td>
+                </tr>
+            `;
+        }).join("");
+
+        tbody.querySelectorAll("[data-edit-experience]").forEach(function (btn) {
+            btn.addEventListener("click", function () {
+                openExperienceModal(this.dataset.editExperience);
+            });
+        });
+
+        tbody.querySelectorAll("[data-delete-experience]").forEach(function (btn) {
+            btn.addEventListener("click", function () {
+                const id = this.dataset.deleteExperience;
+
+                Swal.fire({
+                    icon: "warning",
+                    title: "Remove this experience record?",
+                    showCancelButton: true,
+                    confirmButtonText: "Yes, remove",
+                    confirmButtonColor: "#b3261e"
+                }).then(function (result) {
+                    if (result.isConfirmed) {
+                        demoDeleteExperience(id).then(function () {
+                            experienceData = experienceData.filter(function (x) {
+                                return String(x.id) !== String(id);
+                            });
+                            renderExperienceTable();
+                        });
+                    }
+                });
+            });
+        });
+    }
+
+    function openExperienceModal(id) {
+        const modalTitle = document.getElementById("experienceModalTitle");
+        document.getElementById("experienceFormMessage").innerHTML = "";
+
+        if (id) {
+            const record = experienceData.find(function (x) {
+                return String(x.id) === String(id);
+            });
+
+            modalTitle.textContent = "Edit Experience";
+            document.getElementById("experienceId").value = record.id;
+            document.getElementById("experienceFromDate").value = record.fromDate;
+            document.getElementById("experienceToDate").value = record.toDate;
+            document.getElementById("experienceOrganization").value = record.organization;
+            document.getElementById("experiencePosition").value = record.position;
+            document.getElementById("experienceReasonOfLeaving").value = record.reasonOfLeaving;
+            document.getElementById("experienceLastCtc").value = record.lastCtc;
+            document.getElementById("experienceLastContactNo").value = record.lastContactNo;
+            document.getElementById("experienceLastReferenceNo").value = record.lastReferenceNo;
+            document.getElementById("experienceTotalLength").value = record.totalLength;
+        } else {
+            modalTitle.textContent = "Add Experience";
+            document.getElementById("experienceForm").reset();
+            document.getElementById("experienceId").value = "";
+        }
+
+        const modal = new bootstrap.Modal(document.getElementById("experienceModal"));
+        modal.show();
+    }
+
+    const addExperienceButton = document.getElementById("addExperienceButton");
+    if (addExperienceButton) {
+        addExperienceButton.addEventListener("click", function () {
+            openExperienceModal(null);
+        });
+    }
+
+    const experienceForm = document.getElementById("experienceForm");
+    if (experienceForm) {
+        experienceForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const id = document.getElementById("experienceId").value;
+
+            const payload = {
+                fromDate: document.getElementById("experienceFromDate").value,
+                toDate: document.getElementById("experienceToDate").value,
+                organization: document.getElementById("experienceOrganization").value.trim(),
+                position: document.getElementById("experiencePosition").value.trim(),
+                reasonOfLeaving: document.getElementById("experienceReasonOfLeaving").value.trim(),
+                lastCtc: document.getElementById("experienceLastCtc").value.trim(),
+                lastContactNo: document.getElementById("experienceLastContactNo").value.trim(),
+                lastReferenceNo: document.getElementById("experienceLastReferenceNo").value.trim(),
+                totalLength: document.getElementById("experienceTotalLength").value.trim()
+            };
+
+            const apiCall = id
+                ? demoUpdateExperience(id, payload)
+                : demoAddExperience(payload);
+
+            apiCall.then(function (res) {
+                const modal = bootstrap.Modal.getInstance(document.getElementById("experienceModal"));
+                if (modal) modal.hide();
+
+                Swal.fire({
+                    icon: "success",
+                    title: res.data.message,
+                    confirmButtonColor: "#17a2b8"
+                });
+
+                loadExperienceInformation();
+            });
+        });
+    }
+
+
+    // =========================
+    // FAMILY INFORMATION
+    // =========================
+
+    let familyMembersData = [];
+
+    function loadFamilyInformation() {
+        const tbody = document.getElementById("familyMembersTableBody");
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4">Loading...</td></tr>`;
+
+        demoGetFamilyMembers().then(function (res) {
+            familyMembersData = res.data;
+            renderFamilyTable();
+        });
+    }
+
+    function renderFamilyTable() {
+        const tbody = document.getElementById("familyMembersTableBody");
+
+        if (familyMembersData.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-muted">No family members added yet.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = familyMembersData.map(function (m) {
+            return `
+                <tr>
+                    <td>${escapeHtml(m.name)}</td>
+                    <td>${escapeHtml(m.relationship)}</td>
+                    <td>${escapeHtml(m.dateOfBirth)}</td>
+                    <td>${escapeHtml(m.phone)}</td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-outline-primary" data-edit-family="${m.id}">Edit</button>
+                        <button type="button" class="btn btn-sm btn-outline-danger" data-delete-family="${m.id}">Delete</button>
+                    </td>
+                </tr>
+            `;
+        }).join("");
+
+        tbody.querySelectorAll("[data-edit-family]").forEach(function (btn) {
+            btn.addEventListener("click", function () {
+                openFamilyMemberModal(this.dataset.editFamily);
+            });
+        });
+
+        tbody.querySelectorAll("[data-delete-family]").forEach(function (btn) {
+            btn.addEventListener("click", function () {
+                const id = this.dataset.deleteFamily;
+
+                Swal.fire({
+                    icon: "warning",
+                    title: "Remove this family member?",
+                    showCancelButton: true,
+                    confirmButtonText: "Yes, remove",
+                    confirmButtonColor: "#b3261e"
+                }).then(function (result) {
+                    if (result.isConfirmed) {
+                        demoDeleteFamilyMember(id).then(function () {
+                            familyMembersData = familyMembersData.filter(function (m) {
+                                return String(m.id) !== String(id);
+                            });
+                            renderFamilyTable();
+                        });
+                    }
+                });
+            });
+        });
+    }
+
+    function openFamilyMemberModal(id) {
+        const modalTitle = document.getElementById("familyMemberModalTitle");
+        document.getElementById("familyMemberFormMessage").innerHTML = "";
+
+        if (id) {
+            const member = familyMembersData.find(function (m) {
+                return String(m.id) === String(id);
+            });
+
+            modalTitle.textContent = "Edit Family Member";
+            document.getElementById("familyMemberId").value = member.id;
+            document.getElementById("familyMemberName").value = member.name;
+            document.getElementById("familyMemberRelationship").value = member.relationship;
+            document.getElementById("familyMemberDob").value = member.dateOfBirth;
+            document.getElementById("familyMemberPhone").value = member.phone;
+        } else {
+            modalTitle.textContent = "Add Family Member";
+            document.getElementById("familyMemberForm").reset();
+            document.getElementById("familyMemberId").value = "";
+        }
+
+        const modal = new bootstrap.Modal(document.getElementById("familyMemberModal"));
+        modal.show();
+    }
+
+    const addFamilyMemberButton = document.getElementById("addFamilyMemberButton");
+    if (addFamilyMemberButton) {
+        addFamilyMemberButton.addEventListener("click", function () {
+            openFamilyMemberModal(null);
+        });
+    }
+
+    const familyMemberForm = document.getElementById("familyMemberForm");
+    if (familyMemberForm) {
+        familyMemberForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const id = document.getElementById("familyMemberId").value;
+
+            const payload = {
+                name: document.getElementById("familyMemberName").value.trim(),
+                relationship: document.getElementById("familyMemberRelationship").value.trim(),
+                dateOfBirth: document.getElementById("familyMemberDob").value,
+                phone: document.getElementById("familyMemberPhone").value.trim()
+            };
+
+            const apiCall = id
+                ? demoUpdateFamilyMember(id, payload)
+                : demoAddFamilyMember(payload);
+
+            apiCall.then(function (res) {
+                const modal = bootstrap.Modal.getInstance(document.getElementById("familyMemberModal"));
+                if (modal) modal.hide();
+
+                Swal.fire({
+                    icon: "success",
+                    title: res.data.message,
+                    confirmButtonColor: "#17a2b8"
+                });
+
+                loadFamilyInformation();
+            });
+        });
+    }
+
+
 
 });
 

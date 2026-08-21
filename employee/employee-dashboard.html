@@ -119,7 +119,6 @@
                 <div class="sidebar-header">
                     <span>EMPLOYEE PANEL</span>
                 </div>
-
                 <div class="sidebar-menu">
                     <button class="sidebar-item active" type="button"
                         data-view="dashboard">
@@ -128,31 +127,25 @@
 
 
 
-
-
-                     <button class="sidebar-item sidebar-group-toggle"
-                        type="button"
-                        data-bs-toggle="collapse"
-                        data-bs-target="#attendanceGroup"
+                    <button class="sidebar-item sidebar-group-toggle" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#myProfileGroup"
                         aria-expanded="false">
-                        <span class="menu-icon">◷</span>My Profile
+                        <span class="menu-icon">◍</span> My Profile
                         <span class="group-arrow">▾</span>
                     </button>
-                    <div class="collapse sidebar-submenu" id="attendanceGroup">
-                        <button class="sidebar-item sidebar-subitem"
-                            type="button" data-view="my-attendance">
-                            My Attendance
-                        </button>
-                        <button class="sidebar-item sidebar-subitem"
-                            type="button" data-view="attendance-calendar">
-                            Attendance Calendar
-                        </button>
-                        <button class="sidebar-item sidebar-subitem"
-                            type="button" data-view="attendance-corrections">
-                            Attendance Corrections
-                        </button>
+                    <div class="collapse sidebar-submenu" id="myProfileGroup">
+                        <button class="sidebar-item sidebar-subitem" type="button" data-view="personal-information">Personal Information</button>
+                        <button class="sidebar-item sidebar-subitem" type="button" data-view="emergency-information">Emergency Information</button>
+                        <button class="sidebar-item sidebar-subitem" type="button" data-view="bank-information">Bank Information</button>
+                        <button class="sidebar-item sidebar-subitem" type="button" data-view="family-information">Family Information</button>
+                        <button class="sidebar-item sidebar-subitem" type="button" data-view="education-information">Education Information</button>
+                        <button class="sidebar-item sidebar-subitem" type="button" data-view="experience-information">Experience Information</button>
+                        <button class="sidebar-item sidebar-subitem" type="button" data-view="joining-details">Joining Details</button>
+                        <button class="sidebar-item sidebar-subitem" type="button" data-view="work-position">Work Position</button>
+                        <button class="sidebar-item sidebar-subitem" type="button" data-view="exit-details">Exit Details</button>
+                        <button class="sidebar-item sidebar-subitem" type="button" data-view="nomination-information">Nomination Information</button>
+                        <button class="sidebar-item sidebar-subitem" type="button" data-view="skills">Skills</button>
                     </div>
-
 
 
 
@@ -640,7 +633,6 @@
                 </section>
 
                 <!-- PROFILE -->
-                <!-- PROFILE -->
                 <section id="profileView" class="content-view d-none">
                     <div class="section-heading">
                         <div><h1>Profile</h1></div>
@@ -721,6 +713,510 @@
                         </div>
                     </div>
                 </section>
+                <!-- PROFILE OVERVIEW (all sections on one page) -->
+                <section id="profile-overviewView" class="content-view d-none">
+                    <div class="section-heading">
+                        <div><h3>My Profile — Full Overview</h3><p>All your profile information at a glance.</p></div>
+                    </div>
+                    <div id="profileOverviewGrid" class="overview-cards-grid"></div>
+                </section>
+
+               <!-- PERSONAL INFORMATION -->
+                <section id="personal-informationView" class="content-view d-none">
+                    <div class="section-heading">
+                        <div><h3>Personal Information</h3></div>
+                        <button type="button" id="editPersonalInfoButton" class="btn btn-outline-primary">Edit</button>
+                    </div>
+                    <div id="personalInfoCard" class="erp-form-card"></div>
+                </section>
+
+                <!-- PERSONAL INFO EDIT MODAL -->
+                <div class="modal fade" id="personalInfoModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content role-modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Edit Personal Information</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <form id="personalInfoForm">
+                                <div class="modal-body">
+                                    <div id="personalInfoFormMessage"></div>
+
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Height</label>
+                                            <input type="text" id="heightField" class="form-control" placeholder="e.g. 5'8&quot;">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Weight</label>
+                                            <input type="text" id="weightField" class="form-control" placeholder="e.g. 70 kg">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Passport No</label>
+                                            <input type="text" id="passportNoField" class="form-control">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">PAN No</label>
+                                            <input type="text" id="panNoField" class="form-control">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Aadhar No</label>
+                                            <input type="text" id="aadharNoField" class="form-control">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Religion</label>
+                                            <input type="text" id="religionField" class="form-control">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Marital Status</label>
+                                            <select id="maritalStatusField" class="form-select">
+                                                <option value="Single">Single</option>
+                                                <option value="Married">Married</option>
+                                                <option value="Other">Other</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Employee Blood Group</label>
+                                            <select id="bloodGroupField" class="form-select">
+                                                <option value="A+">A+</option>
+                                                <option value="A-">A-</option>
+                                                <option value="B+">B+</option>
+                                                <option value="B-">B-</option>
+                                                <option value="AB+">AB+</option>
+                                                <option value="AB-">AB-</option>
+                                                <option value="O+">O+</option>
+                                                <option value="O-">O-</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Shift</label>
+                                            <select id="shiftField" class="form-select">
+                                                <option value="Day">Day</option>
+                                                <option value="Night">Night</option>
+                                                <option value="General">General</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="secondary-action-btn" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn-primary-erp">Save Changes</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- EMERGENCY INFORMATION -->
+                <section id="emergency-informationView" class="content-view d-none">
+                    <div class="section-heading">
+                        <div><h3>Emergency Information</h3></div>
+                        <button type="button" id="addEmergencyContactButton" class="btn btn-primary">+ Add Contact</button>
+                    </div>
+
+                    <div id="emergencyInfoMessage"></div>
+
+                    <div class="table-responsive">
+                        <table class="table erp-table align-middle">
+                            <thead>
+                                <tr><th>Name</th><th>Relationship</th><th>Phone</th><th>Address</th><th>Action</th></tr>
+                            </thead>
+                            <tbody id="emergencyContactsTableBody"></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- EMERGENCY CONTACT MODAL -->
+                <div class="modal fade" id="emergencyContactModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content role-modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="emergencyContactModalTitle">Add Emergency Contact</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <form id="emergencyContactForm">
+                                <div class="modal-body">
+                                    <div id="emergencyContactFormMessage"></div>
+                                    <input type="hidden" id="emergencyContactId">
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Name <span class="required-star">*</span></label>
+                                        <input type="text" id="emergencyContactName" class="form-control" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Relationship <span class="required-star">*</span></label>
+                                        <input type="text" id="emergencyContactRelationship" class="form-control" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Phone <span class="required-star">*</span></label>
+                                        <input type="text" id="emergencyContactPhone" class="form-control" required>
+                                    </div>
+                                    <div class="mb-0">
+                                        <label class="form-label">Address</label>
+                                        <textarea id="emergencyContactAddress" class="form-control" rows="2"></textarea>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="secondary-action-btn" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn-primary-erp">Save</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <section id="bank-informationView" class="content-view d-none">
+                    <div class="section-heading"><div><h3>Bank Information</h3></div></div>
+                    <div class="erp-form-card text-muted">This section is coming soon.</div>
+                </section>
+
+                <!-- EDUCATION INFORMATION -->
+                <section id="education-informationView" class="content-view d-none">
+                    <div class="section-heading">
+                        <div><h3>Education Information</h3><p>Your academic qualifications.</p></div>
+                        <button type="button" id="addEducationButton" class="btn btn-primary">+ Add Education</button>
+                    </div>
+
+                    <div id="educationInfoMessage"></div>
+
+                    <div id="educationCardsList" class="education-cards-grid"></div>
+                </section>
+
+                <!-- EDUCATION MODAL -->
+                <div class="modal fade" id="educationModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content role-modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="educationModalTitle">Add Education</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <form id="educationForm">
+                                <div class="modal-body">
+                                    <div id="educationFormMessage"></div>
+                                    <input type="hidden" id="educationId">
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Qualification <span class="required-star">*</span></label>
+                                        <input type="text" id="educationQualification" class="form-control" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">College/University/Institution <span class="required-star">*</span></label>
+                                        <input type="text" id="educationInstitution" class="form-control" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Roll Number</label>
+                                        <input type="text" id="educationRollNumber" class="form-control">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Subjects/Specialization</label>
+                                        <input type="text" id="educationSubjects" class="form-control">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Year Of Passing</label>
+                                        <input type="text" id="educationYear" class="form-control" placeholder="e.g. 2020">
+                                    </div>
+                                    <div class="mb-0">
+                                        <label class="form-label">Percentage Of Marks</label>
+                                        <input type="text" id="educationPercentage" class="form-control" placeholder="e.g. 78%">
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="secondary-action-btn" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn-primary-erp">Save</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- EXPERIENCE INFORMATION -->
+                <section id="experience-informationView" class="content-view d-none">
+                    <div class="section-heading">
+                        <div><h3>Experience Information</h3></div>
+                        <button type="button" id="addExperienceButton" class="btn btn-primary">+ Add Experience</button>
+                    </div>
+
+                    <div id="experienceInfoMessage"></div>
+
+                    <div class="table-responsive">
+                        <table class="table erp-table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>From Date</th>
+                                    <th>To Date</th>
+                                    <th>Organization</th>
+                                    <th>Position</th>
+                                    <th>Reason Of Leaving</th>
+                                    <th>Last CTC</th>
+                                    <th>Last Contact No</th>
+                                    <th>Last Reference No</th>
+                                    <th>Total Length Of Service</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="experienceTableBody"></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- EXPERIENCE MODAL -->
+                <div class="modal fade" id="experienceModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                        <div class="modal-content role-modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="experienceModalTitle">Add Experience</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <form id="experienceForm">
+                                <div class="modal-body">
+                                    <div id="experienceFormMessage"></div>
+                                    <input type="hidden" id="experienceId">
+
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">From Date <span class="required-star">*</span></label>
+                                            <input type="date" id="experienceFromDate" class="form-control" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">To Date</label>
+                                            <input type="date" id="experienceToDate" class="form-control">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Organization <span class="required-star">*</span></label>
+                                            <input type="text" id="experienceOrganization" class="form-control" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Position</label>
+                                            <input type="text" id="experiencePosition" class="form-control">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Reason Of Leaving</label>
+                                            <input type="text" id="experienceReasonOfLeaving" class="form-control">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Last CTC</label>
+                                            <input type="text" id="experienceLastCtc" class="form-control">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Last Contact No</label>
+                                            <input type="text" id="experienceLastContactNo" class="form-control">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Last Reference No</label>
+                                            <input type="text" id="experienceLastReferenceNo" class="form-control">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Total Length Of Service</label>
+                                            <input type="text" id="experienceTotalLength" class="form-control" placeholder="e.g. 2 years 3 months">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="secondary-action-btn" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn-primary-erp">Save</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+               <!-- WORK POSITION (view-only, HR/Admin controlled) -->
+                <section id="work-positionView" class="content-view d-none">
+                    <div class="section-heading">
+                        <div><h3>Work Position</h3></div>
+                    </div>
+                    <div id="workPositionCard" class="erp-form-card"></div>
+                </section>
+
+
+                <!-- EXIT DETAILS (view-only, HR/Admin controlled) -->
+                <section id="exit-detailsView" class="content-view d-none">
+                    <div class="section-heading">
+                        <div><h3>Exit Details</h3></div>
+                    </div>
+                    <div id="exitDetailsCard" class="erp-form-card"></div>
+                </section>
+
+
+                <!-- NOMINATION INFORMATION -->
+                <section id="nomination-informationView" class="content-view d-none">
+                    <div class="section-heading">
+                        <div><h3>Nomination Information</h3></div>
+                        <button type="button" id="addNominationButton" class="btn btn-primary">+ Add Nomination</button>
+                    </div>
+
+                    <div id="nominationInfoMessage"></div>
+
+                    <div class="table-responsive">
+                        <table class="table erp-table align-middle">
+                            <thead>
+                                <tr><th>Nomination For</th><th>Family Member</th><th>Percentage</th><th>Action</th></tr>
+                            </thead>
+                            <tbody id="nominationTableBody"></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- NOMINATION MODAL -->
+                <div class="modal fade" id="nominationModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content role-modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="nominationModalTitle">Add Nomination</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <form id="nominationForm">
+                                <div class="modal-body">
+                                    <div id="nominationFormMessage"></div>
+                                    <input type="hidden" id="nominationId">
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Nomination For <span class="required-star">*</span></label>
+                                        <select id="nominationFor" class="form-select" required>
+                                            <option value="">-- Select --</option>
+                                            <option value="PF">PF</option>
+                                            <option value="Gratuity">Gratuity</option>
+                                            <option value="Insurance">Insurance</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Family Member <span class="required-star">*</span></label>
+                                        <input type="text" id="nominationFamilyMember" class="form-control" required>
+                                    </div>
+                                    <div class="mb-0">
+                                        <label class="form-label">Percentage <span class="required-star">*</span></label>
+                                        <input type="number" id="nominationPercentage" class="form-control" min="1" max="100" required>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="secondary-action-btn" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn-primary-erp">Save</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- SKILLS -->
+                <section id="skillsView" class="content-view d-none">
+                    <div class="section-heading">
+                        <div><h3>Skills</h3></div>
+                    </div>
+
+                    <div class="erp-form-card">
+                        <div class="cc-input-group">
+                            <input type="text" id="newSkillInput" class="form-control" placeholder="e.g. Java, React, SQL">
+                            <button type="button" id="addSkillButton" class="btn btn-add-cc">+ Add</button>
+                        </div>
+                        <div id="skillsChipsList" class="cc-chips mt-3"></div>
+                    </div>
+                </section>
+
+                <section id="joining-detailsView" class="content-view d-none">
+                    <div class="section-heading">
+                        <div><h3>Joining Details</h3></div>
+                        <button type="button" id="editJoiningDetailsButton" class="btn btn-outline-primary">Edit</button>
+                    </div>
+                    <div id="joiningDetailsCard" class="erp-form-card"></div>
+                </section>
+
+                <!-- JOINING DETAILS EDIT MODAL -->
+                <div class="modal fade" id="joiningDetailsModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content role-modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Edit Joining Details</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <form id="joiningDetailsForm">
+                                <div class="modal-body">
+                                    <div id="joiningDetailsFormMessage"></div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Date of Joining</label>
+                                        <input type="date" id="dateOfJoiningField" class="form-control" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Confirmation Date</label>
+                                        <input type="date" id="confirmationDateField" class="form-control">
+                                    </div>
+                                    <div class="mb-0">
+                                        <label class="form-label">Status</label>
+                                        <select id="joiningStatusField" class="form-select">
+                                            <option value="Active">Active</option>
+                                            <option value="Probation">Probation</option>
+                                            <option value="Confirmed">Confirmed</option>
+                                            <option value="Terminated">Terminated</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="secondary-action-btn" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn-primary-erp">Save Changes</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+
+                <section id="family-informationView" class="content-view d-none">
+                    <div class="section-heading">
+                        <div><h3>Family Information</h3></div>
+                        <button type="button" id="addFamilyMemberButton" class="btn btn-primary">+ Add Member</button>
+                    </div>
+
+                    <div id="familyInfoMessage"></div>
+
+                    <div class="table-responsive">
+                        <table class="table erp-table align-middle">
+                            <thead>
+                                <tr><th>Name</th><th>Relationship</th><th>Date of Birth</th><th>Phone</th><th>Action</th></tr>
+                            </thead>
+                            <tbody id="familyMembersTableBody"></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- FAMILY MEMBER MODAL (Add aur Edit dono ke liye same modal) -->
+                <div class="modal fade" id="familyMemberModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content role-modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="familyMemberModalTitle">Add Family Member</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <form id="familyMemberForm">
+                                <div class="modal-body">
+                                    <div id="familyMemberFormMessage"></div>
+                                    <input type="hidden" id="familyMemberId">
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Name <span class="required-star">*</span></label>
+                                        <input type="text" id="familyMemberName" class="form-control" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Relationship <span class="required-star">*</span></label>
+                                        <input type="text" id="familyMemberRelationship" class="form-control" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Date of Birth</label>
+                                        <input type="date" id="familyMemberDob" class="form-control">
+                                    </div>
+                                    <div class="mb-0">
+                                        <label class="form-label">Phone</label>
+                                        <input type="text" id="familyMemberPhone" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="secondary-action-btn" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn-primary-erp">Save</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
 
             </main>
         </div>

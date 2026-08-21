@@ -1135,6 +1135,206 @@
 }
 
 
+
+/*  ======================= 
+        Education Cards 
+    ======================= */
+.education-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+}
+
+.education-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    border-left: 4px solid #17a2b8;
+    position: relative;
+}
+
+.education-card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.education-card-icon {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    border-radius: 10px;
+    background: #e6f7fa;
+    color: #17a2b8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+.education-card-title h5 {
+    margin: 0 0 2px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1c2126;
+}
+
+.education-card-title p {
+    margin: 0;
+    font-size: 0.82rem;
+    color: #6c757d;
+}
+
+.education-card-actions {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    display: flex;
+    gap: 6px;
+}
+
+.education-card-actions button {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.education-edit-btn {
+    background: #eef2ff;
+    color: #3949ab;
+}
+.education-edit-btn:hover { background: #dde3fb; }
+
+.education-delete-btn {
+    background: #fde8e8;
+    color: #b3261e;
+}
+.education-delete-btn:hover { background: #fbd4d4; }
+
+.education-card-details {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px 16px;
+    padding-top: 12px;
+    border-top: 1px solid #eef0f3;
+}
+
+.education-detail-item span {
+    display: block;
+    font-size: 0.72rem;
+    color: #9aa1ab;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 2px;
+}
+
+.education-detail-item strong {
+    font-size: 0.85rem;
+    color: #1c2126;
+}
+
+
+
+/*  ============================
+     Profile header action button 
+    =============================*/
+.profile-header-action-btn {
+    margin-left: auto;
+    align-self: center;
+    white-space: nowrap;
+}
+
+/* Profile Overview cards */
+.overview-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+}
+
+.overview-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 18px 20px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    border-top: 3px solid #17a2b8;
+}
+
+.overview-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.overview-card-header h5 {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1c2126;
+}
+
+.overview-edit-btn, .overview-nav-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.overview-edit-btn {
+    background: #eef2ff;
+    color: #3949ab;
+}
+.overview-edit-btn:hover { background: #dde3fb; }
+
+.overview-nav-btn {
+    background: #e6f7fa;
+    color: #17a2b8;
+    font-size: 16px;
+    font-weight: 700;
+}
+.overview-nav-btn:hover { background: #d3f0f5; }
+
+.overview-kv-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px 14px;
+}
+
+.overview-kv span {
+    display: block;
+    font-size: 0.7rem;
+    color: #9aa1ab;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 2px;
+}
+
+.overview-kv strong {
+    font-size: 0.82rem;
+    color: #1c2126;
+}
+
+.overview-summary-text {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #495057;
+}
+
+
 /* =========================================
                  RESPONSIVE
    ========================================= */

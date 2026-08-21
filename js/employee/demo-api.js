@@ -225,3 +225,205 @@ function demoGetLeaveFormMeta() {
         ]
     });
 }
+
+
+// Suggested real endpoint: GET /api/employee/me/joining-details
+function demoGetJoiningDetails() {
+    return demoDelay({
+        dateOfJoining: "2026-08-01",
+        confirmationDate: "2027-02-01",
+        status: "Active"
+    });
+}
+
+// Suggested real endpoint: PUT /api/employee/me/joining-details
+function demoUpdateJoiningDetails(payload) {
+    console.log("Demo update joining details payload:", payload);
+    return demoDelay({ message: "Joining details updated successfully." }, 600);
+}
+
+// Suggested real endpoint: GET /api/employee/me/family
+function demoGetFamilyMembers() {
+    return demoDelay([
+        { id: 1, name: "Sunita Pathak", relationship: "Mother", dateOfBirth: "1968-03-12", phone: "9876500001" },
+        { id: 2, name: "Aarav Pathak", relationship: "Son", dateOfBirth: "2018-11-05", phone: "" }
+    ]);
+}
+
+// Suggested real endpoint: POST /api/employee/me/family
+function demoAddFamilyMember(payload) {
+    console.log("Demo add family member payload:", payload);
+    return demoDelay({ message: "Family member added successfully." }, 600);
+}
+
+// Suggested real endpoint: PUT /api/employee/me/family/{id}
+function demoUpdateFamilyMember(id, payload) {
+    console.log("Demo update family member", id, payload);
+    return demoDelay({ message: "Family member updated successfully." }, 600);
+}
+
+// Suggested real endpoint: DELETE /api/employee/me/family/{id}
+function demoDeleteFamilyMember(id) {
+    console.log("Demo delete family member", id);
+    return demoDelay({ message: "Family member removed successfully." }, 400);
+}
+
+
+// Suggested real endpoint: GET /api/employee/me/personal-information
+function demoGetPersonalInformation() {
+    return demoDelay({
+        height: "5'8\"",
+        weight: "70 kg",
+        passportNo: "",
+        panNo: "ABCDE1234F",
+        aadharNo: "XXXX-XXXX-1234",
+        religion: "",
+        maritalStatus: "Single",
+        bloodGroup: "O+",
+        shift: "Day"
+    });
+}
+
+// Suggested real endpoint: PUT /api/employee/me/personal-information
+function demoUpdatePersonalInformation(payload) {
+    console.log("Demo update personal info payload:", payload);
+    return demoDelay({ message: "Personal information updated successfully." }, 600);
+}
+
+// Suggested real endpoint: GET /api/employee/me/emergency-contacts
+function demoGetEmergencyContacts() {
+    return demoDelay([
+        { id: 1, name: "Sunita Pathak", relationship: "Mother", phone: "9876500001", address: "Kanpur, UP" }
+    ]);
+}
+
+// Suggested real endpoint: POST /api/employee/me/emergency-contacts
+function demoAddEmergencyContact(payload) {
+    console.log("Demo add emergency contact payload:", payload);
+    return demoDelay({ message: "Emergency contact added successfully." }, 600);
+}
+
+// Suggested real endpoint: PUT /api/employee/me/emergency-contacts/{id}
+function demoUpdateEmergencyContact(id, payload) {
+    console.log("Demo update emergency contact", id, payload);
+    return demoDelay({ message: "Emergency contact updated successfully." }, 600);
+}
+
+// Suggested real endpoint: DELETE /api/employee/me/emergency-contacts/{id}
+function demoDeleteEmergencyContact(id) {
+    console.log("Demo delete emergency contact", id);
+    return demoDelay({ message: "Emergency contact removed successfully." }, 400);
+}
+
+// Suggested real endpoint: GET /api/employee/me/education
+function demoGetEducation() {
+    return demoDelay([
+        {
+            id: 1, qualification: "B.Tech", institution: "IIT Kanpur",
+            rollNumber: "20CS1042", subjects: "Computer Science",
+            year: "2022", percentage: "82%"
+        }
+    ]);
+}
+
+// Suggested real endpoint: POST /api/employee/me/education
+function demoAddEducation(payload) {
+    console.log("Demo add education payload:", payload);
+    return demoDelay({ message: "Education record added successfully." }, 600);
+}
+
+// Suggested real endpoint: PUT /api/employee/me/education/{id}
+function demoUpdateEducation(id, payload) {
+    console.log("Demo update education", id, payload);
+    return demoDelay({ message: "Education record updated successfully." }, 600);
+}
+
+// Suggested real endpoint: DELETE /api/employee/me/education/{id}
+function demoDeleteEducation(id) {
+    console.log("Demo delete education", id);
+    return demoDelay({ message: "Education record removed successfully." }, 400);
+}
+
+// Suggested real endpoint: GET /api/employee/me/experience
+function demoGetExperience() {
+    return demoDelay([
+        {
+            id: 1, fromDate: "2022-07-01", toDate: "2026-07-31",
+            organization: "Infosys", position: "Software Engineer",
+            reasonOfLeaving: "Better opportunity", lastCtc: "6.5 LPA",
+            lastContactNo: "9876543210", lastReferenceNo: "REF-2201",
+            totalLength: "4 years 1 month"
+        }
+    ]);
+}
+
+// Suggested real endpoint: POST /api/employee/me/experience
+function demoAddExperience(payload) {
+    console.log("Demo add experience payload:", payload);
+    return demoDelay({ message: "Experience record added successfully." }, 600);
+}
+
+// Suggested real endpoint: PUT /api/employee/me/experience/{id}
+function demoUpdateExperience(id, payload) {
+    console.log("Demo update experience", id, payload);
+    return demoDelay({ message: "Experience record updated successfully." }, 600);
+}
+
+// Suggested real endpoint: DELETE /api/employee/me/experience/{id}
+function demoDeleteExperience(id) {
+    console.log("Demo delete experience", id);
+    return demoDelay({ message: "Experience record removed successfully." }, 400);
+}
+
+// Suggested real endpoint: GET /api/employee/me/work-position
+function demoGetWorkPosition() {
+    return demoDelay({
+        departmentName: "IT",
+        designation: "6",
+        gradeLevel: "12"
+    });
+}
+
+// Suggested real endpoint: GET /api/employee/me/exit-details
+function demoGetExitDetails() {
+    return demoDelay({
+        separationMode: "Confirmed",
+        lastWorkingDate: ""
+    });
+}
+
+// Suggested real endpoint: GET /api/employee/me/nominations
+function demoGetNominations() {
+    return demoDelay([
+        { id: 1, nominationFor: "PF", familyMember: "Sunita Pathak", percentage: 100 }
+    ]);
+}
+
+// Suggested real endpoint: POST /api/employee/me/nominations
+function demoAddNomination(payload) {
+    console.log("Demo add nomination payload:", payload);
+    return demoDelay({ message: "Nomination added successfully." }, 600);
+}
+
+// Suggested real endpoint: PUT /api/employee/me/nominations/{id}
+function demoUpdateNomination(id, payload) {
+    console.log("Demo update nomination", id, payload);
+    return demoDelay({ message: "Nomination updated successfully." }, 600);
+}
+
+// Suggested real endpoint: DELETE /api/employee/me/nominations/{id}
+function demoDeleteNomination(id) {
+    console.log("Demo delete nomination", id);
+    return demoDelay({ message: "Nomination removed successfully." }, 400);
+}
+
+// Suggested real endpoint: GET /api/employee/me/skills
+function demoGetSkills() {
+    return demoDelay(["Java", "Spring Boot", "MySQL"]);
+}
+
+// Suggested real endpoint: PUT /api/employee/me/skills
+function demoUpdateSkills(skillsArray) {
+    console.log("Demo update skills payload:", skillsArray);
+    return demoDelay({ message: "Skills updated successfully." }, 500);
+}
