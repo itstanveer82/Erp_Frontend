@@ -671,7 +671,10 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById(
                 "employeesView"
             ),
-
+        users:
+            document.getElementById(
+                "usersView"
+            ),
         attendance:
             document.getElementById(
                 "attendanceView"
@@ -816,29 +819,35 @@ document.addEventListener("DOMContentLoaded", function () {
 
         }
 
+        if (viewName === "users") {
+
+            loadUsers();
+
+        }
+
     }
 
     // ==============================
-// OPEN MY PROFILE
-// ==============================
+    // OPEN MY PROFILE
+    // ==============================
 
-const profileViewButton =
-    document.getElementById("profileViewButton");
+    const profileViewButton =
+        document.getElementById("profileViewButton");
 
 
-if (profileViewButton) {
+    if (profileViewButton) {
 
-    profileViewButton.addEventListener("click", function () {
+        profileViewButton.addEventListener("click", function () {
 
-        showView("profile");
+            showView("profile");
 
-        if (adminProfileDropdown) {
-            adminProfileDropdown.classList.remove("show");
-        }
+            if (adminProfileDropdown) {
+                adminProfileDropdown.classList.remove("show");
+            }
 
-    });
+        });
 
-}
+    }
 
     // ==============================
     // SIDEBAR + QUICK ACTIONS +
@@ -1042,93 +1051,93 @@ if (profileViewButton) {
 
     }
 
-// =========================================
-// ADD ROLE
-// =========================================
+    // =========================================
+    // ADD ROLE
+    // =========================================
 
-const addRoleModal = new bootstrap.Modal(
-    document.getElementById("addRoleModal")
-);
-
-
-document.getElementById("addRoleButton")
-    .addEventListener("click", function () {
-
-        document.getElementById("addRoleForm").reset();
-
-        document.getElementById("addRoleMessage").innerHTML = "";
-
-        addRoleModal.show();
-
-    });
+    const addRoleModal = new bootstrap.Modal(
+        document.getElementById("addRoleModal")
+    );
 
 
-document.getElementById("addRoleForm")
-    .addEventListener("submit", async function (event) {
+    document.getElementById("addRoleButton")
+        .addEventListener("click", function () {
 
-        event.preventDefault();
+            document.getElementById("addRoleForm").reset();
 
+            document.getElementById("addRoleMessage").innerHTML = "";
 
-        const name =
-            document.getElementById("roleName")
-                .value.trim();
+            addRoleModal.show();
 
-        const description =
-            document.getElementById("roleDescription")
-                .value.trim();
+        });
 
 
-        if (!name || !description) {
+    document.getElementById("addRoleForm")
+        .addEventListener("submit", async function (event) {
 
-            document.getElementById("addRoleMessage").innerHTML =
-                `<div class="custom-alert error">
+            event.preventDefault();
+
+
+            const name =
+                document.getElementById("roleName")
+                    .value.trim();
+
+            const description =
+                document.getElementById("roleDescription")
+                    .value.trim();
+
+
+            if (!name || !description) {
+
+                document.getElementById("addRoleMessage").innerHTML =
+                    `<div class="custom-alert error">
                     Please fill all fields.
                 </div>`;
 
-            return;
-
-        }
-
-
-        try {
-
-            const response =
-                await apiRequest("/api/roles", {
-
-                    method: "POST",
-
-                    body: JSON.stringify({
-                        name: name,
-                        description: description
-                    })
-
-                });
-
-
-            if (response.success === false) {
-
-                throw new Error(
-                    response.message || "Failed to add role"
-                );
+                return;
 
             }
 
 
-            await loadRoles();
+            try {
 
-            addRoleModal.hide();
+                const response =
+                    await apiRequest("/api/roles", {
+
+                        method: "POST",
+
+                        body: JSON.stringify({
+                            name: name,
+                            description: description
+                        })
+
+                    });
 
 
-        } catch (error) {
+                if (response.success === false) {
 
-            document.getElementById("addRoleMessage").innerHTML =
-                `<div class="custom-alert error">
+                    throw new Error(
+                        response.message || "Failed to add role"
+                    );
+
+                }
+
+
+                await loadRoles();
+
+                addRoleModal.hide();
+
+
+            } catch (error) {
+
+                document.getElementById("addRoleMessage").innerHTML =
+                    `<div class="custom-alert error">
                     ${escapeHtml(error.message)}
                 </div>`;
 
-        }
+            }
 
-    });        
+        });
     // ==============================
     // LOAD ALL PERMISSIONS
     // GET /api/permissions
@@ -1272,6 +1281,432 @@ document.getElementById("addRoleForm")
     }
 
 
+    //for roles modal
+  
+    const userRolesModalElement =
+        document.getElementById(
+            "userRolesModal"
+        );
+
+
+    const userRolesList =
+        document.getElementById(
+            "userRolesList"
+        );
+
+
+    let userRolesModal = null;
+
+
+    if (userRolesModalElement) {
+
+        userRolesModal =
+            new bootstrap.Modal(
+                userRolesModalElement
+            );
+
+    }
+    // load User function
+      let loadedUsers = [];
+    async function loadUsers() {
+
+
+        const usersTableBody =
+            document.getElementById(
+                "usersTableBody"
+            );
+
+
+        if (!usersTableBody) {
+
+            console.error(
+                "usersTableBody not found"
+            );
+
+            return;
+
+        }
+
+
+        usersTableBody.innerHTML = `
+        <tr>
+
+            <td colspan="5"
+                class="text-center py-4">
+
+                Loading users...
+
+            </td>
+
+        </tr>
+    `;
+
+
+        try {
+
+            const response =
+                await apiRequest(
+                    "/api/users"
+                );
+
+
+            console.log(
+                "Users API Response:",
+                response
+            );
+
+            const users =
+                Array.isArray(
+                    response.data?.content
+                )
+                    ? response.data.content
+                    : [];
+
+            loadedUsers = users;
+
+            if (users.length === 0) {
+
+                usersTableBody.innerHTML = `
+                <tr>
+
+                    <td colspan="5"
+                        class="text-center py-4 text-muted">
+
+                        No users found
+
+                    </td>
+
+                </tr>
+            `;
+
+                return;
+
+            }
+
+
+            usersTableBody.innerHTML = "";
+
+
+            users.forEach(
+                function (user) {
+
+                    const fullName =
+                        `${user.firstName || ""} ${user.lastName || ""}`
+                            .trim() || "--";
+
+
+                    const roles =
+                        Array.isArray(user.roles)
+                            ? user.roles
+                            : [];
+
+
+                    const rolesHtml =
+                        roles.length > 0
+                            ? roles.map(
+                                function (role) {
+
+                                    return `
+                                    <span class="small-permission-tag">
+
+                                        ${escapeHtml(role)}
+
+                                    </span>
+                                `;
+
+                                }
+                            ).join("")
+                            : `<span class="text-muted">No roles</span>`;
+
+
+                    const status =
+                        user.enabled
+                            ? "Active"
+                            : "Inactive";
+
+
+                    const row =
+                        document.createElement("tr");
+
+
+                    row.innerHTML = `
+
+                    <td class="table-role-name">
+
+                        ${escapeHtml(fullName)}
+
+                    </td>
+
+
+                    <td>
+
+                        ${escapeHtml(
+                        user.email || "--"
+                    )}
+
+                    </td>
+
+
+                    <td class="table-permissions">
+
+                        ${rolesHtml}
+
+                    </td>
+
+
+                    <td>
+
+                        <span class="${user.enabled
+                            ? "text-success"
+                            : "text-danger"
+                        }">
+
+                            ${status}
+
+                        </span>
+
+                    </td>
+
+
+                    <td class="text-end">
+
+                        <button
+                            type="button"
+                            class="secondary-action-btn user-roles-btn"
+                            data-user-id="${escapeHtml(user.id)}">
+
+                            Roles
+
+                        </button>
+
+                    </td>
+
+                `;
+
+
+                    usersTableBody.appendChild(
+                        row
+                    );
+
+                }
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                "Failed to fetch users:",
+                error
+            );
+
+
+            usersTableBody.innerHTML = `
+            <tr>
+
+                <td colspan="5"
+                    class="text-center py-4 text-danger">
+
+                    ${escapeHtml(
+                error.message ||
+                "Failed to load users"
+            )}
+
+                </td>
+
+            </tr>
+        `;
+
+        }
+
+    }
+
+    document.addEventListener(
+        "click",
+        async function (event) {
+
+            const button =
+                event.target.closest(
+                    ".user-roles-btn"
+                );
+
+
+            if (!button) {
+
+                return;
+
+            }
+
+
+            const userId =
+                button.dataset.userId;
+
+
+            const user =
+                loadedUsers.find(
+                    function (item) {
+
+                        return String(item.id) ===
+                            String(userId);
+
+                    }
+                );
+
+
+            if (!user) {
+
+                return;
+
+            }
+
+
+            if (!userRolesModal) {
+
+                return;
+
+            }
+
+
+            // Modal title
+
+            const fullName =
+                `${user.firstName || ""} ${user.lastName || ""}`
+                    .trim() || "User";
+
+
+            document.getElementById(
+                "userRolesModalLabel"
+            ).textContent =
+                `Roles for ${fullName}`;
+
+
+            // Open modal
+
+            userRolesModal.show();
+
+
+            // Loading
+
+            userRolesList.innerHTML =
+                `Loading roles...`;
+
+
+            try {
+
+                const response =
+                    await apiRequest(
+                        "/api/roles"
+                    );
+
+
+                console.log(
+                    "Roles API Response:",
+                    response
+                );
+
+
+                const roles =
+                    Array.isArray(response.data)
+                        ? response.data
+                        : [];
+
+
+                const userRoles =
+                    Array.isArray(user.roles)
+                        ? user.roles
+                        : [];
+
+
+                if (roles.length === 0) {
+
+                    userRolesList.innerHTML = `
+                    <div class="text-muted">
+
+                        No roles found
+
+                    </div>
+                `;
+
+                    return;
+
+                }
+
+
+                userRolesList.innerHTML = "";
+
+
+                roles.forEach(
+                    function (role) {
+
+                        const roleName =
+                            role.name || role;
+
+
+                        const isChecked =
+                            userRoles.includes(
+                                roleName
+                            );
+
+
+                        const roleItem =
+                            document.createElement(
+                                "div"
+                            );
+
+
+                        roleItem.className =
+                            "form-check mb-3";
+
+
+                        roleItem.innerHTML = `
+
+                        <input
+                            class="form-check-input user-role-checkbox"
+                            type="checkbox"
+                            value="${escapeHtml(roleName)}"
+                            id="userRole_${escapeHtml(roleName)}"
+                            ${isChecked ? "checked" : ""}>
+
+                        <label
+                            class="form-check-label"
+                            for="userRole_${escapeHtml(roleName)}">
+
+                            ${escapeHtml(roleName)}
+
+                        </label>
+
+                    `;
+
+
+                        userRolesList.appendChild(
+                            roleItem
+                        );
+
+                    }
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "Failed to load roles:",
+                    error
+                );
+
+
+                userRolesList.innerHTML = `
+
+                <div class="text-danger">
+
+                    Failed to load roles
+
+                </div>
+
+            `;
+
+            }
+
+        }
+    );
     // ==============================
     // SESSION MANAGEMENT
     // ==============================
@@ -1862,129 +2297,60 @@ document.getElementById("addRoleForm")
 
 
     // ==============================
-// DROPDOWN LOGOUT
-// ==============================
+    // DROPDOWN LOGOUT
+    // ==============================
 
-const dropdownLogoutButton =
-    document.getElementById("dropdownLogoutButton");
-
-
-if (dropdownLogoutButton) {
-
-    dropdownLogoutButton.addEventListener("click", function () {
-
-        if (typeof logout === "function") {
-
-            logout();
-            return;
-
-        }
-
-        localStorage.clear();
-        sessionStorage.clear();
-
-        window.location.href =
-            "../auth/login.html";
-
-    });
-
-}
+    const dropdownLogoutButton =
+        document.getElementById("dropdownLogoutButton");
 
 
-// =========================================
-// ADMIN DASHBOARD - RESET PASSWORD
-// Uses ACTUAL API
-// POST /api/auth/change-password
-// =========================================
+    if (dropdownLogoutButton) {
 
+        dropdownLogoutButton.addEventListener("click", function () {
 
-// =========================================
-// CLICK HANDLER
-// Handles:
-// 1. Reset Password button
-// 2. Reset Password form submit
-// =========================================
+            if (typeof logout === "function") {
 
-document.addEventListener("click", function (event) {
+                logout();
+                return;
 
-    // =====================================
-    // OPEN / CLOSE RESET PASSWORD FORM
-    // =====================================
+            }
 
-    const resetButton =
-        event.target.closest("#resetPasswordToggleButton");
+            localStorage.clear();
+            sessionStorage.clear();
 
+            window.location.href =
+                "../auth/login.html";
 
-    if (!resetButton) {
-        return;
-    }
-
-
-    event.preventDefault();
-
-
-    console.log("Reset Password button clicked");
-
-
-    const resetPasswordFormWrapper =
-        document.getElementById(
-            "resetPasswordFormWrapper"
-        );
-
-
-    const resetPasswordMessage =
-        document.getElementById(
-            "resetPasswordMessage"
-        );
-
-
-    if (!resetPasswordFormWrapper) {
-
-        console.error(
-            "ERROR: resetPasswordFormWrapper not found"
-        );
-
-        return;
-    }
-
-
-    resetPasswordFormWrapper.classList.toggle(
-        "d-none"
-    );
-
-
-    console.log(
-        "Reset password form toggled"
-    );
-
-
-    if (resetPasswordMessage) {
-
-        resetPasswordMessage.innerHTML = "";
+        });
 
     }
 
-});
+
+    // =========================================
+    // ADMIN DASHBOARD - RESET PASSWORD
+    // Uses ACTUAL API
+    // POST /api/auth/change-password
+    // =========================================
 
 
-// =========================================
-// FORM SUBMIT
-// Event delegation
-// =========================================
+    // =========================================
+    // CLICK HANDLER
+    // Handles:
+    // 1. Reset Password button
+    // 2. Reset Password form submit
+    // =========================================
 
-document.addEventListener(
-    "submit",
-    async function (event) {
+    document.addEventListener("click", function (event) {
 
-        const form =
-            event.target.closest(
-                "#resetPasswordForm"
-            );
+        // =====================================
+        // OPEN / CLOSE RESET PASSWORD FORM
+        // =====================================
+
+        const resetButton =
+            event.target.closest("#resetPasswordToggleButton");
 
 
-        // Not our reset password form
-
-        if (!form) {
+        if (!resetButton) {
             return;
         }
 
@@ -1992,14 +2358,14 @@ document.addEventListener(
         event.preventDefault();
 
 
-        console.log(
-            "Reset Password form submitted"
-        );
+        console.log("Reset Password button clicked");
 
 
-        // =====================================
-        // GET ELEMENTS
-        // =====================================
+        const resetPasswordFormWrapper =
+            document.getElementById(
+                "resetPasswordFormWrapper"
+            );
+
 
         const resetPasswordMessage =
             document.getElementById(
@@ -2007,206 +2373,275 @@ document.addEventListener(
             );
 
 
-        const currentPasswordField =
-            document.getElementById(
-                "currentPasswordField"
-            );
-
-
-        const newPasswordField =
-            document.getElementById(
-                "newPasswordField"
-            );
-
-
-        const confirmPasswordField =
-            document.getElementById(
-                "confirmPasswordField"
-            );
-
-
-        // =====================================
-        // CHECK ELEMENTS
-        // =====================================
-
-        if (
-            !resetPasswordMessage ||
-            !currentPasswordField ||
-            !newPasswordField ||
-            !confirmPasswordField
-        ) {
+        if (!resetPasswordFormWrapper) {
 
             console.error(
-                "ERROR: Reset password elements not found"
+                "ERROR: resetPasswordFormWrapper not found"
             );
 
             return;
         }
 
 
-        // =====================================
-        // GET VALUES
-        // Don't trim passwords
-        // =====================================
-
-        const oldPassword =
-            currentPasswordField.value;
-
-
-        const newPassword =
-            newPasswordField.value;
-
-
-        const confirmPassword =
-            confirmPasswordField.value;
-
-
-        console.log(
-            "Password fields received"
+        resetPasswordFormWrapper.classList.toggle(
+            "d-none"
         );
 
 
-        // =====================================
-        // VALIDATION
-        // =====================================
-
-        resetPasswordMessage.innerHTML = "";
+        console.log(
+            "Reset password form toggled"
+        );
 
 
-        if (
-            !oldPassword ||
-            !newPassword ||
-            !confirmPassword
-        ) {
+        if (resetPasswordMessage) {
 
-            resetPasswordMessage.innerHTML =
-                `<div class="custom-alert error">
-                    Please fill in all password fields.
-                </div>`;
-
-            return;
-        }
-
-
-        if (
-            newPassword !== confirmPassword
-        ) {
-
-            resetPasswordMessage.innerHTML =
-                `<div class="custom-alert error">
-                    New password and confirm password do not match.
-                </div>`;
-
-            return;
-        }
-
-
-        if (newPassword.length < 6) {
-
-            resetPasswordMessage.innerHTML =
-                `<div class="custom-alert error">
-                    Password must be at least 6 characters.
-                </div>`;
-
-            return;
-        }
-
-
-        // =====================================
-        // SUBMIT BUTTON
-        // =====================================
-
-        const submitButton =
-            form.querySelector(
-                'button[type="submit"]'
-            );
-
-
-        const originalButtonText =
-            submitButton
-                ? submitButton.textContent
-                : "Update Password";
-
-
-        if (submitButton) {
-
-            submitButton.disabled = true;
-
-            submitButton.textContent =
-                "Updating...";
+            resetPasswordMessage.innerHTML = "";
 
         }
 
-
-        // =====================================
-        // ACTUAL API CALL
-        // =====================================
-
-        try {
-
-            const payload = {
-
-                oldPassword: oldPassword,
-
-                newPassword: newPassword
-
-            };
+    });
 
 
-            console.log(
-                "Change Password Request:",
-                payload
-            );
+    // =========================================
+    // FORM SUBMIT
+    // Event delegation
+    // =========================================
 
+    document.addEventListener(
+        "submit",
+        async function (event) {
 
-            const response =
-                await apiRequest(
-                    "/api/auth/change-password",
-                    {
-
-                        method: "POST",
-
-                        body: JSON.stringify(
-                            payload
-                        )
-
-                    }
+            const form =
+                event.target.closest(
+                    "#resetPasswordForm"
                 );
 
 
+            // Not our reset password form
+
+            if (!form) {
+                return;
+            }
+
+
+            event.preventDefault();
+
+
             console.log(
-                "Change Password Response:",
-                response
+                "Reset Password form submitted"
             );
 
 
-            // =================================
-            // BACKEND RETURNED FAILURE
-            // =================================
+            // =====================================
+            // GET ELEMENTS
+            // =====================================
+
+            const resetPasswordMessage =
+                document.getElementById(
+                    "resetPasswordMessage"
+                );
+
+
+            const currentPasswordField =
+                document.getElementById(
+                    "currentPasswordField"
+                );
+
+
+            const newPasswordField =
+                document.getElementById(
+                    "newPasswordField"
+                );
+
+
+            const confirmPasswordField =
+                document.getElementById(
+                    "confirmPasswordField"
+                );
+
+
+            // =====================================
+            // CHECK ELEMENTS
+            // =====================================
 
             if (
-                response &&
-                response.success === false
+                !resetPasswordMessage ||
+                !currentPasswordField ||
+                !newPasswordField ||
+                !confirmPasswordField
+            ) {
+
+                console.error(
+                    "ERROR: Reset password elements not found"
+                );
+
+                return;
+            }
+
+
+            // =====================================
+            // GET VALUES
+            // Don't trim passwords
+            // =====================================
+
+            const oldPassword =
+                currentPasswordField.value;
+
+
+            const newPassword =
+                newPasswordField.value;
+
+
+            const confirmPassword =
+                confirmPasswordField.value;
+
+
+            console.log(
+                "Password fields received"
+            );
+
+
+            // =====================================
+            // VALIDATION
+            // =====================================
+
+            resetPasswordMessage.innerHTML = "";
+
+
+            if (
+                !oldPassword ||
+                !newPassword ||
+                !confirmPassword
             ) {
 
                 resetPasswordMessage.innerHTML =
                     `<div class="custom-alert error">
+                    Please fill in all password fields.
+                </div>`;
+
+                return;
+            }
+
+
+            if (
+                newPassword !== confirmPassword
+            ) {
+
+                resetPasswordMessage.innerHTML =
+                    `<div class="custom-alert error">
+                    New password and confirm password do not match.
+                </div>`;
+
+                return;
+            }
+
+
+            if (newPassword.length < 6) {
+
+                resetPasswordMessage.innerHTML =
+                    `<div class="custom-alert error">
+                    Password must be at least 6 characters.
+                </div>`;
+
+                return;
+            }
+
+
+            // =====================================
+            // SUBMIT BUTTON
+            // =====================================
+
+            const submitButton =
+                form.querySelector(
+                    'button[type="submit"]'
+                );
+
+
+            const originalButtonText =
+                submitButton
+                    ? submitButton.textContent
+                    : "Update Password";
+
+
+            if (submitButton) {
+
+                submitButton.disabled = true;
+
+                submitButton.textContent =
+                    "Updating...";
+
+            }
+
+
+            // =====================================
+            // ACTUAL API CALL
+            // =====================================
+
+            try {
+
+                const payload = {
+
+                    oldPassword: oldPassword,
+
+                    newPassword: newPassword
+
+                };
+
+
+                console.log(
+                    "Change Password Request:",
+                    payload
+                );
+
+
+                const response =
+                    await apiRequest(
+                        "/api/auth/change-password",
+                        {
+
+                            method: "POST",
+
+                            body: JSON.stringify(
+                                payload
+                            )
+
+                        }
+                    );
+
+
+                console.log(
+                    "Change Password Response:",
+                    response
+                );
+
+
+                // =================================
+                // BACKEND RETURNED FAILURE
+                // =================================
+
+                if (
+                    response &&
+                    response.success === false
+                ) {
+
+                    resetPasswordMessage.innerHTML =
+                        `<div class="custom-alert error">
                         ${escapeHtml(
                             response.message ||
                             "Password update failed."
                         )}
                     </div>`;
 
-                return;
-            }
+                    return;
+                }
 
 
-            // =================================
-            // SUCCESS
-            // =================================
+                // =================================
+                // SUCCESS
+                // =================================
 
-            resetPasswordMessage.innerHTML =
-                `<div class="custom-alert success">
+                resetPasswordMessage.innerHTML =
+                    `<div class="custom-alert success">
                     ${escapeHtml(
                         response.message ||
                         "Password updated successfully."
@@ -2214,41 +2649,41 @@ document.addEventListener(
                 </div>`;
 
 
-            form.reset();
+                form.reset();
 
 
-            setTimeout(function () {
+                setTimeout(function () {
 
-                const wrapper =
-                    document.getElementById(
-                        "resetPasswordFormWrapper"
-                    );
-
-
-                if (wrapper) {
-
-                    wrapper.classList.add(
-                        "d-none"
-                    );
-
-                }
+                    const wrapper =
+                        document.getElementById(
+                            "resetPasswordFormWrapper"
+                        );
 
 
-                resetPasswordMessage.innerHTML = "";
+                    if (wrapper) {
 
-            }, 1500);
+                        wrapper.classList.add(
+                            "d-none"
+                        );
 
-
-        } catch (error) {
-
-            console.error(
-                "Change Password API Error:",
-                error
-            );
+                    }
 
 
-            resetPasswordMessage.innerHTML =
-                `<div class="custom-alert error">
+                    resetPasswordMessage.innerHTML = "";
+
+                }, 1500);
+
+
+            } catch (error) {
+
+                console.error(
+                    "Change Password API Error:",
+                    error
+                );
+
+
+                resetPasswordMessage.innerHTML =
+                    `<div class="custom-alert error">
                     ${escapeHtml(
                         error.message ||
                         "Something went wrong. Please try again."
@@ -2256,21 +2691,21 @@ document.addEventListener(
                 </div>`;
 
 
-        } finally {
+            } finally {
 
-            if (submitButton) {
+                if (submitButton) {
 
-                submitButton.disabled = false;
+                    submitButton.disabled = false;
 
-                submitButton.textContent =
-                    originalButtonText;
+                    submitButton.textContent =
+                        originalButtonText;
+
+                }
 
             }
 
         }
-
-    }
-);
+    );
 
 
     // ==============================
