@@ -885,171 +885,205 @@ document.addEventListener("DOMContentLoaded", function () {
     // GET /api/roles
     // ==============================
 
-    async function loadRoles() {
+  async function loadRoles() {
 
-        const rolesTableBody =
-            document.getElementById(
-                "rolesTableBody"
-            );
+    const rolesCardsContainer =
+        document.getElementById(
+            "rolesCardsContainer"
+        );
 
 
-        if (!rolesTableBody) {
+    if (!rolesCardsContainer) {
 
-            console.error(
-                "rolesTableBody not found"
-            );
+        console.error(
+            "rolesCardsContainer not found"
+        );
+
+        return;
+
+    }
+
+
+    rolesCardsContainer.innerHTML = `
+        <div class="text-center py-5">
+
+            Loading roles...
+
+        </div>
+    `;
+
+
+    try {
+
+        const response =
+            await apiRequest("/api/roles");
+
+
+        console.log(
+            "Roles API Response:",
+            response
+        );
+
+
+        const roles =
+            Array.isArray(response.data)
+                ? response.data
+                : [];
+
+
+        if (roles.length === 0) {
+
+            rolesCardsContainer.innerHTML = `
+                <div class="text-center py-5 text-muted">
+
+                    No roles found
+
+                </div>
+            `;
 
             return;
 
         }
 
 
-        rolesTableBody.innerHTML = `
-            <tr>
-                <td colspan="5"
-                    class="text-center py-4">
-
-                    Loading roles...
-
-                </td>
-            </tr>
-        `;
+        rolesCardsContainer.innerHTML = "";
 
 
-        try {
+        roles.forEach(function (role) {
 
-            const response =
-                await apiRequest("/api/roles");
-
-
-            console.log(
-                "Roles API Response:",
-                response
-            );
-
-
-            const roles =
-                Array.isArray(response.data)
-                    ? response.data
+            const permissions =
+                Array.isArray(role.permissions)
+                    ? role.permissions
                     : [];
 
 
-            if (roles.length === 0) {
+            const permissionsHtml =
+                permissions.length > 0
+                    ? permissions.map(
+                        function (permission) {
 
-                rolesTableBody.innerHTML = `
-                    <tr>
-                        <td colspan="5"
-                            class="text-center py-4 text-muted">
+                            return `
+                                <span class="small-permission-tag">
 
-                            No roles found
+                                    ${escapeHtml(
+                                        getDisplayName(permission)
+                                    )}
 
-                        </td>
-                    </tr>
-                `;
+                                </span>
+                            `;
 
-                return;
-
-            }
-
-
-            rolesTableBody.innerHTML = "";
-
-
-            roles.forEach(function (role) {
-
-                const permissions =
-                    Array.isArray(role.permissions)
-                        ? role.permissions
-                        : [];
-
-
-                const permissionsHtml =
-                    permissions.length > 0
-                        ? permissions.map(
-                            function (permission) {
-
-                                return `
-                                    <span class="small-permission-tag">
-                                        ${escapeHtml(
-                                    getDisplayName(permission)
-                                )}
-                                    </span>
-                                `;
-
-                            }
-                        ).join("")
-                        : `
-                            <span class="text-muted">
-                                No permissions
-                            </span>
-                        `;
-
-
-                const row =
-                    document.createElement("tr");
-
-
-                row.innerHTML = `
-
-                    <td>
-                        ${escapeHtml(role.id)}
-                    </td>
-
-                    <td class="table-role-name">
-                        ${escapeHtml(
-                    getDisplayName(role)
-                )}
-                    </td>
-
-                    <td class="table-description">
-                        ${escapeHtml(
-                    role.description || "--"
-                )}
-                    </td>
-
-                    <td class="table-permissions">
-                        ${permissionsHtml}
-                    </td>
-
-                    <td class="text-end">
+                        }
+                    ).join("")
+                    : `
                         <span class="text-muted">
-                            --
+
+                            No permissions
+
                         </span>
-                    </td>
-
-                `;
+                    `;
 
 
-                rolesTableBody.appendChild(row);
-
-            });
-
-
-        } catch (error) {
-
-            console.error(
-                "Failed to fetch roles:",
-                error
-            );
+            const roleCard =
+                document.createElement("div");
 
 
-            rolesTableBody.innerHTML = `
-                <tr>
-                    <td colspan="5"
-                        class="text-center py-4 text-danger">
+            roleCard.className =
+                "role-card";
+
+
+            roleCard.innerHTML = `
+
+                <div class="role-card-header">
+
+                    <div>
+
+                        <small>
+
+                            ROLE ID: ${escapeHtml(role.id)}
+
+                        </small>
+
+
+                        <h5>
+
+                            ${escapeHtml(
+                                getDisplayName(role)
+                            )}
+
+                        </h5>
+
+                    </div>
+
+                </div>
+
+
+                <div class="role-card-body">
+
+                    <p class="role-card-label">
+
+                        Description
+
+                    </p>
+
+
+                    <p class="role-card-description">
 
                         ${escapeHtml(
-                error.message ||
-                "Failed to load roles"
-            )}
+                            role.description || "--"
+                        )}
 
-                    </td>
-                </tr>
+                    </p>
+
+
+                    <p class="role-card-label">
+
+                        Permissions
+
+                    </p>
+
+
+                    <div class="role-card-permissions">
+
+                        ${permissionsHtml}
+
+                    </div>
+
+                </div>
+
             `;
 
-        }
+
+            rolesCardsContainer.appendChild(
+                roleCard
+            );
+
+        });
+
+
+    } catch (error) {
+
+        console.error(
+            "Failed to fetch roles:",
+            error
+        );
+
+
+        rolesCardsContainer.innerHTML = `
+
+            <div class="text-center py-5 text-danger">
+
+                ${escapeHtml(
+                    error.message ||
+                    "Failed to load roles"
+                )}
+
+            </div>
+
+        `;
 
     }
+
+}
 
     // =========================================
     // ADD ROLE
@@ -1282,7 +1316,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     //for roles modal
-  
+
     const userRolesModalElement =
         document.getElementById(
             "userRolesModal"
@@ -1307,7 +1341,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     }
     // load User function
-      let loadedUsers = [];
+    let loadedUsers = [];
     async function loadUsers() {
 
 
@@ -1468,19 +1502,53 @@ document.addEventListener("DOMContentLoaded", function () {
                     </td>
 
 
-                    <td class="text-end">
+                   <td class="text-end">
 
-                        <button
-                            type="button"
-                            class="secondary-action-btn user-roles-btn"
-                            data-user-id="${escapeHtml(user.id)}">
+    <div class="d-flex justify-content-end gap-2">
 
-                            Roles
+        <button 
+            type="button" 
+            class="secondary-action-btn user-roles-btn" 
+            data-user-id="${escapeHtml(user.id)}">
 
-                        </button>
+            Roles
 
-                    </td>
+        </button>
 
+
+        ${user.enabled
+
+            ? `
+
+                <button 
+                    type="button" 
+                    class="secondary-action-btn user-disable-btn"
+                    data-user-id="${escapeHtml(user.id)}">
+
+                    Disable
+
+                </button>
+
+            `
+
+            : `
+
+                <button 
+                    type="button" 
+                    class="secondary-action-btn user-enable-btn"
+                    data-user-id="${escapeHtml(user.id)}">
+
+                    Enable
+
+                </button>
+
+            `
+
+        }
+
+    </div>
+
+</td>
                 `;
 
 
@@ -1540,6 +1608,8 @@ document.addEventListener("DOMContentLoaded", function () {
             const userId =
                 button.dataset.userId;
 
+            window.selectedUserId =
+                userId;
 
             const user =
                 loadedUsers.find(
@@ -1707,6 +1777,167 @@ document.addEventListener("DOMContentLoaded", function () {
 
         }
     );
+
+
+    // for disabling user function
+    document.addEventListener(
+    "click",
+    async function (event) {
+
+        const disableButton =
+            event.target.closest(
+                ".user-disable-btn"
+            );
+
+
+        if (!disableButton) {
+
+            return;
+
+        }
+
+
+        const userId =
+            disableButton.dataset.userId;
+
+
+        const confirmed =
+            confirm(
+                "Are you sure you want to disable this user?"
+            );
+
+
+        if (!confirmed) {
+
+            return;
+
+        }
+
+
+        try {
+
+            disableButton.disabled = true;
+
+            disableButton.textContent =
+                "Disabling...";
+
+
+            const response =
+                await apiRequest(
+                    `/api/users/${userId}`,
+                    {
+                        method: "DELETE"
+                    }
+                );
+
+
+            console.log(
+                "Disable User Response:",
+                response
+            );
+
+
+            await loadUsers();
+
+
+        } catch (error) {
+
+            console.error(
+                "Failed to disable user:",
+                error
+            );
+
+
+            alert(
+                error.message ||
+                "Failed to disable user"
+            );
+
+
+            disableButton.disabled = false;
+
+            disableButton.textContent =
+                "Disable";
+
+        }
+
+    }
+);
+
+    document
+        .getElementById(
+            "saveUserRolesButton"
+        )
+        .addEventListener(
+            "click",
+            async function () {
+
+                const checkedRoles =
+                    Array.from(
+                        document.querySelectorAll(
+                            ".user-role-checkbox:checked"
+                        )
+                    )
+                        .map(
+                            function (checkbox) {
+
+                                return checkbox.value;
+
+                            }
+                        );
+
+
+                if (
+                    !window.selectedUserId
+                ) {
+
+                    console.error(
+                        "Selected user not found"
+                    );
+
+                    return;
+
+                }
+
+
+                try {
+
+                    const response =
+                        await apiRequest(
+                            `/api/users/${window.selectedUserId}/roles`,
+                            {
+                                method: "POST",
+
+                                body: JSON.stringify({
+                                    roleNames: checkedRoles
+                                })
+                            }
+                        );
+
+
+                    console.log(
+                        "Save Roles Response:",
+                        response
+                    );
+
+
+                    userRolesModal.hide();
+
+
+                    await loadUsers();
+
+
+                } catch (error) {
+
+                    console.error(
+                        "Failed to save roles:",
+                        error
+                    );
+
+                }
+
+            }
+        );
     // ==============================
     // SESSION MANAGEMENT
     // ==============================
