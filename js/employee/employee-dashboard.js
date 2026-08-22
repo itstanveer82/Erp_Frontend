@@ -672,7 +672,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     Swal.fire({
                         icon: "success",
-                        title: "Try Again.....",
+                        title: "Chal BSDK.....",
                         confirmButtonColor: "#17a2b8",
                         timer: 2000,
                         timerProgressBar: true,
@@ -731,12 +731,15 @@ document.addEventListener("DOMContentLoaded", function () {
     // ATTENDANCE CORRECTIONS
     // =========================
     const newCorrectionButton = document.getElementById("newCorrectionButton");
-    const correctionFormWrapper = document.getElementById("correctionFormWrapper");
     const correctionForm = document.getElementById("correctionForm");
     const correctionFormMessage = document.getElementById("correctionFormMessage");
 
     newCorrectionButton.addEventListener("click", function () {
-        correctionFormWrapper.classList.toggle("d-none");
+        correctionForm.reset();
+        correctionFormMessage.innerHTML = "";
+
+        const modal = new bootstrap.Modal(document.getElementById("correctionModal"));
+        modal.show();
     });
 
     correctionForm.addEventListener("submit", function (e) {
@@ -751,12 +754,34 @@ document.addEventListener("DOMContentLoaded", function () {
         };
 
         demoSubmitCorrection(payload).then(function (res) {
-            correctionFormMessage.innerHTML = `<div class="custom-alert success">${escapeHtml(res.data.message)}</div>`;
-            correctionForm.reset();
-            correctionFormWrapper.classList.add("d-none");
+            const modal = bootstrap.Modal.getInstance(document.getElementById("correctionModal"));
+            if (modal) modal.hide();
+
+            Swal.fire({
+                icon: "success",
+                title: res.data.message,
+                confirmButtonColor: "#17a2b8"
+            });
+
             loadCorrections();
         });
     });
+
+    function renderCorrectionStats(rows) {
+        const counts = { PENDING: 0, APPROVED: 0, REJECTED: 0 };
+
+        rows.forEach(function (r) {
+            const status = (r.status || "").toUpperCase();
+            if (counts.hasOwnProperty(status)) {
+                counts[status]++;
+            }
+        });
+
+        document.getElementById("corrStatPending").textContent = counts.PENDING;
+        document.getElementById("corrStatApproved").textContent = counts.APPROVED;
+        document.getElementById("corrStatRejected").textContent = counts.REJECTED;
+        document.getElementById("corrStatTotal").textContent = rows.length;
+    }
 
     function loadCorrections() {
         const tbody = document.getElementById("correctionsTableBody");
@@ -765,18 +790,29 @@ document.addEventListener("DOMContentLoaded", function () {
         demoGetCorrections().then(function (res) {
             const rows = res.data;
 
+            renderCorrectionStats(rows);
+
             if (rows.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-muted">No correction requests.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-muted">No correction requests yet. Click "+ New Request" to submit one.</td></tr>`;
                 return;
             }
 
+            const statusClassMap = {
+                PENDING: "LATE",
+                APPROVED: "PRESENT",
+                REJECTED: "ABSENT"
+            };
+
             tbody.innerHTML = rows.map(function (r) {
+                const statusKey = (r.status || "").toUpperCase();
+                const badgeClass = statusClassMap[statusKey] || "LEAVE";
+
                 return `
                     <tr>
                         <td>${escapeHtml(r.date)}</td>
                         <td>${escapeHtml(r.change)}</td>
                         <td>${escapeHtml(r.reason)}</td>
-                        <td><span class="badge text-bg-secondary">${escapeHtml(r.status)}</span></td>
+                        <td><span class="status-badge ${badgeClass}">${escapeHtml(r.status)}</span></td>
                     </tr>
                 `;
             }).join("");
@@ -2365,6 +2401,164 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 loadFamilyInformation();
             });
+        });
+    }
+
+
+    // =========================
+    // SESSION MANAGEMENT
+    // =========================
+
+    function parseDeviceInfo(ua) {
+        if (!ua) return "Unknown device";
+
+        let browser = "Unknown browser";
+        if (ua.includes("Chrome")) {
+            const match = ua.match(/Chrome\/(\d+)/);
+            browser = "Chrome" + (match ? " " + match[1] : "");
+        } else if (ua.includes("Firefox")) {
+            browser = "Firefox";
+        } else if (ua.includes("Safari") && !ua.includes("Chrome")) {
+            browser = "Safari";
+        } else if (ua.includes("Edg")) {
+            browser = "Edge";
+        }
+
+        let os = "Unknown OS";
+        if (ua.includes("Windows")) {
+            os = "Windows";
+        } else if (ua.includes("Android")) {
+            os = "Android";
+        } else if (ua.includes("Mac OS")) {
+            os = "macOS";
+        } else if (ua.includes("Linux")) {
+            os = "Linux";
+        } else if (ua.includes("iPhone") || ua.includes("iPad")) {
+            os = "iOS";
+        }
+
+        const isMobile = ua.includes("Mobile");
+
+        return `${browser} on ${os}${isMobile ? " (Mobile)" : ""}`;
+    }
+
+    function formatSessionDate(isoString) {
+        if (!isoString) return "--";
+
+        const date = new Date(isoString);
+        return date.toLocaleString("en-IN", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit"
+        });
+    }
+
+    function loadSessions() {
+        const body = document.getElementById("sessionsModalBody");
+        body.innerHTML = `<p class="text-muted text-center py-4">Loading sessions...</p>`;
+
+        apiRequest("/api/sessions").then(function (res) {
+            const sessions = res.data || [];
+
+            if (sessions.length === 0) {
+                body.innerHTML = `<p class="text-muted text-center py-4">No active sessions found.</p>`;
+                return;
+            }
+
+            body.innerHTML = sessions.map(function (s) {
+                const isMobile = (s.deviceInfo || "").includes("Mobile");
+                const icon = isMobile ? "📱" : "🖥️";
+
+                return `
+                    <div class="session-card ${s.current ? "session-card-current" : ""}">
+
+                        <div class="session-card-top">
+                            <div class="session-device-line">
+                                <span class="session-device-icon">${icon}</span>
+                                <span>${escapeHtml(s.deviceInfo)}</span>
+                            </div>
+
+                            ${s.current
+                        ? `<span class="session-current-tag">Current Session</span>`
+                        : `<button type="button" class="session-revoke-btn" data-revoke-session="${s.id}">Revoke</button>`
+                    }
+                        </div>
+
+                        <div class="session-ip-line">
+                            <strong>IP Address:</strong> ${escapeHtml(s.ipAddress)}
+                        </div>
+
+                        <hr class="session-divider">
+
+                        <div class="session-meta-grid">
+                            <div class="session-meta-item">
+                                <span>Logged In</span>
+                                <strong>${escapeHtml(formatSessionDate(s.createdAt))}</strong>
+                            </div>
+                            <div class="session-meta-item">
+                                <span>Last Used</span>
+                                <strong>${escapeHtml(formatSessionDate(s.lastUsedAt))}</strong>
+                            </div>
+                            <div class="session-meta-item">
+                                <span>Expires</span>
+                                <strong>${escapeHtml(formatSessionDate(s.expiryDate))}</strong>
+                            </div>
+                        </div>
+
+                    </div>
+                `;
+            }).join("");
+
+            body.querySelectorAll("[data-revoke-session]").forEach(function (btn) {
+                btn.addEventListener("click", function () {
+                    const sessionId = this.dataset.revokeSession;
+
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Revoke this session?",
+                        text: "This device will be signed out immediately.",
+                        showCancelButton: true,
+                        confirmButtonText: "Yes, revoke",
+                        confirmButtonColor: "#b3261e"
+                    }).then(function (result) {
+                        if (result.isConfirmed) {
+                            apiRequest(`/api/sessions/${sessionId}`, {
+                                method: "DELETE"
+                            }).then(function () {
+                                Swal.fire({
+                                    icon: "success",
+                                    title: "Session revoked",
+                                    confirmButtonColor: "#17a2b8",
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                });
+                                loadSessions();
+                            }).catch(function (error) {
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Could not revoke session",
+                                    text: error.message,
+                                    confirmButtonColor: "#17a2b8"
+                                });
+                            });
+                        }
+                    });
+                });
+            });
+
+        }).catch(function (error) {
+            body.innerHTML = `<div class="custom-alert error">${escapeHtml(error.message || "Failed to load sessions.")}</div>`;
+        });
+    }
+
+    const sessionsButton = document.getElementById("sessionsButton");
+    if (sessionsButton) {
+        sessionsButton.addEventListener("click", function () {
+            const modal = new bootstrap.Modal(document.getElementById("sessionsModal"));
+            modal.show();
+            loadSessions();
         });
     }
 
