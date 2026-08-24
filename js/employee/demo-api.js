@@ -19,14 +19,14 @@ function demoGetProfile() {
         employeeCode: "EMP-1312",
         systemId: "SYS-1042",
         firstName: "Mohd",
-        lastName: "Eraj Ansari",
-        profileImage: "../assets/image/Image01.jpg",
-        email: "era1312@gmail.com",
+        lastName: "Tanveer Ansari",
+        // profileImage: "../assets/image/Image01.jpg",
+        email: "tannu1312@gmail.com",
         phone: "+91 888193***",
         departmentName: "IT",
         designation: "Software Developer",
         joiningDate: "2026-08-01",
-        reportingManager: "Manmohan Pathak",
+        reportingManager: "RM",
         systemStatus: "OUT",
         dateOfBirth: "1998-04-15",
         gender: "Male"
@@ -426,4 +426,10 @@ function demoGetSkills() {
 function demoUpdateSkills(skillsArray) {
     console.log("Demo update skills payload:", skillsArray);
     return demoDelay({ message: "Skills updated successfully." }, 500);
+}
+
+// Suggested real endpoint: POST /api/employee/me/profile-image (multipart/form-data)
+function demoUpdateProfileImage(file) {
+    console.log("Demo update profile image:", file && file.name);
+    return demoDelay({ message: "Profile photo updated successfully." }, 600);
 }

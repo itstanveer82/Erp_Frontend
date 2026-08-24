@@ -150,6 +150,39 @@ document.addEventListener("DOMContentLoaded", function () {
     // nahi karna padega.
     // =========================================
 
+    // let overriddenProfileImage = null;
+    let currentProfileInitials = "";
+
+    // let cachedRealPhotoUrl = null;
+    // let realPhotoFetchedOnce = false;
+    resetProfilePhotoCache();
+
+    // function getRealProfilePhotoUrl() {  };
+
+    function getRealProfilePhotoUrl() {
+
+    const token = sessionStorage.getItem("authData");
+
+    return fetch("http://localhost:8085/api/profile/photo", {
+        method: "GET",
+        headers: {
+            "Authorization": "Bearer " + token
+        }
+    })
+    .then(function (response) {
+
+        if (!response.ok) {
+            throw new Error("Failed to load profile picture: " + response.status);
+        }
+
+        return response.blob();
+    })
+    .then(function (blob) {
+        console.log(URL.createObjectURL(blob))
+        return URL.createObjectURL(blob);
+    });
+}
+
     function fetchCurrentUserProfile() {
         return apiRequest("/api/users/me")
             .then(function (res) {
@@ -186,6 +219,7 @@ document.addEventListener("DOMContentLoaded", function () {
                                 "Not available",
 
                             profileImage:
+                                overriddenProfileImage ||
                                 u.profileImage ||
                                 d.profileImage ||
                                 null,
@@ -213,34 +247,177 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     }
 
+    
+
+    function fetchCurrentUserProfilePhoto() {
+        return apiRequest("/api/profile-photos/me")
+            .then(function (res) {
+                const u = res.data || {};
+                return demoGetProfile().then(function (demoRes) {
+                    const d = demoRes.data || {};
+
+                    
+                    return {
+                        success: true,
+                        data: {
+                            employeeCode: u.employeeCode || d.employeeCode || "--",
+                            firstName: u.firstName || d.firstName || "",
+                            lastName: u.lastName || d.lastName || "",
+                            email: u.email || d.email || "--",
+                            phone: u.phone || d.phone || "--",
+
+                            departmentName:
+                                u.departmentName ||
+                                d.departmentName ||
+                                "Not available",
+
+                            designation:
+                                u.designation ||
+                                d.designation ||
+                                "Not available",
+
+                            joiningDate:
+                                u.joiningDate ||
+                                d.joiningDate ||
+                                "Not available",
+
+                            reportingManager:
+                                u.reportingManager ||
+                                d.reportingManager ||
+                                "Not available",
+
+                            profileImage:
+                                overriddenProfileImage ||
+                                u.profileImage ||
+                                d.profileImage ||
+                                null,
+
+                            dateOfBirth:
+                                u.dateOfBirth ||
+                                d.dateOfBirth ||
+                                "Not available",
+
+                            gender:
+                                u.gender ||
+                                d.gender ||
+                                "Not available"
+                        }
+                    };
+                });
+            })
+            .catch(function (error) {
+
+                console.warn(
+                    "Profile API failed, using demo profile.",
+                    error
+                );
+                return demoGetProfile();
+            });
+    }
+
+    // function fetchCurrentUserProfileImage() {
+
+    //     return apiRequest("/api/users/me")
+    //         .then(function (res) {
+
+    //             const u = res.data || {};
+
+    //             return getRealProfilePhotoUrl()
+    //                 .then(function (realPhotoUrl) {
+
+    //                     return {
+    //                         success: true,
+    //                         data: {
+
+    //                             employeeCode:
+    //                                 u.employeeCode || "--",
+
+    //                             firstName:
+    //                                 u.firstName || "",
+
+    //                             lastName:
+    //                                 u.lastName || "",
+
+    //                             email:
+    //                                 u.email || "--",
+
+    //                             phone:
+    //                                 u.phone || "--",
+
+    //                             departmentName:
+    //                                 u.departmentName || "Not available",
+
+    //                             designation:
+    //                                 u.designation || "Not available",
+
+    //                             joiningDate:
+    //                                 u.joiningDate || "Not available",
+
+    //                             reportingManager:
+    //                                 u.reportingManager || "Not available",
+
+    //                             profileImage:
+    //                                 realPhotoUrl || null,
+
+    //                             dateOfBirth:
+    //                                 u.dateOfBirth || "Not available",
+
+    //                             gender:
+    //                                 u.gender || "Not available"
+    //                         }
+    //                     };
+    //                 });
+    //         })
+    //         .catch(function (error) {
+
+    //             console.error(
+    //                 "Employee profile failed:",
+    //                 error
+    //             );
+
+    //             throw error;
+    //         });
+    // }
+
     // =========================================
     // LOAD EMPLOYEE PROFILE
     // =========================================
     function loadHeaderEmployeeProfile() {
         fetchCurrentUserProfile().then(function (res) {
-            const p = res.data;
+
+            const p = res.data || {};
 
             const fullName =
-                `${p.firstName} ${p.lastName}`.trim();
+                `${p.firstName || ""} ${p.lastName || ""}`.trim();
 
             const employeeImage =
-                p.profileImage || "../assets/image/Image01.jpg";
+                p.profileImage ||
+                "../assets/image/Image01.jpg";
 
-            headerEmployeeName.textContent = fullName;
+            headerEmployeeName.textContent =
+                fullName || "Employee";
+
             headerEmployeeId.textContent =
                 p.employeeCode || "EMP-0000";
 
-            headerEmployeeImage.src = employeeImage;
+            headerEmployeeImage.src =
+                employeeImage;
 
             profileDropdownName.textContent =
-                fullName;
+                fullName || "Employee";
 
             profileDropdownId.textContent =
                 p.employeeCode || "EMP-0000";
 
             profileDropdownImage.src =
                 employeeImage;
-        });
+        })
+            .catch(function (error) {
+                console.error(
+                    "Employee header profile error:",
+                    error
+                );
+            });
     }
     loadHeaderEmployeeProfile();
 
@@ -277,11 +454,38 @@ document.addEventListener("DOMContentLoaded", function () {
             const p = res.data;
             const fullName = `${p.firstName} ${p.lastName}`.trim();
 
-            dashboardWelcomeEl.textContent = `Welcome back, ${p.firstName}!`;
+            // dashboardWelcomeEl.textContent = `Welcome back, ${p.firstName}!`;
+            // userInitialsEl.textContent = initials;
 
-            const initials = `${p.firstName.charAt(0)}${p.lastName.charAt(0)}`.toUpperCase();
-            userInitialsEl.textContent = initials;
+            const initials =
+                `${p.firstName || ""}${p.lastName || ""}`
+                    .trim()
+                    .split(/\s+/)
+                    .map(function (name) {
+                        return name.charAt(0);
+                    })
+                    .join("")
+                    .toUpperCase();
+
+            safeSetText(
+                "dashboardWelcome",
+                `Welcome back, ${p.firstName || "Employee"}!`
+            );
+
+            safeSetText(
+                "userInitials",
+                initials || "E"
+            );
+
         });
+        function safeSetText(elementId, text) {
+            const el = document.getElementById(elementId);
+            if (el) {
+                el.textContent = text;
+            } else {
+                console.warn(`Element #${elementId} not found — skipping textContent update.`);
+            }
+        }
 
         demoGetDashboardSummary().then(function (res) {
             const s = res.data;
@@ -840,6 +1044,9 @@ document.addEventListener("DOMContentLoaded", function () {
         </div>
          `;
 
+        fetchCurrentUserProfilePhoto().data
+
+
         fetchCurrentUserProfile().then(function (res) {
             const p = res.data;
 
@@ -848,21 +1055,25 @@ document.addEventListener("DOMContentLoaded", function () {
             const initials =
                 `${p.firstName.charAt(0)}${p.lastName.charAt(0)}`
                     .toUpperCase();
-
+            
             card.innerHTML = `
             <div class="employee-profile">
 
              <!-- PROFILE HEADER -->
                 <div class="profile-header">
 
-                <div class="profile-avatar">
+                <div class="profile-avatar" id="profileAvatarClickable">
+
+
+
                     ${p.profileImage
-                    ? `<img src="${escapeHtml(p.profileImage)}"
+                    ? `<img src="${p.profileImage}"
                         alt="Employee Profile"
                         class="profile-avatar-image"
                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">`
-                    : ""
+                    : "<img src='../assets/image/Prime_Minister_of_India,_Shri_Narendra_Modi.jpg'>"
                 }
+
                    <span class="profile-avatar-fallback"
                         style="${p.profileImage ? 'display:none;' : 'display:flex;'}">
                     ${escapeHtml(initials)}
@@ -1062,6 +1273,135 @@ document.addEventListener("DOMContentLoaded", function () {
                     showView("profile-overview");
                 });
             }
+
+            currentProfileInitials = initials;
+
+            const profileAvatarClickable = document.getElementById("profileAvatarClickable");
+            if (profileAvatarClickable) {
+                profileAvatarClickable.addEventListener("click", function () {
+                    openViewPhotoModal(p.profileImage, initials);
+                });
+            }
+        });
+    }
+
+
+    // =========================
+    // VIEW / UPLOAD PROFILE PHOTO
+    // =========================
+
+    function openViewPhotoModal(imageUrl, initialsText) {
+        const img = document.getElementById("viewPhotoImage");
+        const fallback = document.getElementById("viewPhotoFallback");
+
+        if (imageUrl) {
+            img.src = imageUrl;
+            img.classList.remove("d-none");
+            fallback.style.display = "none";
+        } else {
+            img.classList.add("d-none");
+            fallback.textContent = initialsText || "?";
+            fallback.style.display = "flex";
+        }
+
+        const modal = new bootstrap.Modal(document.getElementById("viewPhotoModal"));
+        modal.show();
+    }
+
+    let selectedPhotoFile = null;
+
+    function openUploadPhotoModal() {
+        selectedPhotoFile = null;
+
+        document.getElementById("uploadPhotoInput").value = "";
+        document.getElementById("uploadPhotoMessage").innerHTML = "";
+        document.getElementById("savePhotoButton").disabled = true;
+
+        const preview = document.getElementById("uploadPhotoPreview");
+        const previewFallback = document.getElementById("uploadPhotoPreviewFallback");
+
+        preview.classList.add("d-none");
+        previewFallback.style.display = "flex";
+        previewFallback.textContent = currentProfileInitials || "?";
+
+        const modal = new bootstrap.Modal(document.getElementById("uploadPhotoModal"));
+        modal.show();
+    }
+
+    const openUploadPhotoButton = document.getElementById("openUploadPhotoButton");
+    if (openUploadPhotoButton) {
+        openUploadPhotoButton.addEventListener("click", function () {
+            const viewModal = bootstrap.Modal.getInstance(document.getElementById("viewPhotoModal"));
+            if (viewModal) viewModal.hide();
+
+            openUploadPhotoModal();
+        });
+    }
+
+    const uploadPhotoInput = document.getElementById("uploadPhotoInput");
+    if (uploadPhotoInput) {
+        uploadPhotoInput.addEventListener("change", function () {
+            const file = this.files[0];
+            if (!file) return;
+
+            selectedPhotoFile = file;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const preview = document.getElementById("uploadPhotoPreview");
+                const previewFallback = document.getElementById("uploadPhotoPreviewFallback");
+
+                preview.src = e.target.result;
+                preview.classList.remove("d-none");
+                previewFallback.style.display = "none";
+
+                document.getElementById("savePhotoButton").disabled = false;
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    const savePhotoButton = document.getElementById("savePhotoButton");
+    if (savePhotoButton) {
+        savePhotoButton.addEventListener("click", function () {
+            if (!selectedPhotoFile) return;
+
+            const messageBox = document.getElementById("uploadPhotoMessage");
+            messageBox.innerHTML = "";
+            savePhotoButton.disabled = true;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const localPreviewUrl = e.target.result;
+
+                uploadProfilePhoto(selectedPhotoFile).then(function () {
+                    overriddenProfileImage = localPreviewUrl;
+                    resetProfilePhotoCache();
+
+                    const modal = bootstrap.Modal.getInstance(document.getElementById("uploadPhotoModal"));
+                    if (modal) modal.hide();
+
+                    Swal.fire({
+                        icon: "success",
+                        title: "Profile photo updated",
+                        confirmButtonColor: "#17a2b8"
+                    });
+
+                    loadHeaderEmployeeProfile();
+                    refreshSidebarProfileImage();
+
+                    const profileViewEl = document.getElementById("profileView");
+                    if (profileViewEl && !profileViewEl.classList.contains("d-none")) {
+                        loadProfile();
+                    }
+                }).catch(function (error) {
+                    console.error("Photo upload failed:", error.responseData || error);
+                    messageBox.innerHTML =
+                        `<div class="custom-alert error">${escapeHtml(error.message || "Upload failed.")}</div>`;
+                    savePhotoButton.disabled = false;
+                });
+            };
+            reader.readAsDataURL(selectedPhotoFile);
         });
     }
 
@@ -1073,167 +1413,167 @@ document.addEventListener("DOMContentLoaded", function () {
         const grid = document.getElementById("profileOverviewGrid");
         grid.innerHTML = `<p class="text-muted">Loading...</p>`;
 
-        Promise.all([
-            demoGetPersonalInformation(),
-            demoGetEmergencyContacts(),
-            demoGetFamilyMembers(),
-            demoGetEducation(),
-            demoGetExperience(),
-            demoGetJoiningDetails(),
-            demoGetWorkPosition(),
-            demoGetExitDetails(),
-            demoGetNominations(),
-            demoGetSkills()
-        ]).then(function (results) {
+        // Promise.all([
+        //     demoGetPersonalInformation(),
+        //     demoGetEmergencyContacts(),
+        //     demoGetFamilyMembers(),
+        //     demoGetEducation(),
+        //     demoGetExperience(),
+        //     demoGetJoiningDetails(),
+        //     demoGetWorkPosition(),
+        //     demoGetExitDetails(),
+        //     demoGetNominations(),
+        //     demoGetSkills()
+        // ]).then(function (results) {
 
-            currentPersonalInfo = results[0].data;
-            const emergencyContacts = results[1].data;
-            const familyMembers = results[2].data;
-            const education = results[3].data;
-            const experience = results[4].data;
-            currentJoiningDetails = results[5].data;
-            const workPosition = results[6].data;
-            const exitDetails = results[7].data;
-            const nominations = results[8].data;
-            const skills = results[9].data;
+        //     currentPersonalInfo = results[0].data;
+        //     const emergencyContacts = results[1].data;
+        //     const familyMembers = results[2].data;
+        //     const education = results[3].data;
+        //     const experience = results[4].data;
+        //     currentJoiningDetails = results[5].data;
+        //     const workPosition = results[6].data;
+        //     const exitDetails = results[7].data;
+        //     const nominations = results[8].data;
+        //     const skills = results[9].data;
 
-            grid.innerHTML = `
+        //     grid.innerHTML = `
 
-                <div class="overview-card">
-                    <div class="overview-card-header">
-                        <h5>Personal Information</h5>
-                        <button type="button" class="overview-edit-btn" id="overviewEditPersonalInfo" title="Edit">✎</button>
-                    </div>
-                    <div class="overview-card-body overview-kv-grid">
-                        <div class="overview-kv"><span>Height</span><strong>${escapeHtml(currentPersonalInfo.height) || "--"}</strong></div>
-                        <div class="overview-kv"><span>Weight</span><strong>${escapeHtml(currentPersonalInfo.weight) || "--"}</strong></div>
-                        <div class="overview-kv"><span>Blood Group</span><strong>${escapeHtml(currentPersonalInfo.bloodGroup) || "--"}</strong></div>
-                        <div class="overview-kv"><span>Shift</span><strong>${escapeHtml(currentPersonalInfo.shift) || "--"}</strong></div>
-                    </div>
-                </div>
+        //         <div class="overview-card">
+        //             <div class="overview-card-header">
+        //                 <h5>Personal Information</h5>
+        //                 <button type="button" class="overview-edit-btn" id="overviewEditPersonalInfo" title="Edit">✎</button>
+        //             </div>
+        //             <div class="overview-card-body overview-kv-grid">
+        //                 <div class="overview-kv"><span>Height</span><strong>${escapeHtml(currentPersonalInfo.height) || "--"}</strong></div>
+        //                 <div class="overview-kv"><span>Weight</span><strong>${escapeHtml(currentPersonalInfo.weight) || "--"}</strong></div>
+        //                 <div class="overview-kv"><span>Blood Group</span><strong>${escapeHtml(currentPersonalInfo.bloodGroup) || "--"}</strong></div>
+        //                 <div class="overview-kv"><span>Shift</span><strong>${escapeHtml(currentPersonalInfo.shift) || "--"}</strong></div>
+        //             </div>
+        //         </div>
 
-                <div class="overview-card">
-                    <div class="overview-card-header">
-                        <h5>Emergency Information</h5>
-                        <button type="button" class="overview-nav-btn" data-goto-view="emergency-information" title="Manage">›</button>
-                    </div>
-                    <div class="overview-card-body">
-                        <p class="overview-summary-text">${emergencyContacts.length} contact(s) added${emergencyContacts.length ? " — " + escapeHtml(emergencyContacts[0].name) : ""}</p>
-                    </div>
-                </div>
+        //         <div class="overview-card">
+        //             <div class="overview-card-header">
+        //                 <h5>Emergency Information</h5>
+        //                 <button type="button" class="overview-nav-btn" data-goto-view="emergency-information" title="Manage">›</button>
+        //             </div>
+        //             <div class="overview-card-body">
+        //                 <p class="overview-summary-text">${emergencyContacts.length} contact(s) added${emergencyContacts.length ? " — " + escapeHtml(emergencyContacts[0].name) : ""}</p>
+        //             </div>
+        //         </div>
 
-                <div class="overview-card">
-                    <div class="overview-card-header">
-                        <h5>Bank Information</h5>
-                    </div>
-                    <div class="overview-card-body">
-                        <p class="overview-summary-text text-muted">Coming soon.</p>
-                    </div>
-                </div>
+        //         <div class="overview-card">
+        //             <div class="overview-card-header">
+        //                 <h5>Bank Information</h5>
+        //             </div>
+        //             <div class="overview-card-body">
+        //                 <p class="overview-summary-text text-muted">Coming soon.</p>
+        //             </div>
+        //         </div>
 
-                <div class="overview-card">
-                    <div class="overview-card-header">
-                        <h5>Family Information</h5>
-                        <button type="button" class="overview-nav-btn" data-goto-view="family-information" title="Manage">›</button>
-                    </div>
-                    <div class="overview-card-body">
-                        <p class="overview-summary-text">${familyMembers.length} member(s) added${familyMembers.length ? " — " + escapeHtml(familyMembers[0].name) : ""}</p>
-                    </div>
-                </div>
+        //         <div class="overview-card">
+        //             <div class="overview-card-header">
+        //                 <h5>Family Information</h5>
+        //                 <button type="button" class="overview-nav-btn" data-goto-view="family-information" title="Manage">›</button>
+        //             </div>
+        //             <div class="overview-card-body">
+        //                 <p class="overview-summary-text">${familyMembers.length} member(s) added${familyMembers.length ? " — " + escapeHtml(familyMembers[0].name) : ""}</p>
+        //             </div>
+        //         </div>
 
-                <div class="overview-card">
-                    <div class="overview-card-header">
-                        <h5>Education Information</h5>
-                        <button type="button" class="overview-nav-btn" data-goto-view="education-information" title="Manage">›</button>
-                    </div>
-                    <div class="overview-card-body">
-                        <p class="overview-summary-text">${education.length} record(s)${education.length ? " — " + escapeHtml(education[0].qualification) : ""}</p>
-                    </div>
-                </div>
+        //         <div class="overview-card">
+        //             <div class="overview-card-header">
+        //                 <h5>Education Information</h5>
+        //                 <button type="button" class="overview-nav-btn" data-goto-view="education-information" title="Manage">›</button>
+        //             </div>
+        //             <div class="overview-card-body">
+        //                 <p class="overview-summary-text">${education.length} record(s)${education.length ? " — " + escapeHtml(education[0].qualification) : ""}</p>
+        //             </div>
+        //         </div>
 
-                <div class="overview-card">
-                    <div class="overview-card-header">
-                        <h5>Experience Information</h5>
-                        <button type="button" class="overview-nav-btn" data-goto-view="experience-information" title="Manage">›</button>
-                    </div>
-                    <div class="overview-card-body">
-                        <p class="overview-summary-text">${experience.length} record(s)${experience.length ? " — " + escapeHtml(experience[0].organization) : ""}</p>
-                    </div>
-                </div>
+        //         <div class="overview-card">
+        //             <div class="overview-card-header">
+        //                 <h5>Experience Information</h5>
+        //                 <button type="button" class="overview-nav-btn" data-goto-view="experience-information" title="Manage">›</button>
+        //             </div>
+        //             <div class="overview-card-body">
+        //                 <p class="overview-summary-text">${experience.length} record(s)${experience.length ? " — " + escapeHtml(experience[0].organization) : ""}</p>
+        //             </div>
+        //         </div>
 
-                <div class="overview-card">
-                    <div class="overview-card-header">
-                        <h5>Joining Details</h5>
-                        <button type="button" class="overview-edit-btn" id="overviewEditJoiningDetails" title="Edit">✎</button>
-                    </div>
-                    <div class="overview-card-body overview-kv-grid">
-                        <div class="overview-kv"><span>Date of Joining</span><strong>${escapeHtml(currentJoiningDetails.dateOfJoining) || "--"}</strong></div>
-                        <div class="overview-kv"><span>Status</span><strong>${escapeHtml(currentJoiningDetails.status) || "--"}</strong></div>
-                    </div>
-                </div>
+        //         <div class="overview-card">
+        //             <div class="overview-card-header">
+        //                 <h5>Joining Details</h5>
+        //                 <button type="button" class="overview-edit-btn" id="overviewEditJoiningDetails" title="Edit">✎</button>
+        //             </div>
+        //             <div class="overview-card-body overview-kv-grid">
+        //                 <div class="overview-kv"><span>Date of Joining</span><strong>${escapeHtml(currentJoiningDetails.dateOfJoining) || "--"}</strong></div>
+        //                 <div class="overview-kv"><span>Status</span><strong>${escapeHtml(currentJoiningDetails.status) || "--"}</strong></div>
+        //             </div>
+        //         </div>
 
-                <div class="overview-card">
-                    <div class="overview-card-header">
-                        <h5>Work Position</h5>
-                    </div>
-                    <div class="overview-card-body overview-kv-grid">
-                        <div class="overview-kv"><span>Department</span><strong>${escapeHtml(workPosition.departmentName) || "--"}</strong></div>
-                        <div class="overview-kv"><span>Grade Level</span><strong>${escapeHtml(workPosition.gradeLevel) || "--"}</strong></div>
-                    </div>
-                </div>
+        //         <div class="overview-card">
+        //             <div class="overview-card-header">
+        //                 <h5>Work Position</h5>
+        //             </div>
+        //             <div class="overview-card-body overview-kv-grid">
+        //                 <div class="overview-kv"><span>Department</span><strong>${escapeHtml(workPosition.departmentName) || "--"}</strong></div>
+        //                 <div class="overview-kv"><span>Grade Level</span><strong>${escapeHtml(workPosition.gradeLevel) || "--"}</strong></div>
+        //             </div>
+        //         </div>
 
-                <div class="overview-card">
-                    <div class="overview-card-header">
-                        <h5>Exit Details</h5>
-                    </div>
-                    <div class="overview-card-body overview-kv-grid">
-                        <div class="overview-kv"><span>Separation Mode</span><strong>${escapeHtml(exitDetails.separationMode) || "--"}</strong></div>
-                        <div class="overview-kv"><span>Last Working Date</span><strong>${escapeHtml(exitDetails.lastWorkingDate) || "--"}</strong></div>
-                    </div>
-                </div>
+        //         <div class="overview-card">
+        //             <div class="overview-card-header">
+        //                 <h5>Exit Details</h5>
+        //             </div>
+        //             <div class="overview-card-body overview-kv-grid">
+        //                 <div class="overview-kv"><span>Separation Mode</span><strong>${escapeHtml(exitDetails.separationMode) || "--"}</strong></div>
+        //                 <div class="overview-kv"><span>Last Working Date</span><strong>${escapeHtml(exitDetails.lastWorkingDate) || "--"}</strong></div>
+        //             </div>
+        //         </div>
 
-                <div class="overview-card">
-                    <div class="overview-card-header">
-                        <h5>Nomination Information</h5>
-                        <button type="button" class="overview-nav-btn" data-goto-view="nomination-information" title="Manage">›</button>
-                    </div>
-                    <div class="overview-card-body">
-                        <p class="overview-summary-text">${nominations.length} nomination(s) added</p>
-                    </div>
-                </div>
+        //         <div class="overview-card">
+        //             <div class="overview-card-header">
+        //                 <h5>Nomination Information</h5>
+        //                 <button type="button" class="overview-nav-btn" data-goto-view="nomination-information" title="Manage">›</button>
+        //             </div>
+        //             <div class="overview-card-body">
+        //                 <p class="overview-summary-text">${nominations.length} nomination(s) added</p>
+        //             </div>
+        //         </div>
 
-                <div class="overview-card">
-                    <div class="overview-card-header">
-                        <h5>Skills</h5>
-                        <button type="button" class="overview-nav-btn" data-goto-view="skills" title="Manage">›</button>
-                    </div>
-                    <div class="overview-card-body">
-                        ${skills.length
-                    ? `<div class="cc-chips">${skills.map(function (s) { return `<span class="cc-chip">${escapeHtml(s)}</span>`; }).join("")}</div>`
-                    : `<p class="overview-summary-text text-muted">No skills added yet.</p>`
-                }
-                    </div>
-                </div>
+        //         <div class="overview-card">
+        //             <div class="overview-card-header">
+        //                 <h5>Skills</h5>
+        //                 <button type="button" class="overview-nav-btn" data-goto-view="skills" title="Manage">›</button>
+        //             </div>
+        //             <div class="overview-card-body">
+        //                 ${skills.length
+        //             ? `<div class="cc-chips">${skills.map(function (s) { return `<span class="cc-chip">${escapeHtml(s)}</span>`; }).join("")}</div>`
+        //             : `<p class="overview-summary-text text-muted">No skills added yet.</p>`
+        //         }
+        //             </div>
+        //         </div>
 
-            `;
+        //     `;
 
-            const overviewEditPersonalInfo = document.getElementById("overviewEditPersonalInfo");
-            if (overviewEditPersonalInfo) {
-                overviewEditPersonalInfo.addEventListener("click", openPersonalInfoModal);
-            }
+        //     const overviewEditPersonalInfo = document.getElementById("overviewEditPersonalInfo");
+        //     if (overviewEditPersonalInfo) {
+        //         overviewEditPersonalInfo.addEventListener("click", openPersonalInfoModal);
+        //     }
 
-            const overviewEditJoiningDetails = document.getElementById("overviewEditJoiningDetails");
-            if (overviewEditJoiningDetails) {
-                overviewEditJoiningDetails.addEventListener("click", openJoiningDetailsModal);
-            }
+        //     const overviewEditJoiningDetails = document.getElementById("overviewEditJoiningDetails");
+        //     if (overviewEditJoiningDetails) {
+        //         overviewEditJoiningDetails.addEventListener("click", openJoiningDetailsModal);
+        //     }
 
-            grid.querySelectorAll("[data-goto-view]").forEach(function (btn) {
-                btn.addEventListener("click", function () {
-                    showView(this.dataset.gotoView);
-                });
-            });
+        //     grid.querySelectorAll("[data-goto-view]").forEach(function (btn) {
+        //         btn.addEventListener("click", function () {
+        //             showView(this.dataset.gotoView);
+        //         });
+        //     });
 
-        });
+        // });
     }
 
     // =========================
@@ -1269,14 +1609,15 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-            apiRequest("/api/auth/change-password", {
-                method: "POST",
-                body: JSON.stringify({
-                    oldPassword: currentPassword,
-                    newPassword: newPassword
-                })
+            // apiRequest("/api/auth/change-password", {
+            //     method: "POST",
+            //     body: JSON.stringify({
+            //         oldPassword: currentPassword,
+            //         newPassword: newPassword
+            //     })
 
-            }).then(function (res) {
+            // }).then(function (res) {
+            changeEmployeePassword(currentPassword, newPassword).then(function (res) {
 
                 const modalEl = document.getElementById("resetPasswordModal");
                 const modal = bootstrap.Modal.getInstance(modalEl);
@@ -1350,26 +1691,18 @@ document.addEventListener("DOMContentLoaded", function () {
     // =========================
     showView("dashboard");
 
-    const sidebarImage =
-        document.getElementById("sidebarProfileImage");
+    function refreshSidebarProfileImage() {
+        const sidebarImage = document.getElementById("sidebarProfileImage");
+        const sidebarInitials = document.getElementById("sidebarInitials");
 
-    const sidebarInitials =
-        document.getElementById("sidebarInitials");
-
-    fetchCurrentUserProfile().then(function (res) {
-
-        const p = res.data;
-
-        if (p.profileImage) {
-            sidebarImage.src = p.profileImage;
-            sidebarImage.style.display = "block";
-            sidebarInitials.style.display = "none";
-        } else {
-            sidebarImage.style.display = "none";
-            sidebarInitials.style.display = "flex";
+        if (!sidebarImage || !sidebarInitials) {
+            console.warn(
+                "Sidebar photo elements missing — sidebarProfileImage:",
+                !!sidebarImage, "| sidebarInitials:", !!sidebarInitials
+            );
+            return;
         }
-    });
-
+    }
 
 
     // =========================
@@ -2459,7 +2792,8 @@ document.addEventListener("DOMContentLoaded", function () {
         const body = document.getElementById("sessionsModalBody");
         body.innerHTML = `<p class="text-muted text-center py-4">Loading sessions...</p>`;
 
-        apiRequest("/api/sessions").then(function (res) {
+        // apiRequest("/api/sessions").then(function (res) {
+        getEmployeeSessions().then(function (res) {
             const sessions = res.data || [];
 
             if (sessions.length === 0) {
@@ -2524,9 +2858,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         confirmButtonColor: "#b3261e"
                     }).then(function (result) {
                         if (result.isConfirmed) {
-                            apiRequest(`/api/sessions/${sessionId}`, {
-                                method: "DELETE"
-                            }).then(function () {
+                            revokeEmployeeSession(sessionId).then(function () {
                                 Swal.fire({
                                     icon: "success",
                                     title: "Session revoked",

@@ -130,9 +130,9 @@ if (loginForm) {
 
             .then(function (data) {
 
-                console.log("LOGIN FULL RESPONSE:", data);
-                console.log("LOGIN DATA:", data.data);
-                console.log("LOGIN TOKEN:", data.data?.accessToken);
+                // console.log("LOGIN FULL RESPONSE:", data);
+                // console.log("LOGIN DATA:", data.data);
+                // console.log("LOGIN TOKEN:", data.data?.accessToken);
 
 
                 // Save authentication data
