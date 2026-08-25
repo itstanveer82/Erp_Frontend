@@ -885,26 +885,28 @@ document.addEventListener("DOMContentLoaded", function () {
     // GET /api/roles
     // ==============================
 
-  async function loadRoles() {
-
-    const rolesCardsContainer =
-        document.getElementById(
-            "rolesCardsContainer"
-        );
 
 
-    if (!rolesCardsContainer) {
+    let selectedRoleId = null;
+    let selectedRole = null;
+    async function loadRoles() {
 
-        console.error(
-            "rolesCardsContainer not found"
-        );
+        const rolesCardsContainer =
+            document.getElementById(
+                "rolesCardsContainer"
+            );
 
-        return;
+        if (!rolesCardsContainer) {
 
-    }
+            console.error(
+                "rolesCardsContainer not found"
+            );
 
+            return;
 
-    rolesCardsContainer.innerHTML = `
+        }
+
+        rolesCardsContainer.innerHTML = `
         <div class="text-center py-5">
 
             Loading roles...
@@ -912,28 +914,24 @@ document.addEventListener("DOMContentLoaded", function () {
         </div>
     `;
 
+        try {
 
-    try {
+            const response =
+                await apiRequest("/api/roles");
 
-        const response =
-            await apiRequest("/api/roles");
+            console.log(
+                "Roles API Response:",
+                response
+            );
 
+            const roles =
+                Array.isArray(response.data)
+                    ? response.data
+                    : [];
 
-        console.log(
-            "Roles API Response:",
-            response
-        );
+            if (roles.length === 0) {
 
-
-        const roles =
-            Array.isArray(response.data)
-                ? response.data
-                : [];
-
-
-        if (roles.length === 0) {
-
-            rolesCardsContainer.innerHTML = `
+                rolesCardsContainer.innerHTML = `
                 <div class="text-center py-5 text-muted">
 
                     No roles found
@@ -941,40 +939,37 @@ document.addEventListener("DOMContentLoaded", function () {
                 </div>
             `;
 
-            return;
+                return;
 
-        }
+            }
 
+            rolesCardsContainer.innerHTML = "";
 
-        rolesCardsContainer.innerHTML = "";
+            roles.forEach(function (role) {
 
+                const permissions =
+                    Array.isArray(role.permissions)
+                        ? role.permissions
+                        : [];
 
-        roles.forEach(function (role) {
+                const permissionsHtml =
+                    permissions.length > 0
+                        ? permissions.map(
+                            function (permission) {
 
-            const permissions =
-                Array.isArray(role.permissions)
-                    ? role.permissions
-                    : [];
-
-
-            const permissionsHtml =
-                permissions.length > 0
-                    ? permissions.map(
-                        function (permission) {
-
-                            return `
+                                return `
                                 <span class="small-permission-tag">
 
                                     ${escapeHtml(
-                                        getDisplayName(permission)
-                                    )}
+                                    getDisplayName(permission)
+                                )}
 
                                 </span>
                             `;
 
-                        }
-                    ).join("")
-                    : `
+                            }
+                        ).join("")
+                        : `
                         <span class="text-muted">
 
                             No permissions
@@ -982,16 +977,13 @@ document.addEventListener("DOMContentLoaded", function () {
                         </span>
                     `;
 
+                const roleCard =
+                    document.createElement("div");
 
-            const roleCard =
-                document.createElement("div");
+                roleCard.className =
+                    "role-card";
 
-
-            roleCard.className =
-                "role-card";
-
-
-            roleCard.innerHTML = `
+                roleCard.innerHTML = `
 
                 <div class="role-card-header">
 
@@ -1003,19 +995,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
                         </small>
 
-
                         <h5>
 
                             ${escapeHtml(
-                                getDisplayName(role)
-                            )}
+                    getDisplayName(role)
+                )}
 
                         </h5>
 
                     </div>
 
                 </div>
-
 
                 <div class="role-card-body">
 
@@ -1025,15 +1015,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     </p>
 
-
                     <p class="role-card-description">
 
                         ${escapeHtml(
-                            role.description || "--"
-                        )}
+                    role.description || "--"
+                )}
 
                     </p>
-
 
                     <p class="role-card-label">
 
@@ -1041,49 +1029,363 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     </p>
 
-
                     <div class="role-card-permissions">
 
                         ${permissionsHtml}
 
                     </div>
 
+                    <div class="role-card-actions">
+
+                        <button
+    type="button"
+    class="secondary-action-btn edit-role-btn"
+    data-role-id="${role.id}"
+    data-role-name="${escapeHtml(role.name || "")}"
+    data-role-description="${escapeHtml(role.description || "")}">
+
+    Edit
+
+</button>
+
+                        <button
+    type="button"
+    class="secondary-action-btn role-permissions-btn"
+    data-role-id="${role.id}"
+    data-role-name="${escapeHtml(role.name || "")}">
+
+    Permissions
+
+</button>
+                        <button
+                            type="button"
+                            class="btn btn-outline-danger delete-role-btn"
+                            data-role-id="${role.id}">
+
+                            Delete
+
+                        </button>
+
+                    </div>
+
                 </div>
 
             `;
+                roleCard.querySelector(".edit-role-btn")
+                    .addEventListener("click", function () {
+
+                        selectedRoleId = role.id;
+                        selectedRole = role;
+
+                        document.getElementById("editRoleName").value =
+                            role.name || "";
+
+                        document.getElementById("editRoleDescription").value =
+                            role.description || "";
+
+                        editRoleModal.show();
+
+                    });
 
 
-            rolesCardsContainer.appendChild(
-                roleCard
+                roleCard.querySelector(".role-permissions-btn")
+                    .addEventListener("click", function () {
+
+                        selectedRoleId = role.id;
+                        selectedRole = role;
+
+                        loadRolePermissions(role);
+
+                        rolePermissionsModal.show();
+
+                    });
+
+
+                roleCard.querySelector(".delete-role-btn")
+                    .addEventListener("click", function () {
+
+                        deleteRole(role.id);
+
+                    });
+                rolesCardsContainer.appendChild(
+                    roleCard
+                );
+
+            });
+
+        } catch (error) {
+
+            console.error(
+                "Failed to fetch roles:",
+                error
             );
 
-        });
-
-
-    } catch (error) {
-
-        console.error(
-            "Failed to fetch roles:",
-            error
-        );
-
-
-        rolesCardsContainer.innerHTML = `
+            rolesCardsContainer.innerHTML = `
 
             <div class="text-center py-5 text-danger">
 
                 ${escapeHtml(
-                    error.message ||
-                    "Failed to load roles"
-                )}
+                error.message ||
+                "Failed to load roles"
+            )}
 
             </div>
 
         `;
 
+        }
+
     }
 
-}
+    // selectedRoleId
+
+    const editRoleModal =
+        new bootstrap.Modal(
+            document.getElementById("editRoleModal")
+        );
+
+
+    const rolePermissionsModal =
+        new bootstrap.Modal(
+            document.getElementById("rolePermissionsModal")
+        );
+
+
+    document.addEventListener(
+        "click",
+        async function (event) {
+
+            const editButton =
+                event.target.closest(".edit-role-btn");
+
+
+            const permissionsButton =
+                event.target.closest(".role-permissions-btn");
+
+
+            const deleteButton =
+                event.target.closest(".delete-role-btn");
+
+
+            // EDIT
+
+            if (editButton) {
+
+                selectedRoleId =
+                    editButton.dataset.roleId;
+
+
+                document.getElementById(
+                    "editRoleName"
+                ).value =
+                    editButton.dataset.roleName;
+
+
+                document.getElementById(
+                    "editRoleDescription"
+                ).value =
+                    editButton.dataset.roleDescription;
+
+
+                editRoleModal.show();
+
+            }
+
+
+            // PERMISSIONS
+
+            if (permissionsButton) {
+
+                selectedRoleId =
+                    permissionsButton.dataset.roleId;
+
+
+                const response =
+                    await apiRequest("/api/roles");
+
+
+                const role =
+                    response.data.find(
+                        function (item) {
+
+                            return String(item.id) ===
+                                String(selectedRoleId);
+
+                        }
+                    );
+
+
+                const permissionsResponse =
+                    await apiRequest("/api/permissions");
+
+
+                const permissions =
+                    permissionsResponse.data || [];
+
+
+                const assignedPermissions =
+                    role?.permissions || [];
+
+
+                document.getElementById(
+                    "rolePermissionsTitle"
+                ).textContent =
+                    `Permissions for ${permissionsButton.dataset.roleName}`;
+
+
+                document.getElementById(
+                    "rolePermissionsList"
+                ).innerHTML =
+                    permissions.map(
+                        function (permission) {
+
+                            const permissionName =
+                                permission.name || permission;
+
+
+                            return `
+
+                            <div class="form-check mb-2">
+
+                                <input
+                                    class="form-check-input role-permission-checkbox"
+                                    type="checkbox"
+                                    value="${escapeHtml(permissionName)}"
+                                    id="permission_${escapeHtml(permissionName)}"
+                                    ${assignedPermissions.includes(permissionName)
+                                    ? "checked"
+                                    : ""
+                                }>
+
+                                <label
+                                    class="form-check-label"
+                                    for="permission_${escapeHtml(permissionName)}">
+
+                                    ${escapeHtml(permissionName)}
+
+                                </label>
+
+                            </div>
+
+                        `;
+
+                        }
+                    ).join("");
+
+
+                rolePermissionsModal.show();
+
+            }
+
+
+            // DELETE
+
+            if (deleteButton) {
+
+                const roleId =
+                    deleteButton.dataset.roleId;
+
+
+                if (!confirm("Delete this role?")) {
+                    return;
+                }
+
+
+                await apiRequest(
+                    `/api/roles/${roleId}`,
+                    {
+                        method: "DELETE"
+                    }
+                );
+
+
+                loadRoles();
+
+            }
+
+        }
+    );
+
+
+    //save edit role fucntion for when the edit role modal is submitted
+    document
+        .getElementById("saveEditRoleButton")
+        .addEventListener(
+            "click",
+            async function () {
+
+                await apiRequest(
+                    `/api/roles/${selectedRoleId}`,
+                    {
+                        method: "PUT",
+
+                        body: JSON.stringify({
+
+                            name:
+                                document.getElementById(
+                                    "editRoleName"
+                                ).value,
+
+                            description:
+                                document.getElementById(
+                                    "editRoleDescription"
+                                ).value
+
+                        })
+                    }
+                );
+
+
+                editRoleModal.hide();
+
+                loadRoles();
+
+            }
+        );
+
+    //save role permissions function for when the role permissions modal is submitted
+    document
+        .getElementById("saveRolePermissionsButton")
+        .addEventListener(
+            "click",
+            async function () {
+
+                const permissionNames =
+                    Array.from(
+                        document.querySelectorAll(
+                            ".role-permission-checkbox:checked"
+                        )
+                    ).map(
+                        function (checkbox) {
+
+                            return checkbox.value;
+
+                        }
+                    );
+
+
+                await apiRequest(
+                    `/api/roles/${selectedRoleId}/permissions`,
+                    {
+                        method: "POST",
+
+                        body: JSON.stringify({
+
+                            permissionNames:
+                                permissionNames
+
+                        })
+                    }
+                );
+
+
+                rolePermissionsModal.hide();
+
+                loadRoles();
+
+            }
+        );
+
 
     // =========================================
     // ADD ROLE
@@ -1172,6 +1474,10 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
         });
+
+
+
+        
     // ==============================
     // LOAD ALL PERMISSIONS
     // GET /api/permissions
@@ -1314,6 +1620,118 @@ document.addEventListener("DOMContentLoaded", function () {
 
     }
 
+    const addPermissionModal =
+    new bootstrap.Modal(
+        document.getElementById(
+            "addPermissionModal"
+        )
+    );
+
+
+document
+    .getElementById("addPermissionButton")
+    .addEventListener(
+        "click",
+        function () {
+
+            addPermissionModal.show();
+
+        }
+    );
+
+
+document
+    .getElementById("addPermissionForm")
+    .addEventListener(
+        "submit",
+        async function (event) {
+
+            event.preventDefault();
+
+
+            await apiRequest(
+                "/api/permissions",
+                {
+                    method: "POST",
+
+                    body: JSON.stringify({
+
+                        name:
+                            document.getElementById(
+                                "permissionName"
+                            ).value,
+
+                        description:
+                            document.getElementById(
+                                "permissionDescription"
+                            ).value
+
+                    })
+                }
+            );
+
+
+            addPermissionModal.hide();
+
+            loadPermissions();
+
+        }
+    );
+
+const removePermissionModalElement =
+    document.getElementById("removePermissionModal");
+
+const removePermissionButton =
+    document.getElementById("removePermissionButton");
+
+const removePermissionForm =
+    document.getElementById("removePermissionForm");
+
+if (
+    removePermissionModalElement &&
+    removePermissionButton &&
+    removePermissionForm
+) {
+    const removePermissionModal =
+        new bootstrap.Modal(removePermissionModalElement);
+
+    removePermissionButton.addEventListener(
+        "click",
+        function () {
+
+            removePermissionModal.show();
+
+        }
+    );
+
+    removePermissionForm.addEventListener(
+        "submit",
+        async function (event) {
+
+            event.preventDefault();
+
+
+            const permissionId =
+                document.getElementById(
+                    "removePermissionId"
+                ).value;
+
+
+            await apiRequest(
+                `/api/permissions/${permissionId}`,
+                {
+                    method: "DELETE"
+                }
+            );
+
+
+            removePermissionModal.hide();
+
+            loadPermissions();
+
+        }
+    );
+}
 
     //for roles modal
 
@@ -1518,7 +1936,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         ${user.enabled
 
-            ? `
+                            ? `
 
                 <button 
                     type="button" 
@@ -1531,7 +1949,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             `
 
-            : `
+                            : `
 
                 <button 
                     type="button" 
@@ -1544,7 +1962,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             `
 
-        }
+                        }
 
     </div>
 
@@ -1781,88 +2199,88 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // for disabling user function
     document.addEventListener(
-    "click",
-    async function (event) {
+        "click",
+        async function (event) {
 
-        const disableButton =
-            event.target.closest(
-                ".user-disable-btn"
-            );
-
-
-        if (!disableButton) {
-
-            return;
-
-        }
-
-
-        const userId =
-            disableButton.dataset.userId;
-
-
-        const confirmed =
-            confirm(
-                "Are you sure you want to disable this user?"
-            );
-
-
-        if (!confirmed) {
-
-            return;
-
-        }
-
-
-        try {
-
-            disableButton.disabled = true;
-
-            disableButton.textContent =
-                "Disabling...";
-
-
-            const response =
-                await apiRequest(
-                    `/api/users/${userId}`,
-                    {
-                        method: "DELETE"
-                    }
+            const disableButton =
+                event.target.closest(
+                    ".user-disable-btn"
                 );
 
 
-            console.log(
-                "Disable User Response:",
-                response
-            );
+            if (!disableButton) {
+
+                return;
+
+            }
 
 
-            await loadUsers();
+            const userId =
+                disableButton.dataset.userId;
 
 
-        } catch (error) {
-
-            console.error(
-                "Failed to disable user:",
-                error
-            );
+            const confirmed =
+                confirm(
+                    "Are you sure you want to disable this user?"
+                );
 
 
-            alert(
-                error.message ||
-                "Failed to disable user"
-            );
+            if (!confirmed) {
+
+                return;
+
+            }
 
 
-            disableButton.disabled = false;
+            try {
 
-            disableButton.textContent =
-                "Disable";
+                disableButton.disabled = true;
+
+                disableButton.textContent =
+                    "Disabling...";
+
+
+                const response =
+                    await apiRequest(
+                        `/api/users/${userId}`,
+                        {
+                            method: "DELETE"
+                        }
+                    );
+
+
+                console.log(
+                    "Disable User Response:",
+                    response
+                );
+
+
+                await loadUsers();
+
+
+            } catch (error) {
+
+                console.error(
+                    "Failed to disable user:",
+                    error
+                );
+
+
+                alert(
+                    error.message ||
+                    "Failed to disable user"
+                );
+
+
+                disableButton.disabled = false;
+
+                disableButton.textContent =
+                    "Disable";
+
+            }
 
         }
-
-    }
-);
+    );
 
     document
         .getElementById(
@@ -3053,7 +3471,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // ==============================
 
-document.getElementById("addEmployeeForm").addEventListener("submit", async function (event) {
+const addEmployeeForm = document.getElementById("addEmployeeForm");
+
+if (addEmployeeForm) {
+    addEmployeeForm.addEventListener("submit", async function (event) {
 
     event.preventDefault();
 
@@ -3119,4 +3540,5 @@ document.getElementById("addEmployeeForm").addEventListener("submit", async func
         alert(error.message);
 
     }
-});
+    });
+}

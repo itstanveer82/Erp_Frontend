@@ -1159,6 +1159,23 @@ body {
 
 }
 
+.remove-permission-btn {
+    border: none;
+    border-radius: 8px;
+    padding: 9px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #dc3545;
+    background: #fff;
+    border: 1px solid #dc3545;
+    transition: 0.2s;
+}
+
+.remove-permission-btn:hover {
+    background: #dc3545;
+    color: #fff;
+}
+
 
 
 /* =========================
