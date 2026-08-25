@@ -1075,6 +1075,92 @@ body {
 }
 
 
+.roles-cards-container {
+
+    display: grid;
+
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 20px;
+
+}
+
+
+.role-card {
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 12px;
+
+    padding: 22px;
+
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+
+}
+
+
+.role-card-header small {
+
+    font-size: 11px;
+
+    color: #6b7280;
+
+}
+
+
+.role-card-header h5 {
+
+    margin: 6px 0 0;
+
+    font-size: 18px;
+
+    font-weight: 700;
+
+}
+
+.role-card-body {
+
+    margin-top: 20px;
+
+}
+
+
+.role-card-label {
+
+    margin-bottom: 5px;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    color: #6b7280;
+
+    text-transform: uppercase;
+
+}
+
+
+.role-card-description {
+
+    margin-bottom: 20px;
+
+}
+
+
+.role-card-permissions {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 7px;
+
+}
+
+
+
 /* =========================
    TABLET RESPONSIVE
 ========================= */
@@ -1192,6 +1278,12 @@ body {
 
     .management-table {
         min-width: 650px;
+    }
+
+    .roles-cards-container {
+
+        grid-template-columns: 1fr;
+
     }
 
 }

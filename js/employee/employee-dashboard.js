@@ -150,97 +150,51 @@ document.addEventListener("DOMContentLoaded", function () {
     // nahi karna padega.
     // =========================================
 
-    function fetchCurrentUserProfile() {
-        return apiRequest("/api/users/me")
-            .then(function (res) {
-                const u = res.data || {};
-                return demoGetProfile().then(function (demoRes) {
-                    const d = demoRes.data || {};
-                    return {
-                        success: true,
-                        data: {
-                            employeeCode: u.employeeCode || d.employeeCode || "--",
-                            firstName: u.firstName || d.firstName || "",
-                            lastName: u.lastName || d.lastName || "",
-                            email: u.email || d.email || "--",
-                            phone: u.phone || d.phone || "--",
+    // let overriddenProfileImage = null;
+    let currentProfileInitials = "";
 
-                            departmentName:
-                                u.departmentName ||
-                                d.departmentName ||
-                                "Not available",
+    // let cachedRealPhotoUrl = null;
+    // let realPhotoFetchedOnce = false;
+    resetProfilePhotoCache();
 
-                            designation:
-                                u.designation ||
-                                d.designation ||
-                                "Not available",
 
-                            joiningDate:
-                                u.joiningDate ||
-                                d.joiningDate ||
-                                "Not available",
-
-                            reportingManager:
-                                u.reportingManager ||
-                                d.reportingManager ||
-                                "Not available",
-
-                            profileImage:
-                                u.profileImage ||
-                                d.profileImage ||
-                                null,
-
-                            dateOfBirth:
-                                u.dateOfBirth ||
-                                d.dateOfBirth ||
-                                "Not available",
-
-                            gender:
-                                u.gender ||
-                                d.gender ||
-                                "Not available"
-                        }
-                    };
-                });
-            })
-            .catch(function (error) {
-
-                console.warn(
-                    "Profile API failed, using demo profile.",
-                    error
-                );
-                return demoGetProfile();
-            });
-    }
-
-    // =========================================
-    // LOAD EMPLOYEE PROFILE
-    // =========================================
+  
+   
     function loadHeaderEmployeeProfile() {
         fetchCurrentUserProfile().then(function (res) {
-            const p = res.data;
+
+            const p = res.data || {};
 
             const fullName =
-                `${p.firstName} ${p.lastName}`.trim();
+                `${p.firstName || ""} ${p.lastName || ""}`.trim();
 
             const employeeImage =
-                p.profileImage || "../assets/image/Image01.jpg";
+                p.profileImage;
 
-            headerEmployeeName.textContent = fullName;
+            headerEmployeeName.textContent =
+                fullName || "Employee";
+
             headerEmployeeId.textContent =
                 p.employeeCode || "EMP-0000";
 
-            headerEmployeeImage.src = employeeImage;
+            headerEmployeeImage.src =
+                employeeImage;
 
             profileDropdownName.textContent =
-                fullName;
+                fullName || "Employee";
 
             profileDropdownId.textContent =
                 p.employeeCode || "EMP-0000";
 
             profileDropdownImage.src =
                 employeeImage;
-        });
+        })
+            .catch(function (error) {
+                console.error(
+                    "Employee header profile error:",
+                    error
+                );
+            });
     }
     loadHeaderEmployeeProfile();
 
@@ -277,11 +231,38 @@ document.addEventListener("DOMContentLoaded", function () {
             const p = res.data;
             const fullName = `${p.firstName} ${p.lastName}`.trim();
 
-            dashboardWelcomeEl.textContent = `Welcome back, ${p.firstName}!`;
+            // dashboardWelcomeEl.textContent = `Welcome back, ${p.firstName}!`;
+            // userInitialsEl.textContent = initials;
 
-            const initials = `${p.firstName.charAt(0)}${p.lastName.charAt(0)}`.toUpperCase();
-            userInitialsEl.textContent = initials;
+            const initials =
+                `${p.firstName || ""}${p.lastName || ""}`
+                    .trim()
+                    .split(/\s+/)
+                    .map(function (name) {
+                        return name.charAt(0);
+                    })
+                    .join("")
+                    .toUpperCase();
+
+            safeSetText(
+                "dashboardWelcome",
+                `Welcome back, ${p.firstName || "Employee"}!`
+            );
+
+            safeSetText(
+                "userInitials",
+                initials || "E"
+            );
+
         });
+        function safeSetText(elementId, text) {
+            const el = document.getElementById(elementId);
+            if (el) {
+                el.textContent = text;
+            } else {
+                console.warn(`Element #${elementId} not found — skipping textContent update.`);
+            }
+        }
 
         demoGetDashboardSummary().then(function (res) {
             const s = res.data;
@@ -672,7 +653,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     Swal.fire({
                         icon: "success",
-                        title: "Try Again.....",
+                        title: "Chal BSDK.....",
                         confirmButtonColor: "#17a2b8",
                         timer: 2000,
                         timerProgressBar: true,
@@ -712,31 +693,21 @@ document.addEventListener("DOMContentLoaded", function () {
     function loadPayslips() {
         const tbody = document.getElementById("payslipsTableBody");
         tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4">Loading...</td></tr>`;
-
-        // demoGetPayslips().then(function (res) {
-        //     tbody.innerHTML = res.data.map(function (p) {
-        //         return `
-        //             <tr>
-        //                 <td>${escapeHtml(p.month)}</td>
-        //                 <td>₹${p.netPay.toLocaleString()}</td>
-        //                 <td><span class="badge text-bg-success">${escapeHtml(p.status)}</span></td>
-        //                 <td><button type="button" class="btn btn-sm btn-outline-primary" onclick="alert('Demo only — real download backend se aayega')">Download</button></td>
-        //             </tr>
-        //         `;
-        //     }).join("");
-        // });
     }
 
     // =========================
     // ATTENDANCE CORRECTIONS
     // =========================
     const newCorrectionButton = document.getElementById("newCorrectionButton");
-    const correctionFormWrapper = document.getElementById("correctionFormWrapper");
     const correctionForm = document.getElementById("correctionForm");
     const correctionFormMessage = document.getElementById("correctionFormMessage");
 
     newCorrectionButton.addEventListener("click", function () {
-        correctionFormWrapper.classList.toggle("d-none");
+        correctionForm.reset();
+        correctionFormMessage.innerHTML = "";
+
+        const modal = new bootstrap.Modal(document.getElementById("correctionModal"));
+        modal.show();
     });
 
     correctionForm.addEventListener("submit", function (e) {
@@ -751,12 +722,34 @@ document.addEventListener("DOMContentLoaded", function () {
         };
 
         demoSubmitCorrection(payload).then(function (res) {
-            correctionFormMessage.innerHTML = `<div class="custom-alert success">${escapeHtml(res.data.message)}</div>`;
-            correctionForm.reset();
-            correctionFormWrapper.classList.add("d-none");
+            const modal = bootstrap.Modal.getInstance(document.getElementById("correctionModal"));
+            if (modal) modal.hide();
+
+            Swal.fire({
+                icon: "success",
+                title: res.data.message,
+                confirmButtonColor: "#17a2b8"
+            });
+
             loadCorrections();
         });
     });
+
+    function renderCorrectionStats(rows) {
+        const counts = { PENDING: 0, APPROVED: 0, REJECTED: 0 };
+
+        rows.forEach(function (r) {
+            const status = (r.status || "").toUpperCase();
+            if (counts.hasOwnProperty(status)) {
+                counts[status]++;
+            }
+        });
+
+        document.getElementById("corrStatPending").textContent = counts.PENDING;
+        document.getElementById("corrStatApproved").textContent = counts.APPROVED;
+        document.getElementById("corrStatRejected").textContent = counts.REJECTED;
+        document.getElementById("corrStatTotal").textContent = rows.length;
+    }
 
     function loadCorrections() {
         const tbody = document.getElementById("correctionsTableBody");
@@ -765,18 +758,29 @@ document.addEventListener("DOMContentLoaded", function () {
         demoGetCorrections().then(function (res) {
             const rows = res.data;
 
+            renderCorrectionStats(rows);
+
             if (rows.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-muted">No correction requests.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-muted">No correction requests yet. Click "+ New Request" to submit one.</td></tr>`;
                 return;
             }
 
+            const statusClassMap = {
+                PENDING: "LATE",
+                APPROVED: "PRESENT",
+                REJECTED: "ABSENT"
+            };
+
             tbody.innerHTML = rows.map(function (r) {
+                const statusKey = (r.status || "").toUpperCase();
+                const badgeClass = statusClassMap[statusKey] || "LEAVE";
+
                 return `
                     <tr>
                         <td>${escapeHtml(r.date)}</td>
                         <td>${escapeHtml(r.change)}</td>
                         <td>${escapeHtml(r.reason)}</td>
-                        <td><span class="badge text-bg-secondary">${escapeHtml(r.status)}</span></td>
+                        <td><span class="status-badge ${badgeClass}">${escapeHtml(r.status)}</span></td>
                     </tr>
                 `;
             }).join("");
@@ -819,14 +823,18 @@ document.addEventListener("DOMContentLoaded", function () {
              <!-- PROFILE HEADER -->
                 <div class="profile-header">
 
-                <div class="profile-avatar">
+                <div class="profile-avatar" id="profileAvatarClickable">
+
+
+
                     ${p.profileImage
-                    ? `<img src="${escapeHtml(p.profileImage)}"
+                    ? `<img src="${p.profileImage}"
                         alt="Employee Profile"
                         class="profile-avatar-image"
                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">`
-                    : ""
+                    : "<img src=''>"
                 }
+
                    <span class="profile-avatar-fallback"
                         style="${p.profileImage ? 'display:none;' : 'display:flex;'}">
                     ${escapeHtml(initials)}
@@ -848,7 +856,6 @@ document.addEventListener("DOMContentLoaded", function () {
         </div>
 
     </div>
-
                 <!-- BASIC INFORMATION -->
                 <div class="profile-section">
 
@@ -1026,6 +1033,135 @@ document.addEventListener("DOMContentLoaded", function () {
                     showView("profile-overview");
                 });
             }
+
+            currentProfileInitials = initials;
+
+            const profileAvatarClickable = document.getElementById("profileAvatarClickable");
+            if (profileAvatarClickable) {
+                profileAvatarClickable.addEventListener("click", function () {
+                    openViewPhotoModal(p.profileImage, initials);
+                });
+            }
+        });
+    }
+
+
+    // =========================
+    // VIEW / UPLOAD PROFILE PHOTO
+    // =========================
+
+    function openViewPhotoModal(imageUrl, initialsText) {
+        const img = document.getElementById("viewPhotoImage");
+        const fallback = document.getElementById("viewPhotoFallback");
+
+        if (imageUrl) {
+            img.src = imageUrl;
+            img.classList.remove("d-none");
+            fallback.style.display = "none";
+        } else {
+            img.classList.add("d-none");
+            fallback.textContent = initialsText || "?";
+            fallback.style.display = "flex";
+        }
+
+        const modal = new bootstrap.Modal(document.getElementById("viewPhotoModal"));
+        modal.show();
+    }
+
+    let selectedPhotoFile = null;
+
+    function openUploadPhotoModal() {
+        selectedPhotoFile = null;
+
+        document.getElementById("uploadPhotoInput").value = "";
+        document.getElementById("uploadPhotoMessage").innerHTML = "";
+        document.getElementById("savePhotoButton").disabled = true;
+
+        const preview = document.getElementById("uploadPhotoPreview");
+        const previewFallback = document.getElementById("uploadPhotoPreviewFallback");
+
+        preview.classList.add("d-none");
+        previewFallback.style.display = "flex";
+        previewFallback.textContent = currentProfileInitials || "?";
+
+        const modal = new bootstrap.Modal(document.getElementById("uploadPhotoModal"));
+        modal.show();
+    }
+
+    const openUploadPhotoButton = document.getElementById("openUploadPhotoButton");
+    if (openUploadPhotoButton) {
+        openUploadPhotoButton.addEventListener("click", function () {
+            const viewModal = bootstrap.Modal.getInstance(document.getElementById("viewPhotoModal"));
+            if (viewModal) viewModal.hide();
+
+            openUploadPhotoModal();
+        });
+    }
+
+    const uploadPhotoInput = document.getElementById("uploadPhotoInput");
+    if (uploadPhotoInput) {
+        uploadPhotoInput.addEventListener("change", function () {
+            const file = this.files[0];
+            if (!file) return;
+
+            selectedPhotoFile = file;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const preview = document.getElementById("uploadPhotoPreview");
+                const previewFallback = document.getElementById("uploadPhotoPreviewFallback");
+
+                preview.src = e.target.result;
+                preview.classList.remove("d-none");
+                previewFallback.style.display = "none";
+
+                document.getElementById("savePhotoButton").disabled = false;
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    const savePhotoButton = document.getElementById("savePhotoButton");
+    if (savePhotoButton) {
+        savePhotoButton.addEventListener("click", function () {
+            if (!selectedPhotoFile) return;
+
+            const messageBox = document.getElementById("uploadPhotoMessage");
+            messageBox.innerHTML = "";
+            savePhotoButton.disabled = true;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const localPreviewUrl = e.target.result;
+
+                uploadProfilePhoto(selectedPhotoFile).then(function () {
+                    overriddenProfileImage = localPreviewUrl;
+                    resetProfilePhotoCache();
+
+                    const modal = bootstrap.Modal.getInstance(document.getElementById("uploadPhotoModal"));
+                    if (modal) modal.hide();
+
+                    Swal.fire({
+                        icon: "success",
+                        title: "Profile photo updated",
+                        confirmButtonColor: "#17a2b8"
+                    });
+
+                    loadHeaderEmployeeProfile();
+                    refreshSidebarProfileImage();
+
+                    const profileViewEl = document.getElementById("profileView");
+                    if (profileViewEl && !profileViewEl.classList.contains("d-none")) {
+                        loadProfile();
+                    }
+                }).catch(function (error) {
+                    console.error("Photo upload failed:", error.responseData || error);
+                    messageBox.innerHTML =
+                        `<div class="custom-alert error">${escapeHtml(error.message || "Upload failed.")}</div>`;
+                    savePhotoButton.disabled = false;
+                });
+            };
+            reader.readAsDataURL(selectedPhotoFile);
         });
     }
 
@@ -1233,14 +1369,15 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-            apiRequest("/api/auth/change-password", {
-                method: "POST",
-                body: JSON.stringify({
-                    oldPassword: currentPassword,
-                    newPassword: newPassword
-                })
+            // apiRequest("/api/auth/change-password", {
+            //     method: "POST",
+            //     body: JSON.stringify({
+            //         oldPassword: currentPassword,
+            //         newPassword: newPassword
+            //     })
 
-            }).then(function (res) {
+            // }).then(function (res) {
+            changeEmployeePassword(currentPassword, newPassword).then(function (res) {
 
                 const modalEl = document.getElementById("resetPasswordModal");
                 const modal = bootstrap.Modal.getInstance(modalEl);
@@ -1314,26 +1451,18 @@ document.addEventListener("DOMContentLoaded", function () {
     // =========================
     showView("dashboard");
 
-    const sidebarImage =
-        document.getElementById("sidebarProfileImage");
+    function refreshSidebarProfileImage() {
+        const sidebarImage = document.getElementById("sidebarProfileImage");
+        const sidebarInitials = document.getElementById("sidebarInitials");
 
-    const sidebarInitials =
-        document.getElementById("sidebarInitials");
-
-    fetchCurrentUserProfile().then(function (res) {
-
-        const p = res.data;
-
-        if (p.profileImage) {
-            sidebarImage.src = p.profileImage;
-            sidebarImage.style.display = "block";
-            sidebarInitials.style.display = "none";
-        } else {
-            sidebarImage.style.display = "none";
-            sidebarInitials.style.display = "flex";
+        if (!sidebarImage || !sidebarInitials) {
+            console.warn(
+                "Sidebar photo elements missing — sidebarProfileImage:",
+                !!sidebarImage, "| sidebarInitials:", !!sidebarInitials
+            );
+            return;
         }
-    });
-
+    }
 
 
     // =========================
@@ -2365,6 +2494,163 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 loadFamilyInformation();
             });
+        });
+    }
+
+
+    // =========================
+    // SESSION MANAGEMENT
+    // =========================
+
+    function parseDeviceInfo(ua) {
+        if (!ua) return "Unknown device";
+
+        let browser = "Unknown browser";
+        if (ua.includes("Chrome")) {
+            const match = ua.match(/Chrome\/(\d+)/);
+            browser = "Chrome" + (match ? " " + match[1] : "");
+        } else if (ua.includes("Firefox")) {
+            browser = "Firefox";
+        } else if (ua.includes("Safari") && !ua.includes("Chrome")) {
+            browser = "Safari";
+        } else if (ua.includes("Edg")) {
+            browser = "Edge";
+        }
+
+        let os = "Unknown OS";
+        if (ua.includes("Windows")) {
+            os = "Windows";
+        } else if (ua.includes("Android")) {
+            os = "Android";
+        } else if (ua.includes("Mac OS")) {
+            os = "macOS";
+        } else if (ua.includes("Linux")) {
+            os = "Linux";
+        } else if (ua.includes("iPhone") || ua.includes("iPad")) {
+            os = "iOS";
+        }
+
+        const isMobile = ua.includes("Mobile");
+
+        return `${browser} on ${os}${isMobile ? " (Mobile)" : ""}`;
+    }
+
+    function formatSessionDate(isoString) {
+        if (!isoString) return "--";
+
+        const date = new Date(isoString);
+        return date.toLocaleString("en-IN", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit"
+        });
+    }
+
+    function loadSessions() {
+        const body = document.getElementById("sessionsModalBody");
+        body.innerHTML = `<p class="text-muted text-center py-4">Loading sessions...</p>`;
+
+        // apiRequest("/api/sessions").then(function (res) {
+        getEmployeeSessions().then(function (res) {
+            const sessions = res.data || [];
+
+            if (sessions.length === 0) {
+                body.innerHTML = `<p class="text-muted text-center py-4">No active sessions found.</p>`;
+                return;
+            }
+
+            body.innerHTML = sessions.map(function (s) {
+                const isMobile = (s.deviceInfo || "").includes("Mobile");
+                const icon = isMobile ? "📱" : "🖥️";
+
+                return `
+                    <div class="session-card ${s.current ? "session-card-current" : ""}">
+
+                        <div class="session-card-top">
+                            <div class="session-device-line">
+                                <span class="session-device-icon">${icon}</span>
+                                <span>${escapeHtml(s.deviceInfo)}</span>
+                            </div>
+
+                            ${s.current
+                        ? `<span class="session-current-tag">Current Session</span>`
+                        : `<button type="button" class="session-revoke-btn" data-revoke-session="${s.id}">Revoke</button>`
+                    }
+                        </div>
+
+                        <div class="session-ip-line">
+                            <strong>IP Address:</strong> ${escapeHtml(s.ipAddress)}
+                        </div>
+
+                        <hr class="session-divider">
+
+                        <div class="session-meta-grid">
+                            <div class="session-meta-item">
+                                <span>Logged In</span>
+                                <strong>${escapeHtml(formatSessionDate(s.createdAt))}</strong>
+                            </div>
+                            <div class="session-meta-item">
+                                <span>Last Used</span>
+                                <strong>${escapeHtml(formatSessionDate(s.lastUsedAt))}</strong>
+                            </div>
+                            <div class="session-meta-item">
+                                <span>Expires</span>
+                                <strong>${escapeHtml(formatSessionDate(s.expiryDate))}</strong>
+                            </div>
+                        </div>
+
+                    </div>
+                `;
+            }).join("");
+
+            body.querySelectorAll("[data-revoke-session]").forEach(function (btn) {
+                btn.addEventListener("click", function () {
+                    const sessionId = this.dataset.revokeSession;
+
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Revoke this session?",
+                        text: "This device will be signed out immediately.",
+                        showCancelButton: true,
+                        confirmButtonText: "Yes, revoke",
+                        confirmButtonColor: "#b3261e"
+                    }).then(function (result) {
+                        if (result.isConfirmed) {
+                            revokeEmployeeSession(sessionId).then(function () {
+                                Swal.fire({
+                                    icon: "success",
+                                    title: "Session revoked",
+                                    confirmButtonColor: "#17a2b8",
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                });
+                                loadSessions();
+                            }).catch(function (error) {
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Could not revoke session",
+                                    text: error.message,
+                                    confirmButtonColor: "#17a2b8"
+                                });
+                            });
+                        }
+                    });
+                });
+            });
+
+        }).catch(function (error) {
+            body.innerHTML = `<div class="custom-alert error">${escapeHtml(error.message || "Failed to load sessions.")}</div>`;
+        });
+    }
+
+    const sessionsButton = document.getElementById("sessionsButton");
+    if (sessionsButton) {
+        sessionsButton.addEventListener("click", function () {
+            const modal = new bootstrap.Modal(document.getElementById("sessionsModal"));
+            modal.show();
+            loadSessions();
         });
     }
 

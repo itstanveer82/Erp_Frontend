@@ -36,7 +36,7 @@ async function apiRequest(endpoint, options = {}) {
             data = {};
         }
 
-        console.log("API URL:", API_BASE_URL + endpoint);
+        // console.log("API URL:", API_BASE_URL + endpoint);
         console.log("API Status:", response.status);
         console.log("API Response:", data);
 

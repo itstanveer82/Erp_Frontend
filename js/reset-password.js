@@ -2,10 +2,10 @@ const form = document.getElementById("resetPasswordForm");
 
 const newPassword = document.getElementById("newPassword");
 const confirmPassword = document.getElementById("confirmPassword");
+const otp = document.getElementById("otp");
 
-const newPasswordError =
-    document.getElementById("newPasswordError");
-
+const otpError = document.getElementById("otpError");
+const newPasswordError = document.getElementById("newPasswordError");
 const confirmPasswordError =
     document.getElementById("confirmPasswordError");
 
@@ -25,9 +25,7 @@ const resetPasswordLoader =
     document.getElementById("resetPasswordLoader");
 
 
-// =================================
-// SHOW / HIDE NEW PASSWORD
-// =================================
+//              SHOW / HIDE NEW PASSWORD
 
 const toggleNewPassword =
     document.getElementById("toggleNewPassword");
@@ -35,261 +33,231 @@ const toggleNewPassword =
 const toggleNewPasswordText =
     document.getElementById("toggleNewPasswordText");
 
-
 if (toggleNewPassword) {
 
-    toggleNewPassword.addEventListener(
-        "click",
-        function () {
+    toggleNewPassword.addEventListener("click", function () {
 
-            if (newPassword.type === "password") {
+        if (newPassword.type === "password") {
 
-                newPassword.type = "text";
+            newPassword.type = "text";
+            toggleNewPasswordText.textContent = "Hide";
 
-                toggleNewPasswordText.textContent =
-                    "Hide";
+        } else {
 
-            } else {
-
-                newPassword.type = "password";
-
-                toggleNewPasswordText.textContent =
-                    "Show";
-
-            }
+            newPassword.type = "password";
+            toggleNewPasswordText.textContent = "Show";
 
         }
-    );
+
+    });
 
 }
 
 
-// =================================
-// SHOW / HIDE CONFIRM PASSWORD
-// =================================
+//          SHOW / HIDE CONFIRM PASSWORD
 
 const toggleConfirmPassword =
     document.getElementById("toggleConfirmPassword");
 
 const toggleConfirmPasswordText =
-    document.getElementById(
-        "toggleConfirmPasswordText"
-    );
-
+    document.getElementById("toggleConfirmPasswordText");
 
 if (toggleConfirmPassword) {
 
-    toggleConfirmPassword.addEventListener(
-        "click",
-        function () {
+    toggleConfirmPassword.addEventListener("click", function () {
 
-            if (confirmPassword.type === "password") {
+        if (confirmPassword.type === "password") {
 
-                confirmPassword.type = "text";
+            confirmPassword.type = "text";
+            toggleConfirmPasswordText.textContent = "Hide";
 
-                toggleConfirmPasswordText.textContent =
-                    "Hide";
+        } else {
 
-            } else {
-
-                confirmPassword.type = "password";
-
-                toggleConfirmPasswordText.textContent =
-                    "Show";
-
-            }
+            confirmPassword.type = "password";
+            toggleConfirmPasswordText.textContent = "Show";
 
         }
-    );
+
+    });
 
 }
 
-
-// =================================
-// GET TOKEN FROM URL
-// Example:
-// reset-password.html?token=abc123
-// =================================
-
-const urlParams = new URLSearchParams(
-    window.location.search
-);
-
-const token = urlParams.get("token");
-
-
-// =================================
-// FORM SUBMIT
-// =================================
+//                  RESET PASSWORD
 
 if (form) {
 
-    form.addEventListener(
-        "submit",
-        async function (e) {
+    form.addEventListener("submit", async function (e) {
 
-            e.preventDefault();
+        e.preventDefault();
 
+// Clear messages
 
-            // Clear old messages
+        otpError.textContent = "";
+        newPasswordError.textContent = "";
+        confirmPasswordError.textContent = "";
+        resetError.textContent = "";
 
-            newPasswordError.textContent = "";
-
-            confirmPasswordError.textContent = "";
-
-            resetError.textContent = "";
-
-            successMessage.textContent = "";
-
-            successMessage.classList.add("d-none");
+        successMessage.textContent = "";
+        successMessage.classList.add("d-none");
 
 
-            const passwordValue =
-                newPassword.value.trim();
+// Get values
 
-            const confirmValue =
-                confirmPassword.value.trim();
-
-
-            // New password validation
-
-            if (passwordValue === "") {
-
-                newPasswordError.textContent =
-                    "New password is required.";
-
-                return;
-
-            }
+        const otpValue = otp.value.trim();
+        const passwordValue = newPassword.value.trim();
+        const confirmValue = confirmPassword.value.trim();
 
 
-            if (passwordValue.length < 6) {
+//                  OTP VALIDATION
 
-                newPasswordError.textContent =
-                    "Password must be at least 6 characters.";
+        if (otpValue === "") {
 
-                return;
+            otpError.textContent =
+                "OTP is required.";
 
-            }
+            return;
+        }
 
+        if (!/^\d{6}$/.test(otpValue)) {
 
-            // Confirm password validation
+            otpError.textContent =
+                "Please enter a valid 6-digit OTP.";
 
-            if (confirmValue === "") {
-
-                confirmPasswordError.textContent =
-                    "Please confirm your password.";
-
-                return;
-
-            }
+            return;
+        }
 
 
-            // Password match
+//              PASSWORD VALIDATION
 
-            if (passwordValue !== confirmValue) {
+        if (passwordValue === "") {
 
-                confirmPasswordError.textContent =
-                    "Passwords do not match.";
+            newPasswordError.textContent =
+                "New password is required.";
 
-                return;
+            return;
+        }
 
-            }
+        if (passwordValue.length < 6) {
 
+            newPasswordError.textContent =
+                "Password must be at least 6 characters.";
 
-            // Token validation
-
-            if (!token) {
-
-                resetError.textContent =
-                    "Invalid or missing reset token.";
-
-                return;
-
-            }
+            return;
+        }
 
 
-            // Loading state
+//              CONFIRM PASSWORD
 
-            resetPasswordButton.disabled = true;
+        if (confirmValue === "") {
 
-            resetPasswordButtonText.textContent =
-                "Resetting Password...";
+            confirmPasswordError.textContent =
+                "Please confirm your password.";
 
-            resetPasswordLoader.classList.remove(
-                "d-none"
+            return;
+        }
+
+        if (passwordValue !== confirmValue) {
+
+            confirmPasswordError.textContent =
+                "Passwords do not match.";
+
+            return;
+        }
+
+
+//              EMAIL
+
+        const resetEmail =
+            sessionStorage.getItem("resetEmail");
+
+        console.log("Reset Email:", resetEmail);
+        console.log("OTP:", otpValue);
+        console.log("New Password:", passwordValue);
+
+
+        if (!resetEmail) {
+
+            resetError.textContent =
+                "Email session expired. Please request OTP again.";
+
+            return;
+        }
+
+
+//                  LOADING
+
+        resetPasswordButton.disabled = true;
+
+        resetPasswordButtonText.textContent =
+            "Resetting Password...";
+
+        resetPasswordLoader.classList.remove("d-none");
+
+
+//                  API
+
+        try {
+
+            const data = await apiRequest(
+                "/api/auth/reset-password",
+                {
+                    method: "POST",
+
+                    body: JSON.stringify({
+                        email: resetEmail,
+                        otp: otpValue,
+                        newPassword: passwordValue
+                    })
+                }
             );
 
+            console.log(
+                "Reset Password Response:",
+                data
+            );
 
-            try {
+//                  SUCCESS
 
-                const data = await apiRequest(
-                    "/api/auth/reset-password",
-                    {
+            successMessage.textContent =
+                data.message ||
+                "Password reset successfully.";
 
-                        method: "POST",
+            successMessage.classList.remove("d-none");
 
-                        body: JSON.stringify({
-                            token: token,
-                            newPassword: passwordValue
-                        })
-
-                    }
-                );
+            sessionStorage.removeItem("resetEmail");
 
 
-                console.log(
-                    "Reset Password Response:",
-                    data
-                );
+            setTimeout(function () {
+
+                window.location.href =
+                    "login.html";
+
+            }, 2000);
 
 
-                successMessage.textContent =
-                    data.message ||
-                    "Password reset successfully.";
+        } catch (error) {
 
-                successMessage.classList.remove(
-                    "d-none"
-                );
+            console.error(
+                "Reset Password Error:",
+                error
+            );
 
-
-                // Optional redirect after success
-
-                setTimeout(function () {
-
-                    window.location.href =
-                        "login.html";
-
-                }, 2000);
+            resetError.textContent =
+                error.message ||
+                "Password reset failed. Please try again.";
 
 
-            } catch (error) {
+        } finally {
 
-                console.error(
-                    "Reset Password Error:",
-                    error
-                );
+            resetPasswordButton.disabled = false;
 
+            resetPasswordButtonText.textContent =
+                "Reset Password";
 
-                resetError.textContent =
-                    error.message ||
-                    "Password reset failed. Please try again.";
-
-
-            } finally {
-
-                resetPasswordButton.disabled = false;
-
-                resetPasswordButtonText.textContent =
-                    "Reset Password";
-
-                resetPasswordLoader.classList.add(
-                    "d-none"
-                );
-
-            }
+            resetPasswordLoader.classList.add("d-none");
 
         }
-    );
+
+    });
 
 }
