@@ -920,7 +920,7 @@
                     <div class="table-responsive">
                         <table class="table erp-table align-middle">
                             <thead>
-                                <tr><th>Name</th><th>Relationship</th><th>Phone</th><th>Address</th><th>Action</th></tr>
+                                <tr><th>Name</th><th>Relationship</th><th>Phone</th><th>Email</th><th>Address</th><th>Priority</th><th>Action</th></tr>
                             </thead>
                             <tbody id="emergencyContactsTableBody"></tbody>
                         </table>
@@ -952,9 +952,17 @@
                                         <label class="form-label">Phone <span class="required-star">*</span></label>
                                         <input type="text" id="emergencyContactPhone" class="form-control" required>
                                     </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Email</label>
+                                        <input type="email" id="emergencyContactEmail" class="form-control">
+                                    </div>
                                     <div class="mb-0">
                                         <label class="form-label">Address</label>
                                         <textarea id="emergencyContactAddress" class="form-control" rows="2"></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Priority</label>
+                                        <input type="number" id="emergencyContactPriority" class="form-control" min="1">
                                     </div>
                                 </div>
                                 <div class="modal-footer">

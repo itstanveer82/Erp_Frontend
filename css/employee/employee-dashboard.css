@@ -434,6 +434,7 @@
 .profile-header {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: 20px;
 
     padding: 28px 30px;
@@ -487,8 +488,13 @@
     justify-content: center;
 }
 
+.profile-main-info {
+    min-width: 0;
+}
+
 .profile-main-info h2 {
     margin: 0 0 5px;
+    overflow-wrap: break-word;
 
     font-size: 24px;
     font-weight: 700;
@@ -1744,24 +1750,71 @@
 
 @media (max-width: 767.98px) {
 
-    .employee-header-profile {
-        width: 175px;
-        min-width: 175px;
+    /* Navbar overflow fix: brand + system-in/out + profile
+       were fixed-width and didn't shrink, causing the whole
+       page to scroll horizontally on phones. */
+
+    .admin-navbar .container-fluid {
+        gap: 6px;
     }
 
-    .employee-header-avatar {
-        width: 38px;
-        height: 38px;
-        min-width: 38px;
+    .admin-user-area {
+        gap: 8px;
     }
 
-    .employee-header-info strong {
-        max-width: 105px;
+    .brand-text small {
+        display: none;
     }
 
-    .system-attendance-buttons button {
-        padding: 2px 4px;
-        font-size: 7px;
+    .brand-text strong {
+        font-size: 13px;
+    }
+
+    .navbar-system-actions {
+        gap: 4px;
+    }
+
+    .navbar-system-actions .system-btn {
+        padding: 6px 10px;
+        font-size: 10px;
+        border-radius: 6px;
+    }
+
+    /* Collapse the profile button to icon-only so it never
+       pushes the navbar wider than the screen. Dropdown still
+       opens fine since it's right-anchored to the wrapper. */
+
+    .employee-profile-wrapper {
+        width: 40px;
+    }
+
+    .employee-profile-button {
+        width: 40px;
+        height: 40px;
+        padding: 0;
+        justify-content: center;
+    }
+
+    .employee-profile-info {
+        display: none;
+    }
+
+    .employee-profile-image {
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
+    }
+}
+
+@media (max-width: 420px) {
+
+    .brand-text {
+        display: none;
+    }
+
+    .navbar-system-actions .system-btn {
+        padding: 5px 8px;
+        font-size: 9px;
     }
 }
 
@@ -1776,5 +1829,41 @@
     .session-meta-grid {
         grid-template-columns: 1fr;
         gap: 8px;
+    }
+}
+
+@media (max-width: 576px) {
+
+    /* Calendar: 7 fixed columns get too cramped on narrow
+       phones, so tighten padding/font instead of shrinking
+       the grid itself (keeps every day visible, no scroll). */
+    .calendar-grid {
+        gap: 4px;
+    }
+
+    .calendar-day {
+        padding: 6px 2px;
+        font-size: 0.7rem;
+    }
+
+    .overview-kv-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .attendance-toolbar > div {
+        min-width: 0;
+        flex: 1 1 140px;
+    }
+
+    .cc-input-group {
+        flex-wrap: wrap;
+    }
+
+    .form-submit-row {
+        justify-content: stretch;
+    }
+
+    .form-submit-row .btn-primary-erp {
+        width: 100%;
     }
 }

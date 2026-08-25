@@ -158,8 +158,8 @@ document.addEventListener("DOMContentLoaded", function () {
     resetProfilePhotoCache();
 
 
-  
-   
+
+
     function loadHeaderEmployeeProfile() {
         fetchCurrentUserProfile().then(function (res) {
 
@@ -1175,7 +1175,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         Promise.all([
             demoGetPersonalInformation(),
-            demoGetEmergencyContacts(),
+            fetchMyEmergencyContacts(),
             demoGetFamilyMembers(),
             demoGetEducation(),
             demoGetExperience(),
@@ -1924,9 +1924,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function loadEmergencyInformation() {
         const tbody = document.getElementById("emergencyContactsTableBody");
-        tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4">Loading...</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4">Loading...</td></tr>`;
 
-        demoGetEmergencyContacts().then(function (res) {
+        fetchMyEmergencyContacts().then(function (res) {
             emergencyContactsData = res.data;
             renderEmergencyContactsTable();
         });
@@ -1936,7 +1936,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const tbody = document.getElementById("emergencyContactsTableBody");
 
         if (emergencyContactsData.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-muted">No emergency contacts added yet.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-muted">No emergency contacts added yet.</td></tr>`;
             return;
         }
 
@@ -1946,7 +1946,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     <td>${escapeHtml(c.name)}</td>
                     <td>${escapeHtml(c.relationship)}</td>
                     <td>${escapeHtml(c.phone)}</td>
+                    <td>${escapeHtml(c.email)}</td>
                     <td>${escapeHtml(c.address)}</td>
+                    <td>${escapeHtml(c.email)}</td>
                     <td>
                         <button type="button" class="btn btn-sm btn-outline-primary" data-edit-emergency="${c.id}">Edit</button>
                         <button type="button" class="btn btn-sm btn-outline-danger" data-delete-emergency="${c.id}">Delete</button>
@@ -1980,6 +1982,35 @@ document.addEventListener("DOMContentLoaded", function () {
                             renderEmergencyContactsTable();
                         });
                     }
+                });
+            });
+            tbody.querySelectorAll("[data-delete-emergency]").forEach(function (btn) {
+                btn.addEventListener("click", function () {
+                    const id = this.dataset.deleteEmergency;
+
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Remove this contact?",
+                        showCancelButton: true,
+                        confirmButtonText: "Yes, remove",
+                        confirmButtonColor: "#b3261e"
+                    }).then(function (result) {
+                        if (result.isConfirmed) {
+                            deleteMyEmergencyContact(id).then(function () {
+                                emergencyContactsData = emergencyContactsData.filter(function (c) {
+                                    return String(c.id) !== String(id);
+                                });
+                                renderEmergencyContactsTable();
+                            }).catch(function (error) {
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Could not remove contact",
+                                    text: error.message,
+                                    confirmButtonColor: "#17a2b8"
+                                });
+                            });
+                        }
+                    });
                 });
             });
         });
@@ -2028,12 +2059,14 @@ document.addEventListener("DOMContentLoaded", function () {
                 name: document.getElementById("emergencyContactName").value.trim(),
                 relationship: document.getElementById("emergencyContactRelationship").value.trim(),
                 phone: document.getElementById("emergencyContactPhone").value.trim(),
-                address: document.getElementById("emergencyContactAddress").value.trim()
+                email: document.getElementById("emergencyContactEmail").value.trim(),
+                address: document.getElementById("emergencyContactAddress").value.trim(),
+                priority: Number(document.getElementById("emergencyContactPriority").value) || null
             };
 
             const apiCall = id
-                ? demoUpdateEmergencyContact(id, payload)
-                : demoAddEmergencyContact(payload);
+                ? updateMyEmergencyContact(id, payload)
+                : addMyEmergencyContact(payload);
 
             apiCall.then(function (res) {
                 const modal = bootstrap.Modal.getInstance(document.getElementById("emergencyContactModal"));
@@ -2041,11 +2074,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 Swal.fire({
                     icon: "success",
-                    title: res.data.message,
+                    title: res.message || "Emergency contact saved.",
                     confirmButtonColor: "#17a2b8"
                 });
 
                 loadEmergencyInformation();
+            }).catch(function (error) {
+                document.getElementById("emergencyContactFormMessage").innerHTML =
+                    `<div class="custom-alert error">${escapeHtml(error.message || "Something went wrong.")}</div>`;
             });
         });
     }

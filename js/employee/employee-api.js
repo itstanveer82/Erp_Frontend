@@ -10,13 +10,13 @@ function fetchCurrentUserProfile() {
     return Promise.all([
         apiRequest("/api/users/me"),
         apiRequest("/api/profiles/me").catch(function (error) {
-        if (error.message && error.message.includes("No profile found")) {
-            // Expected case — employee ne extended profile abhi tak fill nahi kiya
+            if (error.message && error.message.includes("No profile found")) {
+                // Expected case — employee ne extended profile abhi tak fill nahi kiya
+                return { data: {} };
+            }
+            // console.error("Unexpected error fetching extended profile:", error);
             return { data: {} };
-        }
-        console.error("Unexpected error fetching extended profile:", error);
-        return { data: {} };
-    }), 
+        }),
         demoGetProfile(),
         getRealProfilePhotoUrl()
     ]).then(function (results) {
@@ -47,7 +47,7 @@ function fetchCurrentUserProfile() {
                     d.profileImage ||
                     null,
 
-                dateOfBirth: ext.dateOfBirth || u.dateOfBirth || d.dateOfBirth || "Not available",   
+                dateOfBirth: ext.dateOfBirth || u.dateOfBirth || d.dateOfBirth || "Not available",
                 gender: ext.gender || u.gender || d.gender || "Not available"
             }
         };
@@ -75,7 +75,7 @@ function getRealProfilePhotoUrl() {
         return Promise.resolve(cachedRealPhotoUrl);
     }
 
-    console.log("Fetching profile photo metadata...");
+    // console.log("Fetching profile photo metadata...");
 
     return photoApiRequest("/api/profile-photos/me")
         .then(function (res) {
@@ -260,5 +260,39 @@ function changeEmployeePassword(oldPassword, newPassword) {
             oldPassword: oldPassword,
             newPassword: newPassword
         })
+    });
+}
+
+// =========================================
+// EMERGENCY CONTACTS
+// Real endpoint: GET /api/emergency-contacts/me
+// =========================================
+function fetchMyEmergencyContacts() {
+    return apiRequest("/api/emergency-contacts/me")
+        .catch(function (error) {
+            console.error("❌ Emergency contacts fetch failed:", error.message, error.responseData);
+            return { success: false, data: [] };
+        });
+}
+// Real endpoint: POST /api/emergency-contacts/me
+function addMyEmergencyContact(payload) {
+    return apiRequest("/api/emergency-contacts/me", {
+        method: "POST",
+        body: JSON.stringify(payload)
+    });
+}
+
+// Real endpoint: PUT /api/emergency-contacts/me/{contactId}
+function updateMyEmergencyContact(contactId, payload) {
+    return apiRequest(`/api/emergency-contacts/me/${contactId}`, {
+        method: "PUT",
+        body: JSON.stringify(payload)
+    });
+}
+
+// Real endpoint: DELETE /api/emergency-contacts/me/{contactId}
+function deleteMyEmergencyContact(contactId) {
+    return apiRequest(`/api/emergency-contacts/me/${contactId}`, {
+        method: "DELETE"
     });
 }
