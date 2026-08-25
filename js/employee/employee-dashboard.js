@@ -157,231 +157,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // let realPhotoFetchedOnce = false;
     resetProfilePhotoCache();
 
-    // function getRealProfilePhotoUrl() {  };
 
-    function getRealProfilePhotoUrl() {
-
-    const token = sessionStorage.getItem("authData");
-
-    return fetch("http://localhost:8085/api/profile/photo", {
-        method: "GET",
-        headers: {
-            "Authorization": "Bearer " + token
-        }
-    })
-    .then(function (response) {
-
-        if (!response.ok) {
-            throw new Error("Failed to load profile picture: " + response.status);
-        }
-
-        return response.blob();
-    })
-    .then(function (blob) {
-        console.log(URL.createObjectURL(blob))
-        return URL.createObjectURL(blob);
-    });
-}
-
-    function fetchCurrentUserProfile() {
-        return apiRequest("/api/users/me")
-            .then(function (res) {
-                const u = res.data || {};
-                return demoGetProfile().then(function (demoRes) {
-                    const d = demoRes.data || {};
-                    return {
-                        success: true,
-                        data: {
-                            employeeCode: u.employeeCode || d.employeeCode || "--",
-                            firstName: u.firstName || d.firstName || "",
-                            lastName: u.lastName || d.lastName || "",
-                            email: u.email || d.email || "--",
-                            phone: u.phone || d.phone || "--",
-
-                            departmentName:
-                                u.departmentName ||
-                                d.departmentName ||
-                                "Not available",
-
-                            designation:
-                                u.designation ||
-                                d.designation ||
-                                "Not available",
-
-                            joiningDate:
-                                u.joiningDate ||
-                                d.joiningDate ||
-                                "Not available",
-
-                            reportingManager:
-                                u.reportingManager ||
-                                d.reportingManager ||
-                                "Not available",
-
-                            profileImage:
-                                overriddenProfileImage ||
-                                u.profileImage ||
-                                d.profileImage ||
-                                null,
-
-                            dateOfBirth:
-                                u.dateOfBirth ||
-                                d.dateOfBirth ||
-                                "Not available",
-
-                            gender:
-                                u.gender ||
-                                d.gender ||
-                                "Not available"
-                        }
-                    };
-                });
-            })
-            .catch(function (error) {
-
-                console.warn(
-                    "Profile API failed, using demo profile.",
-                    error
-                );
-                return demoGetProfile();
-            });
-    }
-
-    
-
-    function fetchCurrentUserProfilePhoto() {
-        return apiRequest("/api/profile-photos/me")
-            .then(function (res) {
-                const u = res.data || {};
-                return demoGetProfile().then(function (demoRes) {
-                    const d = demoRes.data || {};
-
-                    
-                    return {
-                        success: true,
-                        data: {
-                            employeeCode: u.employeeCode || d.employeeCode || "--",
-                            firstName: u.firstName || d.firstName || "",
-                            lastName: u.lastName || d.lastName || "",
-                            email: u.email || d.email || "--",
-                            phone: u.phone || d.phone || "--",
-
-                            departmentName:
-                                u.departmentName ||
-                                d.departmentName ||
-                                "Not available",
-
-                            designation:
-                                u.designation ||
-                                d.designation ||
-                                "Not available",
-
-                            joiningDate:
-                                u.joiningDate ||
-                                d.joiningDate ||
-                                "Not available",
-
-                            reportingManager:
-                                u.reportingManager ||
-                                d.reportingManager ||
-                                "Not available",
-
-                            profileImage:
-                                overriddenProfileImage ||
-                                u.profileImage ||
-                                d.profileImage ||
-                                null,
-
-                            dateOfBirth:
-                                u.dateOfBirth ||
-                                d.dateOfBirth ||
-                                "Not available",
-
-                            gender:
-                                u.gender ||
-                                d.gender ||
-                                "Not available"
-                        }
-                    };
-                });
-            })
-            .catch(function (error) {
-
-                console.warn(
-                    "Profile API failed, using demo profile.",
-                    error
-                );
-                return demoGetProfile();
-            });
-    }
-
-    // function fetchCurrentUserProfileImage() {
-
-    //     return apiRequest("/api/users/me")
-    //         .then(function (res) {
-
-    //             const u = res.data || {};
-
-    //             return getRealProfilePhotoUrl()
-    //                 .then(function (realPhotoUrl) {
-
-    //                     return {
-    //                         success: true,
-    //                         data: {
-
-    //                             employeeCode:
-    //                                 u.employeeCode || "--",
-
-    //                             firstName:
-    //                                 u.firstName || "",
-
-    //                             lastName:
-    //                                 u.lastName || "",
-
-    //                             email:
-    //                                 u.email || "--",
-
-    //                             phone:
-    //                                 u.phone || "--",
-
-    //                             departmentName:
-    //                                 u.departmentName || "Not available",
-
-    //                             designation:
-    //                                 u.designation || "Not available",
-
-    //                             joiningDate:
-    //                                 u.joiningDate || "Not available",
-
-    //                             reportingManager:
-    //                                 u.reportingManager || "Not available",
-
-    //                             profileImage:
-    //                                 realPhotoUrl || null,
-
-    //                             dateOfBirth:
-    //                                 u.dateOfBirth || "Not available",
-
-    //                             gender:
-    //                                 u.gender || "Not available"
-    //                         }
-    //                     };
-    //                 });
-    //         })
-    //         .catch(function (error) {
-
-    //             console.error(
-    //                 "Employee profile failed:",
-    //                 error
-    //             );
-
-    //             throw error;
-    //         });
-    // }
-
-    // =========================================
-    // LOAD EMPLOYEE PROFILE
-    // =========================================
+  
+   
     function loadHeaderEmployeeProfile() {
         fetchCurrentUserProfile().then(function (res) {
 
@@ -391,8 +169,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 `${p.firstName || ""} ${p.lastName || ""}`.trim();
 
             const employeeImage =
-                p.profileImage ||
-                "../assets/image/Image01.jpg";
+                p.profileImage;
 
             headerEmployeeName.textContent =
                 fullName || "Employee";
@@ -916,19 +693,6 @@ document.addEventListener("DOMContentLoaded", function () {
     function loadPayslips() {
         const tbody = document.getElementById("payslipsTableBody");
         tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4">Loading...</td></tr>`;
-
-        // demoGetPayslips().then(function (res) {
-        //     tbody.innerHTML = res.data.map(function (p) {
-        //         return `
-        //             <tr>
-        //                 <td>${escapeHtml(p.month)}</td>
-        //                 <td>₹${p.netPay.toLocaleString()}</td>
-        //                 <td><span class="badge text-bg-success">${escapeHtml(p.status)}</span></td>
-        //                 <td><button type="button" class="btn btn-sm btn-outline-primary" onclick="alert('Demo only — real download backend se aayega')">Download</button></td>
-        //             </tr>
-        //         `;
-        //     }).join("");
-        // });
     }
 
     // =========================
@@ -1044,9 +808,6 @@ document.addEventListener("DOMContentLoaded", function () {
         </div>
          `;
 
-        fetchCurrentUserProfilePhoto().data
-
-
         fetchCurrentUserProfile().then(function (res) {
             const p = res.data;
 
@@ -1055,7 +816,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const initials =
                 `${p.firstName.charAt(0)}${p.lastName.charAt(0)}`
                     .toUpperCase();
-            
+
             card.innerHTML = `
             <div class="employee-profile">
 
@@ -1071,7 +832,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         alt="Employee Profile"
                         class="profile-avatar-image"
                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">`
-                    : "<img src='../assets/image/Prime_Minister_of_India,_Shri_Narendra_Modi.jpg'>"
+                    : "<img src=''>"
                 }
 
                    <span class="profile-avatar-fallback"
@@ -1095,7 +856,6 @@ document.addEventListener("DOMContentLoaded", function () {
         </div>
 
     </div>
-
                 <!-- BASIC INFORMATION -->
                 <div class="profile-section">
 
@@ -1413,167 +1173,167 @@ document.addEventListener("DOMContentLoaded", function () {
         const grid = document.getElementById("profileOverviewGrid");
         grid.innerHTML = `<p class="text-muted">Loading...</p>`;
 
-        // Promise.all([
-        //     demoGetPersonalInformation(),
-        //     demoGetEmergencyContacts(),
-        //     demoGetFamilyMembers(),
-        //     demoGetEducation(),
-        //     demoGetExperience(),
-        //     demoGetJoiningDetails(),
-        //     demoGetWorkPosition(),
-        //     demoGetExitDetails(),
-        //     demoGetNominations(),
-        //     demoGetSkills()
-        // ]).then(function (results) {
+        Promise.all([
+            demoGetPersonalInformation(),
+            demoGetEmergencyContacts(),
+            demoGetFamilyMembers(),
+            demoGetEducation(),
+            demoGetExperience(),
+            demoGetJoiningDetails(),
+            demoGetWorkPosition(),
+            demoGetExitDetails(),
+            demoGetNominations(),
+            demoGetSkills()
+        ]).then(function (results) {
 
-        //     currentPersonalInfo = results[0].data;
-        //     const emergencyContacts = results[1].data;
-        //     const familyMembers = results[2].data;
-        //     const education = results[3].data;
-        //     const experience = results[4].data;
-        //     currentJoiningDetails = results[5].data;
-        //     const workPosition = results[6].data;
-        //     const exitDetails = results[7].data;
-        //     const nominations = results[8].data;
-        //     const skills = results[9].data;
+            currentPersonalInfo = results[0].data;
+            const emergencyContacts = results[1].data;
+            const familyMembers = results[2].data;
+            const education = results[3].data;
+            const experience = results[4].data;
+            currentJoiningDetails = results[5].data;
+            const workPosition = results[6].data;
+            const exitDetails = results[7].data;
+            const nominations = results[8].data;
+            const skills = results[9].data;
 
-        //     grid.innerHTML = `
+            grid.innerHTML = `
 
-        //         <div class="overview-card">
-        //             <div class="overview-card-header">
-        //                 <h5>Personal Information</h5>
-        //                 <button type="button" class="overview-edit-btn" id="overviewEditPersonalInfo" title="Edit">✎</button>
-        //             </div>
-        //             <div class="overview-card-body overview-kv-grid">
-        //                 <div class="overview-kv"><span>Height</span><strong>${escapeHtml(currentPersonalInfo.height) || "--"}</strong></div>
-        //                 <div class="overview-kv"><span>Weight</span><strong>${escapeHtml(currentPersonalInfo.weight) || "--"}</strong></div>
-        //                 <div class="overview-kv"><span>Blood Group</span><strong>${escapeHtml(currentPersonalInfo.bloodGroup) || "--"}</strong></div>
-        //                 <div class="overview-kv"><span>Shift</span><strong>${escapeHtml(currentPersonalInfo.shift) || "--"}</strong></div>
-        //             </div>
-        //         </div>
+                <div class="overview-card">
+                    <div class="overview-card-header">
+                        <h5>Personal Information</h5>
+                        <button type="button" class="overview-edit-btn" id="overviewEditPersonalInfo" title="Edit">✎</button>
+                    </div>
+                    <div class="overview-card-body overview-kv-grid">
+                        <div class="overview-kv"><span>Height</span><strong>${escapeHtml(currentPersonalInfo.height) || "--"}</strong></div>
+                        <div class="overview-kv"><span>Weight</span><strong>${escapeHtml(currentPersonalInfo.weight) || "--"}</strong></div>
+                        <div class="overview-kv"><span>Blood Group</span><strong>${escapeHtml(currentPersonalInfo.bloodGroup) || "--"}</strong></div>
+                        <div class="overview-kv"><span>Shift</span><strong>${escapeHtml(currentPersonalInfo.shift) || "--"}</strong></div>
+                    </div>
+                </div>
 
-        //         <div class="overview-card">
-        //             <div class="overview-card-header">
-        //                 <h5>Emergency Information</h5>
-        //                 <button type="button" class="overview-nav-btn" data-goto-view="emergency-information" title="Manage">›</button>
-        //             </div>
-        //             <div class="overview-card-body">
-        //                 <p class="overview-summary-text">${emergencyContacts.length} contact(s) added${emergencyContacts.length ? " — " + escapeHtml(emergencyContacts[0].name) : ""}</p>
-        //             </div>
-        //         </div>
+                <div class="overview-card">
+                    <div class="overview-card-header">
+                        <h5>Emergency Information</h5>
+                        <button type="button" class="overview-nav-btn" data-goto-view="emergency-information" title="Manage">›</button>
+                    </div>
+                    <div class="overview-card-body">
+                        <p class="overview-summary-text">${emergencyContacts.length} contact(s) added${emergencyContacts.length ? " — " + escapeHtml(emergencyContacts[0].name) : ""}</p>
+                    </div>
+                </div>
 
-        //         <div class="overview-card">
-        //             <div class="overview-card-header">
-        //                 <h5>Bank Information</h5>
-        //             </div>
-        //             <div class="overview-card-body">
-        //                 <p class="overview-summary-text text-muted">Coming soon.</p>
-        //             </div>
-        //         </div>
+                <div class="overview-card">
+                    <div class="overview-card-header">
+                        <h5>Bank Information</h5>
+                    </div>
+                    <div class="overview-card-body">
+                        <p class="overview-summary-text text-muted">Coming soon.</p>
+                    </div>
+                </div>
 
-        //         <div class="overview-card">
-        //             <div class="overview-card-header">
-        //                 <h5>Family Information</h5>
-        //                 <button type="button" class="overview-nav-btn" data-goto-view="family-information" title="Manage">›</button>
-        //             </div>
-        //             <div class="overview-card-body">
-        //                 <p class="overview-summary-text">${familyMembers.length} member(s) added${familyMembers.length ? " — " + escapeHtml(familyMembers[0].name) : ""}</p>
-        //             </div>
-        //         </div>
+                <div class="overview-card">
+                    <div class="overview-card-header">
+                        <h5>Family Information</h5>
+                        <button type="button" class="overview-nav-btn" data-goto-view="family-information" title="Manage">›</button>
+                    </div>
+                    <div class="overview-card-body">
+                        <p class="overview-summary-text">${familyMembers.length} member(s) added${familyMembers.length ? " — " + escapeHtml(familyMembers[0].name) : ""}</p>
+                    </div>
+                </div>
 
-        //         <div class="overview-card">
-        //             <div class="overview-card-header">
-        //                 <h5>Education Information</h5>
-        //                 <button type="button" class="overview-nav-btn" data-goto-view="education-information" title="Manage">›</button>
-        //             </div>
-        //             <div class="overview-card-body">
-        //                 <p class="overview-summary-text">${education.length} record(s)${education.length ? " — " + escapeHtml(education[0].qualification) : ""}</p>
-        //             </div>
-        //         </div>
+                <div class="overview-card">
+                    <div class="overview-card-header">
+                        <h5>Education Information</h5>
+                        <button type="button" class="overview-nav-btn" data-goto-view="education-information" title="Manage">›</button>
+                    </div>
+                    <div class="overview-card-body">
+                        <p class="overview-summary-text">${education.length} record(s)${education.length ? " — " + escapeHtml(education[0].qualification) : ""}</p>
+                    </div>
+                </div>
 
-        //         <div class="overview-card">
-        //             <div class="overview-card-header">
-        //                 <h5>Experience Information</h5>
-        //                 <button type="button" class="overview-nav-btn" data-goto-view="experience-information" title="Manage">›</button>
-        //             </div>
-        //             <div class="overview-card-body">
-        //                 <p class="overview-summary-text">${experience.length} record(s)${experience.length ? " — " + escapeHtml(experience[0].organization) : ""}</p>
-        //             </div>
-        //         </div>
+                <div class="overview-card">
+                    <div class="overview-card-header">
+                        <h5>Experience Information</h5>
+                        <button type="button" class="overview-nav-btn" data-goto-view="experience-information" title="Manage">›</button>
+                    </div>
+                    <div class="overview-card-body">
+                        <p class="overview-summary-text">${experience.length} record(s)${experience.length ? " — " + escapeHtml(experience[0].organization) : ""}</p>
+                    </div>
+                </div>
 
-        //         <div class="overview-card">
-        //             <div class="overview-card-header">
-        //                 <h5>Joining Details</h5>
-        //                 <button type="button" class="overview-edit-btn" id="overviewEditJoiningDetails" title="Edit">✎</button>
-        //             </div>
-        //             <div class="overview-card-body overview-kv-grid">
-        //                 <div class="overview-kv"><span>Date of Joining</span><strong>${escapeHtml(currentJoiningDetails.dateOfJoining) || "--"}</strong></div>
-        //                 <div class="overview-kv"><span>Status</span><strong>${escapeHtml(currentJoiningDetails.status) || "--"}</strong></div>
-        //             </div>
-        //         </div>
+                <div class="overview-card">
+                    <div class="overview-card-header">
+                        <h5>Joining Details</h5>
+                        <button type="button" class="overview-edit-btn" id="overviewEditJoiningDetails" title="Edit">✎</button>
+                    </div>
+                    <div class="overview-card-body overview-kv-grid">
+                        <div class="overview-kv"><span>Date of Joining</span><strong>${escapeHtml(currentJoiningDetails.dateOfJoining) || "--"}</strong></div>
+                        <div class="overview-kv"><span>Status</span><strong>${escapeHtml(currentJoiningDetails.status) || "--"}</strong></div>
+                    </div>
+                </div>
 
-        //         <div class="overview-card">
-        //             <div class="overview-card-header">
-        //                 <h5>Work Position</h5>
-        //             </div>
-        //             <div class="overview-card-body overview-kv-grid">
-        //                 <div class="overview-kv"><span>Department</span><strong>${escapeHtml(workPosition.departmentName) || "--"}</strong></div>
-        //                 <div class="overview-kv"><span>Grade Level</span><strong>${escapeHtml(workPosition.gradeLevel) || "--"}</strong></div>
-        //             </div>
-        //         </div>
+                <div class="overview-card">
+                    <div class="overview-card-header">
+                        <h5>Work Position</h5>
+                    </div>
+                    <div class="overview-card-body overview-kv-grid">
+                        <div class="overview-kv"><span>Department</span><strong>${escapeHtml(workPosition.departmentName) || "--"}</strong></div>
+                        <div class="overview-kv"><span>Grade Level</span><strong>${escapeHtml(workPosition.gradeLevel) || "--"}</strong></div>
+                    </div>
+                </div>
 
-        //         <div class="overview-card">
-        //             <div class="overview-card-header">
-        //                 <h5>Exit Details</h5>
-        //             </div>
-        //             <div class="overview-card-body overview-kv-grid">
-        //                 <div class="overview-kv"><span>Separation Mode</span><strong>${escapeHtml(exitDetails.separationMode) || "--"}</strong></div>
-        //                 <div class="overview-kv"><span>Last Working Date</span><strong>${escapeHtml(exitDetails.lastWorkingDate) || "--"}</strong></div>
-        //             </div>
-        //         </div>
+                <div class="overview-card">
+                    <div class="overview-card-header">
+                        <h5>Exit Details</h5>
+                    </div>
+                    <div class="overview-card-body overview-kv-grid">
+                        <div class="overview-kv"><span>Separation Mode</span><strong>${escapeHtml(exitDetails.separationMode) || "--"}</strong></div>
+                        <div class="overview-kv"><span>Last Working Date</span><strong>${escapeHtml(exitDetails.lastWorkingDate) || "--"}</strong></div>
+                    </div>
+                </div>
 
-        //         <div class="overview-card">
-        //             <div class="overview-card-header">
-        //                 <h5>Nomination Information</h5>
-        //                 <button type="button" class="overview-nav-btn" data-goto-view="nomination-information" title="Manage">›</button>
-        //             </div>
-        //             <div class="overview-card-body">
-        //                 <p class="overview-summary-text">${nominations.length} nomination(s) added</p>
-        //             </div>
-        //         </div>
+                <div class="overview-card">
+                    <div class="overview-card-header">
+                        <h5>Nomination Information</h5>
+                        <button type="button" class="overview-nav-btn" data-goto-view="nomination-information" title="Manage">›</button>
+                    </div>
+                    <div class="overview-card-body">
+                        <p class="overview-summary-text">${nominations.length} nomination(s) added</p>
+                    </div>
+                </div>
 
-        //         <div class="overview-card">
-        //             <div class="overview-card-header">
-        //                 <h5>Skills</h5>
-        //                 <button type="button" class="overview-nav-btn" data-goto-view="skills" title="Manage">›</button>
-        //             </div>
-        //             <div class="overview-card-body">
-        //                 ${skills.length
-        //             ? `<div class="cc-chips">${skills.map(function (s) { return `<span class="cc-chip">${escapeHtml(s)}</span>`; }).join("")}</div>`
-        //             : `<p class="overview-summary-text text-muted">No skills added yet.</p>`
-        //         }
-        //             </div>
-        //         </div>
+                <div class="overview-card">
+                    <div class="overview-card-header">
+                        <h5>Skills</h5>
+                        <button type="button" class="overview-nav-btn" data-goto-view="skills" title="Manage">›</button>
+                    </div>
+                    <div class="overview-card-body">
+                        ${skills.length
+                    ? `<div class="cc-chips">${skills.map(function (s) { return `<span class="cc-chip">${escapeHtml(s)}</span>`; }).join("")}</div>`
+                    : `<p class="overview-summary-text text-muted">No skills added yet.</p>`
+                }
+                    </div>
+                </div>
 
-        //     `;
+            `;
 
-        //     const overviewEditPersonalInfo = document.getElementById("overviewEditPersonalInfo");
-        //     if (overviewEditPersonalInfo) {
-        //         overviewEditPersonalInfo.addEventListener("click", openPersonalInfoModal);
-        //     }
+            const overviewEditPersonalInfo = document.getElementById("overviewEditPersonalInfo");
+            if (overviewEditPersonalInfo) {
+                overviewEditPersonalInfo.addEventListener("click", openPersonalInfoModal);
+            }
 
-        //     const overviewEditJoiningDetails = document.getElementById("overviewEditJoiningDetails");
-        //     if (overviewEditJoiningDetails) {
-        //         overviewEditJoiningDetails.addEventListener("click", openJoiningDetailsModal);
-        //     }
+            const overviewEditJoiningDetails = document.getElementById("overviewEditJoiningDetails");
+            if (overviewEditJoiningDetails) {
+                overviewEditJoiningDetails.addEventListener("click", openJoiningDetailsModal);
+            }
 
-        //     grid.querySelectorAll("[data-goto-view]").forEach(function (btn) {
-        //         btn.addEventListener("click", function () {
-        //             showView(this.dataset.gotoView);
-        //         });
-        //     });
+            grid.querySelectorAll("[data-goto-view]").forEach(function (btn) {
+                btn.addEventListener("click", function () {
+                    showView(this.dataset.gotoView);
+                });
+            });
 
-        // });
+        });
     }
 
     // =========================

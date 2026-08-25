@@ -272,23 +272,15 @@ function saveAuthData(data, remember) {
 // ================================
 
 function getAuthData() {
-
-    const localData = localStorage.getItem("authData");
-
+    const localData = localStorage.getItem("authData&quot");
     if (localData) {
         return JSON.parse(localData);
     }
-
-
-    const sessionData = sessionStorage.getItem("authData");
-
+    const sessionData = sessionStorage.getItem("authData&quot");
     if (sessionData) {
         return JSON.parse(sessionData);
     }
-
-
     return null;
-
 }
 
 

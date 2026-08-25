@@ -472,11 +472,11 @@
 }
 
 .profile-avatar-image {
-    width: 100%;
-    height: 100%;
-
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
     object-fit: cover;
-    display: block;
+    object-position: center;
 }
 
 .profile-avatar-fallback {
