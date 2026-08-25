@@ -16,20 +16,20 @@ function demoDelay(data, ms = 400) {
 // Suggested real endpoint: GET /api/employee/me/profile
 function demoGetProfile() {
     return demoDelay({
-        employeeCode: "EMP-1312",
-        systemId: "SYS-1042",
-        firstName: "Mohd",
-        lastName: "Eraj Ansari",
-        profileImage: "../assets/image/Image01.jpg",
-        email: "era1312@gmail.com",
-        phone: "+91 888193***",
-        departmentName: "IT",
-        designation: "Software Developer",
-        joiningDate: "2026-08-01",
-        reportingManager: "Manmohan Pathak",
-        systemStatus: "OUT",
-        dateOfBirth: "1998-04-15",
-        gender: "Male"
+        // employeeCode: "EMP-1312",
+        // systemId: "SYS-1042",
+        // firstName: "Mohd",
+        // lastName: "Tanveer Ansari",
+        // profileImage: "../assets/image/Image01.jpg",
+        // email: "tannu1312@gmail.com",
+        // phone: "+91 888193***",
+        // departmentName: "IT",
+        // designation: "Software Developer",
+        // joiningDate: "2026-08-01",
+        // reportingManager: "RM",
+        // systemStatus: "OUT",
+        // dateOfBirth: "1998-04-15",
+        // gender: "Male"
 
     });
 }
@@ -59,48 +59,6 @@ function demoGetMyAttendance() {
 // =========================
 // RESET PASSWORD (from Profile)
 // =========================
-
-
-
-// if (resetPasswordForm) {
-//     resetPasswordForm.addEventListener("submit", function (e) {
-//         e.preventDefault();
-
-//         resetPasswordMessage.innerHTML = "";
-
-//         const currentPassword = document.getElementById("currentPasswordField").value;
-//         const newPassword = document.getElementById("newPasswordField").value;
-//         const confirmPassword = document.getElementById("confirmPasswordField").value;
-
-//         if (newPassword !== confirmPassword) {
-//             resetPasswordMessage.innerHTML =
-//                 `<div class="custom-alert error">New password and confirm password do not match.</div>`;
-//             return;
-//         }
-
-//         if (newPassword.length < 6) {
-//             resetPasswordMessage.innerHTML =
-//                 `<div class="custom-alert error">Password must be at least 6 characters.</div>`;
-//             return;
-//         }
-
-//         demoChangePassword({
-//             currentPassword: currentPassword,
-//             newPassword: newPassword
-//         }).then(function (res) {
-//             resetPasswordMessage.innerHTML =
-//                 `<div class="custom-alert success">${escapeHtml(res.data.message)}</div>`;
-
-//             resetPasswordForm.reset();
-
-//             setTimeout(function () {
-//                 resetPasswordFormWrapper.classList.add("d-none");
-//                 resetPasswordMessage.innerHTML = "";
-//             }, 1500);
-//         });
-//     });
-// }
-
 // Suggested real endpoint: POST /api/employee/me/change-password
 function demoChangePassword(payload) {
     console.log("Demo change password payload:", payload);
@@ -426,4 +384,10 @@ function demoGetSkills() {
 function demoUpdateSkills(skillsArray) {
     console.log("Demo update skills payload:", skillsArray);
     return demoDelay({ message: "Skills updated successfully." }, 500);
+}
+
+// Suggested real endpoint: POST /api/employee/me/profile-image (multipart/form-data)
+function demoUpdateProfileImage(file) {
+    console.log("Demo update profile image:", file && file.name);
+    return demoDelay({ message: "Profile photo updated successfully." }, 600);
 }

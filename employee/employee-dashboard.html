@@ -47,7 +47,7 @@
 
                             <div class="employee-profile-image">
                                 <img id="headerEmployeeImage"
-                                    src="/assets/image/Prime_Minister_of_India,_Shri_Narendra_Modi.jpg"
+                                    src=""
                                     alt="Employee">
                             </div>
 
@@ -66,7 +66,7 @@
                             <div class="profile-dropdown-header">
 
                                 <img id="profileDropdownImage"
-                                    src="/assets/image/Prime_Minister_of_India,_Shri_Narendra_Modi.jpg"
+                                    src=""
                                     alt="Employee">
 
                                 <div>
@@ -80,11 +80,16 @@
                                 </div>
 
                             </div>
+                            <!-- /assets/image/Prime_Minister_of_India,_Shri_Narendra_Modi.jpg -->
 
                             <button type="button"
                                 id="profileViewButton"
                                 class="profile-menu-btn">
                                 ◍ &nbsp; My Profile
+                            </button>
+
+                            <button type="button" id="sessionsButton" class="employee-profile-menu-btn">
+                                ◷ &nbsp; Session Management
                             </button>
 
                             <button type="button"
@@ -101,6 +106,26 @@
 
             </div>
         </nav>
+
+        <!--    ==================== 
+                    Session Model 
+                ==================== -->
+
+                <!-- SESSION MANAGEMENT MODAL -->
+        <div class="modal fade" id="sessionsModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-xl">
+                <div class="modal-content role-modal-content">
+
+                    <div class="modal-header">
+                        <h5 class="modal-title">Session Management</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body sessions-modal-body" id="sessionsModalBody"></div>
+
+                </div>
+            </div>
+        </div>
 
         <div class="dashboard-layout">
 
@@ -122,34 +147,8 @@
                 <div class="sidebar-menu">
                     <button class="sidebar-item active" type="button"
                         data-view="dashboard">
-                        <span class="menu-icon">▦</span> Dashboard
+                        <span class="menu-icon">▦</span> Home
                     </button>
-
-
-
-                    <button class="sidebar-item sidebar-group-toggle" type="button"
-                        data-bs-toggle="collapse" data-bs-target="#myProfileGroup"
-                        aria-expanded="false">
-                        <span class="menu-icon">◍</span> My Profile
-                        <span class="group-arrow">▾</span>
-                    </button>
-                    <div class="collapse sidebar-submenu" id="myProfileGroup">
-                        <button class="sidebar-item sidebar-subitem" type="button" data-view="personal-information">Personal Information</button>
-                        <button class="sidebar-item sidebar-subitem" type="button" data-view="emergency-information">Emergency Information</button>
-                        <button class="sidebar-item sidebar-subitem" type="button" data-view="bank-information">Bank Information</button>
-                        <button class="sidebar-item sidebar-subitem" type="button" data-view="family-information">Family Information</button>
-                        <button class="sidebar-item sidebar-subitem" type="button" data-view="education-information">Education Information</button>
-                        <button class="sidebar-item sidebar-subitem" type="button" data-view="experience-information">Experience Information</button>
-                        <button class="sidebar-item sidebar-subitem" type="button" data-view="joining-details">Joining Details</button>
-                        <button class="sidebar-item sidebar-subitem" type="button" data-view="work-position">Work Position</button>
-                        <button class="sidebar-item sidebar-subitem" type="button" data-view="exit-details">Exit Details</button>
-                        <button class="sidebar-item sidebar-subitem" type="button" data-view="nomination-information">Nomination Information</button>
-                        <button class="sidebar-item sidebar-subitem" type="button" data-view="skills">Skills</button>
-                    </div>
-
-
-
-
 
                     <!-- ATTENDANCE GROUP -->
                     <button class="sidebar-item sidebar-group-toggle"
@@ -582,55 +581,100 @@
                 </section>
 
                 <!-- ATTENDANCE CORRECTIONS -->
-                <section id="attendance-correctionsView"
+               <section id="attendance-correctionsView"
                     class="content-view d-none">
                     <div class="section-heading">
                         <div><h3>Attendance Corrections</h3><p>Submit a request
                                 to correct your attendance.</p></div>
                         <button type="button" id="newCorrectionButton"
-                            class="btn btn-primary">New Request</button>
+                            class="btn btn-primary">+ New Request</button>
                     </div>
 
-                    <div id="correctionFormWrapper"
-                        class="d-none erp-form-card">
-                        <div id="correctionFormMessage"></div>
-                        <form id="correctionForm" class="erp-form">
-                            <div class="mb-3">
-                                <label class="form-label">Attendance
-                                    Date</label>
-                                <input type="date" id="correctionDate"
-                                    class="form-control" required>
+                    <div class="row g-3 correction-stats-row">
+                        <div class="col-6 col-md-3">
+                            <div class="attendance-stat-card stat-late">
+                                <span>Pending</span>
+                                <h4 id="corrStatPending">--</h4>
                             </div>
-                            <div class="mb-3">
-                                <label class="form-label">Requested
-                                    Change</label>
-                                <input type="text" id="correctionChange"
-                                    class="form-control"
-                                    placeholder="e.g. Check-in time missed"
-                                    required>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="attendance-stat-card stat-present">
+                                <span>Approved</span>
+                                <h4 id="corrStatApproved">--</h4>
                             </div>
-                            <div class="mb-3">
-                                <label class="form-label">Reason</label>
-                                <textarea id="correctionReason"
-                                    class="form-control" rows="2"
-                                    required></textarea>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="attendance-stat-card stat-absent">
+                                <span>Rejected</span>
+                                <h4 id="corrStatRejected">--</h4>
                             </div>
-                            <button type="submit" class="btn btn-primary">Submit
-                                Request</button>
-                        </form>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="attendance-stat-card stat-leave">
+                                <span>Total Requests</span>
+                                <h4 id="corrStatTotal">--</h4>
+                            </div>
+                        </div>
                     </div>
 
                     <div id="correctionsMessage"></div>
-                    <div class="table-responsive">
-                        <table class="table erp-table">
-                            <thead>
-                                <tr><th>Date</th><th>Requested
-                                        Change</th><th>Reason</th><th>Status</th></tr>
-                            </thead>
-                            <tbody id="correctionsTableBody"></tbody>
-                        </table>
+
+                    <div class="erp-form-card correction-table-card">
+                        <div class="table-responsive">
+                            <table class="table erp-table align-middle">
+                                <thead>
+                                    <tr><th>Attendance Date</th><th>Requested Change</th><th>Reason</th><th>Status</th></tr>
+                                </thead>
+                                <tbody id="correctionsTableBody"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </section>
+
+                <!-- ATTENDANCE CORRECTION MODAL -->
+                <div class="modal fade" id="correctionModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content role-modal-content">
+
+                            <div class="modal-header">
+                                <h5 class="modal-title">
+                                    <span class="modal-title-icon">⚑</span> New Correction Request
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+
+                            <form id="correctionForm">
+                                <div class="modal-body">
+                                    <div id="correctionFormMessage"></div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Attendance Date <span class="required-star">*</span></label>
+                                        <input type="date" id="correctionDate" class="form-control" required>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Requested Change <span class="required-star">*</span></label>
+                                        <input type="text" id="correctionChange" class="form-control"
+                                            placeholder="e.g. Check-in time missed" required>
+                                    </div>
+
+                                    <div class="mb-0">
+                                        <label class="form-label">Reason <span class="required-star">*</span></label>
+                                        <textarea id="correctionReason" class="form-control" rows="3"
+                                            placeholder="Explain what went wrong and why this correction is needed"
+                                            required></textarea>
+                                    </div>
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="secondary-action-btn" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn-primary-erp">Submit Request</button>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
 
                 <!-- PROFILE -->
                 <section id="profileView" class="content-view d-none">
@@ -713,9 +757,59 @@
                         </div>
                     </div>
                 </section>
+
+                <!-- VIEW PHOTO MODAL -->
+                <div class="modal fade" id="viewPhotoModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-sm">
+                        <div class="modal-content role-modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Profile Photo</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body view-photo-body">
+                                <div class="view-photo-wrapper">
+                                    <img id="viewPhotoImage" src="" alt="Profile Photo" class="view-photo-image d-none">
+                                    <span id="viewPhotoFallback" class="view-photo-fallback"></span>
+                                    <button type="button" id="openUploadPhotoButton" class="view-photo-edit-btn" title="Change Photo">📷</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- UPLOAD PHOTO MODAL -->
+                <div class="modal fade" id="uploadPhotoModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content role-modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Update Profile Photo</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div id="uploadPhotoMessage"></div>
+
+                                <div class="upload-photo-preview-wrapper">
+                                    <img id="uploadPhotoPreview" src="" alt="Preview" class="upload-photo-preview d-none">
+                                    <span id="uploadPhotoPreviewFallback" class="upload-photo-preview-fallback"></span>
+                                </div>
+
+                                <div class="mb-0 mt-3">
+                                    <label class="form-label">Choose Image</label>
+                                    <input type="file" id="uploadPhotoInput" class="form-control" accept="image/*">
+                                    <small class="text-muted">JPG or PNG, max 2MB recommended.</small>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="secondary-action-btn" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" id="savePhotoButton" class="btn-primary-erp" disabled>Save Photo</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <!-- PROFILE OVERVIEW (all sections on one page) -->
                 <section id="profile-overviewView" class="content-view d-none">
                     <div class="section-heading">
+                         <button type="button" class="back-to-profile-btn" data-view="profile-overview">← Back</button>
                         <div><h3>My Profile — Full Overview</h3><p>All your profile information at a glance.</p></div>
                     </div>
                     <div id="profileOverviewGrid" class="overview-cards-grid"></div>
@@ -724,7 +818,10 @@
                <!-- PERSONAL INFORMATION -->
                 <section id="personal-informationView" class="content-view d-none">
                     <div class="section-heading">
-                        <div><h3>Personal Information</h3></div>
+                        <div class="section-heading-left">
+                            <button type="button" class="back-to-profile-btn" data-view="profile-overview">← Back</button>
+                            <h3>Personal Information</h3>
+                        </div>
                         <button type="button" id="editPersonalInfoButton" class="btn btn-outline-primary">Edit</button>
                     </div>
                     <div id="personalInfoCard" class="erp-form-card"></div>
@@ -809,9 +906,12 @@
 
 
                 <!-- EMERGENCY INFORMATION -->
-                <section id="emergency-informationView" class="content-view d-none">
+               <section id="emergency-informationView" class="content-view d-none">
                     <div class="section-heading">
-                        <div><h3>Emergency Information</h3></div>
+                        <div class="section-heading-left">
+                            <button type="button" class="back-to-profile-btn" data-view="profile-overview">← Back</button>
+                            <h3>Emergency Information</h3>
+                        </div>
                         <button type="button" id="addEmergencyContactButton" class="btn btn-primary">+ Add Contact</button>
                     </div>
 
@@ -867,14 +967,23 @@
                 </div>
 
                 <section id="bank-informationView" class="content-view d-none">
-                    <div class="section-heading"><div><h3>Bank Information</h3></div></div>
+                    <div class="section-heading">
+                        <div class="section-heading-left">
+                            <button type="button" class="back-to-profile-btn" data-view="profile-overview">← Back</button>
+                            <h3>Bank Information</h3>
+                        </div>
+                    </div>
                     <div class="erp-form-card text-muted">This section is coming soon.</div>
                 </section>
 
                 <!-- EDUCATION INFORMATION -->
-                <section id="education-informationView" class="content-view d-none">
+               <section id="education-informationView" class="content-view d-none">
                     <div class="section-heading">
-                        <div><h3>Education Information</h3><p>Your academic qualifications.</p></div>
+                        <div class="section-heading-left">
+                            <button type="button" class="back-to-profile-btn" data-view="profile-overview">← Back</button>
+                            <h3>Education Information</h3>
+                            <p>Your academic qualifications.</p>
+                        </div>
                         <button type="button" id="addEducationButton" class="btn btn-primary">+ Add Education</button>
                     </div>
 
@@ -932,9 +1041,12 @@
 
 
                 <!-- EXPERIENCE INFORMATION -->
-                <section id="experience-informationView" class="content-view d-none">
+               <section id="experience-informationView" class="content-view d-none">
                     <div class="section-heading">
-                        <div><h3>Experience Information</h3></div>
+                        <div class="section-heading-left">
+                            <button type="button" class="back-to-profile-btn" data-view="profile-overview">← Back</button>
+                            <h3>Experience Information</h3>
+                        </div>
                         <button type="button" id="addExperienceButton" class="btn btn-primary">+ Add Experience</button>
                     </div>
 
@@ -944,16 +1056,9 @@
                         <table class="table erp-table align-middle">
                             <thead>
                                 <tr>
-                                    <th>From Date</th>
-                                    <th>To Date</th>
-                                    <th>Organization</th>
-                                    <th>Position</th>
-                                    <th>Reason Of Leaving</th>
-                                    <th>Last CTC</th>
-                                    <th>Last Contact No</th>
-                                    <th>Last Reference No</th>
-                                    <th>Total Length Of Service</th>
-                                    <th>Action</th>
+                                    <th>From Date</th><th>To Date</th><th>Organization</th><th>Position</th>
+                                    <th>Reason Of Leaving</th><th>Last CTC</th><th>Last Contact No</th>
+                                    <th>Last Reference No</th><th>Total Length Of Service</th><th>Action</th>
                                 </tr>
                             </thead>
                             <tbody id="experienceTableBody"></tbody>
@@ -1024,7 +1129,10 @@
                <!-- WORK POSITION (view-only, HR/Admin controlled) -->
                 <section id="work-positionView" class="content-view d-none">
                     <div class="section-heading">
-                        <div><h3>Work Position</h3></div>
+                        <div class="section-heading-left">
+                            <button type="button" class="back-to-profile-btn" data-view="profile-overview">← Back</button>
+                            <h3>Work Position</h3>
+                        </div>
                     </div>
                     <div id="workPositionCard" class="erp-form-card"></div>
                 </section>
@@ -1033,7 +1141,10 @@
                 <!-- EXIT DETAILS (view-only, HR/Admin controlled) -->
                 <section id="exit-detailsView" class="content-view d-none">
                     <div class="section-heading">
-                        <div><h3>Exit Details</h3></div>
+                        <div class="section-heading-left">
+                            <button type="button" class="back-to-profile-btn" data-view="profile-overview">← Back</button>
+                            <h3>Exit Details</h3>
+                        </div>
                     </div>
                     <div id="exitDetailsCard" class="erp-form-card"></div>
                 </section>
@@ -1042,7 +1153,10 @@
                 <!-- NOMINATION INFORMATION -->
                 <section id="nomination-informationView" class="content-view d-none">
                     <div class="section-heading">
-                        <div><h3>Nomination Information</h3></div>
+                        <div class="section-heading-left">
+                            <button type="button" class="back-to-profile-btn" data-view="profile-overview">← Back</button>
+                            <h3>Nomination Information</h3>
+                        </div>
                         <button type="button" id="addNominationButton" class="btn btn-primary">+ Add Nomination</button>
                     </div>
 
@@ -1102,7 +1216,10 @@
                 <!-- SKILLS -->
                 <section id="skillsView" class="content-view d-none">
                     <div class="section-heading">
-                        <div><h3>Skills</h3></div>
+                        <div class="section-heading-left">
+                            <button type="button" class="back-to-profile-btn" data-view="profile-overview">← Back</button>
+                            <h3>Skills</h3>
+                        </div>
                     </div>
 
                     <div class="erp-form-card">
@@ -1116,7 +1233,10 @@
 
                 <section id="joining-detailsView" class="content-view d-none">
                     <div class="section-heading">
-                        <div><h3>Joining Details</h3></div>
+                        <div class="section-heading-left">
+                            <button type="button" class="back-to-profile-btn" data-view="profile-overview">← Back</button>
+                            <h3>Joining Details</h3>
+                        </div>
                         <button type="button" id="editJoiningDetailsButton" class="btn btn-outline-primary">Edit</button>
                     </div>
                     <div id="joiningDetailsCard" class="erp-form-card"></div>
@@ -1161,9 +1281,12 @@
                 </div>
 
 
-                <section id="family-informationView" class="content-view d-none">
+               <section id="family-informationView" class="content-view d-none">
                     <div class="section-heading">
-                        <div><h3>Family Information</h3></div>
+                        <div class="section-heading-left">
+                            <button type="button" class="back-to-profile-btn" data-view="profile-overview">← Back</button>
+                            <h3>Family Information</h3>
+                        </div>
                         <button type="button" id="addFamilyMemberButton" class="btn btn-primary">+ Add Member</button>
                     </div>
 
@@ -1223,13 +1346,14 @@
 
         <script src="../assets/js/bootstrap.bundle.min.js"></script>
 
-        <script src="../js/config.js"></script>
         <script src="../js/api.js"></script>
+        <script src="../js/employee/employee-api.js"></script>
+        <script src="../js/employee/employee-dashboard.js"></script>
+
+        <script src="../js/config.js"></script>
         <script src="../js/auth.js"></script>
 
         <script src="../js/employee/demo-api.js"></script>
-        <script src="../js/employee/employee-dashboard.js"></script>
-
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     </body>

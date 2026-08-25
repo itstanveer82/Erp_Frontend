@@ -10,6 +10,34 @@
     z-index: 1050;
 }
 
+.employee-nav-menu {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+    margin-right: 25px;
+}
+
+.employee-nav-item {
+    border: none;
+    background: transparent;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.employee-nav-item:hover {
+    background: rgba(0, 0, 0, 0.06);
+}
+
+.employee-nav-item.active {
+    font-weight: 600;
+    background: rgba(0, 0, 0, 0.08);
+}
+
 /* DASHBOARD LAYOUT */
 
 .dashboard-layout {
@@ -110,6 +138,14 @@
 .leave-balance-card span {
     color: #6c757d;
     font-size: 0.85rem;
+}
+
+.correction-stats-row {
+    margin-bottom: 20px;
+}
+
+.correction-table-card {
+    padding: 20px;
 }
 
 /* Reusable form card wrapper (apply leave / corrections / profile) */
@@ -436,11 +472,11 @@
 }
 
 .profile-avatar-image {
-    width: 100%;
-    height: 100%;
-
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
     object-fit: cover;
-    display: block;
+    object-position: center;
 }
 
 .profile-avatar-fallback {
@@ -1102,9 +1138,11 @@
     font-size: 0.78rem;
     font-weight: 500;
 }
+
 .password-match-feedback.match {
     color: #34b873;
 }
+
 .password-match-feedback.mismatch {
     color: #d65852;
 }
@@ -1117,18 +1155,22 @@
     align-items: center;
     justify-content: space-between;
 }
+
 .sidebar-group-toggle .group-arrow {
     font-size: 10px;
     margin-left: auto;
     transition: transform 0.2s ease;
 }
+
 .sidebar-group-toggle[aria-expanded="true"] .group-arrow {
     transform: rotate(180deg);
 }
+
 .sidebar-submenu {
     display: flex;
     flex-direction: column;
 }
+
 .sidebar-subitem {
     font-size: 0.85rem;
     padding-left: 44px;
@@ -1211,13 +1253,19 @@
     background: #eef2ff;
     color: #3949ab;
 }
-.education-edit-btn:hover { background: #dde3fb; }
+
+.education-edit-btn:hover {
+    background: #dde3fb;
+}
 
 .education-delete-btn {
     background: #fde8e8;
     color: #b3261e;
 }
-.education-delete-btn:hover { background: #fbd4d4; }
+
+.education-delete-btn:hover {
+    background: #fbd4d4;
+}
 
 .education-card-details {
     display: grid;
@@ -1281,7 +1329,8 @@
     color: #1c2126;
 }
 
-.overview-edit-btn, .overview-nav-btn {
+.overview-edit-btn,
+.overview-nav-btn {
     width: 28px;
     height: 28px;
     border-radius: 50%;
@@ -1298,7 +1347,10 @@
     background: #eef2ff;
     color: #3949ab;
 }
-.overview-edit-btn:hover { background: #dde3fb; }
+
+.overview-edit-btn:hover {
+    background: #dde3fb;
+}
 
 .overview-nav-btn {
     background: #e6f7fa;
@@ -1306,7 +1358,10 @@
     font-size: 16px;
     font-weight: 700;
 }
-.overview-nav-btn:hover { background: #d3f0f5; }
+
+.overview-nav-btn:hover {
+    background: #d3f0f5;
+}
 
 .overview-kv-grid {
     display: grid;
@@ -1333,6 +1388,295 @@
     font-size: 0.85rem;
     color: #495057;
 }
+
+/*  ===================
+        Back button 
+    =================== */
+.back-to-profile-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    color: #17a2b8;
+    /* font-size: 0.85rem; */
+    font-size: 1.3rem !important;
+    font-weight: 600;
+    padding: 0 0 8px;
+    cursor: pointer;
+}
+
+.back-to-profile-btn:hover {
+    text-decoration: underline;
+}
+
+.section-heading-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+/*  ====================
+        Add button  
+    =====================*/
+
+.section-heading-left {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.section-heading {
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.back-to-profile-btn {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    color: #17a2b8;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0;
+    cursor: pointer;
+}
+
+.back-to-profile-btn:hover {
+    text-decoration: underline;
+}
+
+
+/*  ========================
+        Session Button
+    ========================*/
+.employee-profile-menu-btn {
+    width: 100%;
+
+    padding: 11px 8px;
+
+    margin-top: 5px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: transparent;
+
+    text-align: left;
+
+    color: #41474e;
+
+    font-size: 13px;
+    font-weight: 525;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+.employee-profile-menu-btn:hover {
+    background: #f3f7f8;
+}
+
+.sessions-modal-body {
+    max-height: 65vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.session-card {
+    background: #fff;
+    border: 1px solid #eef0f3;
+    border-radius: 10px;
+    padding: 16px 18px;
+}
+
+.session-card-current {
+    border-color: #cfe9ec;
+    background: #fafeff;
+}
+
+.session-card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.session-device-line {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 0.85rem;
+    color: #1c2126;
+    word-break: break-word;
+}
+
+.session-device-icon {
+    font-size: 1rem;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.session-ip-line {
+    margin-top: 8px;
+    font-size: 0.82rem;
+    color: #495057;
+}
+
+.session-ip-line strong {
+    color: #1c2126;
+    font-weight: 600;
+}
+
+.session-revoke-btn {
+    flex-shrink: 0;
+    background: #fff;
+    color: #b3261e;
+    border: 1px solid #f3c6c6;
+    border-radius: 6px;
+    padding: 5px 16px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.session-revoke-btn:hover {
+    background: #fde8e8;
+}
+
+.session-current-tag {
+    flex-shrink: 0;
+    background: #e6f7ec;
+    color: #1a7f4b;
+    border-radius: 6px;
+    padding: 5px 14px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.session-divider {
+    border: none;
+    border-top: 1px solid #eef0f3;
+    margin: 14px 0 12px;
+}
+
+.session-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.session-meta-item span {
+    display: block;
+    font-size: 0.75rem;
+    color: #9aa1ab;
+    margin-bottom: 3px;
+}
+
+.session-meta-item strong {
+    font-size: 0.85rem;
+    color: #1c2126;
+    font-weight: 700;
+}
+
+/*  =================================
+        Profile Image Change Style
+    ================================== */
+
+.profile-avatar {
+    cursor: pointer;
+}
+
+.view-photo-body {
+    display: flex;
+    justify-content: center;
+    padding: 24px;
+}
+
+.view-photo-wrapper {
+    position: relative;
+    width: 180px;
+    height: 180px;
+}
+
+.view-photo-image {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+}
+
+.view-photo-fallback {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background: #17a2b8;
+    color: #fff;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    font-weight: 700;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.view-photo-edit-btn {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #17a2b8;
+    color: #fff;
+    border: 3px solid #fff;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.view-photo-edit-btn:hover {
+    background: #138496;
+}
+
+.upload-photo-preview-wrapper {
+    display: flex;
+    justify-content: center;
+}
+
+.upload-photo-preview,
+.upload-photo-preview-fallback {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.upload-photo-preview-fallback {
+    background: #17a2b8;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    font-weight: 700;
+}
+
 
 
 /* =========================================
@@ -1425,5 +1769,12 @@
     .navbar-system-actions .system-btn {
         padding: 6px 10px;
         font-size: 11px;
+    }
+}
+
+@media (max-width: 576px) {
+    .session-meta-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
     }
 }
