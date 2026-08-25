@@ -2705,6 +2705,9 @@ if (logoutPanel) {
             return;
         }
         // Fallback
+        if (typeof deleteCookie === "function") {
+            deleteCookie("authData");
+        }
         localStorage.clear();
         sessionStorage.clear();
 
