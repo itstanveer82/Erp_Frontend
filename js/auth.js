@@ -110,6 +110,37 @@ function showLoginError(message) {
     loginError.textContent = message;
     loginError.classList.remove("d-none");
 }
+// ---- COOKIE HELPERS ----
+// Set a cookie. If days is omitted/null, it becomes a session cookie
+// (browser deletes it automatically when the browser is closed).
+function setCookie(name, value, days) {
+    let expires = "";
+    if (days) {
+        const date = new Date();
+        date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+        expires = "; expires=" + date.toUTCString();
+    }
+    const secureFlag = location.protocol === "https:" ? "; Secure" : "";
+    document.cookie =
+        name + "=" + encodeURIComponent(value) +
+        expires +
+        "; path=/; SameSite=Lax" +
+        secureFlag;
+}
+function getCookie(name) {
+    const cname = name + "=";
+    const parts = document.cookie.split(";");
+    for (let i = 0; i < parts.length; i++) {
+        let c = parts[i].trim();
+        if (c.indexOf(cname) === 0) {
+            return decodeURIComponent(c.substring(cname.length));
+        }
+    }
+    return null;
+}
+function deleteCookie(name) {
+    document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax";
+}
 // SAVE AUTHENTICATION DATA
 function saveAuthData(data, remember) {
     const loginData = data.data;
@@ -122,33 +153,72 @@ function saveAuthData(data, remember) {
         email: loginData.user?.email || "",
         role: Array.isArray(loginData.user?.roles)
             ? loginData.user.roles[0] || ""
-            : ""
+            : "",
+        // Remember whether this was a "remember me" login so a later
+        // silent token refresh can re-apply the same cookie lifetime.
+        remember: !!remember
     };
-    if (remember) {
-        localStorage.setItem(
-            "authData",
-            JSON.stringify(authData)
-        );
-        sessionStorage.removeItem("authData");
-    } else {
-        sessionStorage.setItem(
-            "authData",
-            JSON.stringify(authData)
-        );
-        localStorage.removeItem("authData");
-    }
+    // "Remember me" checked -> cookie persists 7 days.
+    // Unchecked -> session cookie, cleared when the browser closes.
+    setCookie("authData", JSON.stringify(authData), remember ? 7 : null);
+    // Clean up any old localStorage/sessionStorage data from before this change.
+    localStorage.removeItem("authData");
+    sessionStorage.removeItem("authData");
 }
 // GET AUTHENTICATION DATA
 function getAuthData() {
-    const localData = localStorage.getItem("authData");
-    if (localData) {
-        return JSON.parse(localData);
-    }
-    const sessionData = sessionStorage.getItem("authData");
-    if (sessionData) {
-        return JSON.parse(sessionData);
+    const cookieData = getCookie("authData");
+    if (cookieData) {
+        try {
+            return JSON.parse(cookieData);
+        } catch (e) {
+            return null;
+        }
     }
     return null;
+}
+// REFRESH ACCESS TOKEN
+// Calls POST /api/auth/refresh-token using the stored refreshToken,
+// then overwrites the authData cookie with the new tokens.
+// Uses a plain fetch (not apiRequest) so it never sends the old,
+// possibly-expired access token and never triggers api.js's own
+// 401-retry logic recursively.
+let refreshInFlight = null;
+async function refreshAccessToken() {
+    const current = getAuthData();
+    if (!current || !current.refreshToken) {
+        throw new Error("No refresh token available");
+    }
+    // If a refresh is already running (e.g. two API calls failed with
+    // 401 at the same time), share the same promise instead of firing
+    // the refresh endpoint twice.
+    if (refreshInFlight) {
+        return refreshInFlight;
+    }
+    refreshInFlight = (async () => {
+        const response = await fetch(API_BASE_URL + "/api/auth/refresh-token", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ refreshToken: current.refreshToken })
+        });
+        let data = {};
+        try {
+            data = await response.json();
+        } catch (e) {
+            data = {};
+        }
+        if (!response.ok || !data.success) {
+            throw new Error(data.message || "Session expired. Please log in again.");
+        }
+        // Re-save with the same "remember me" duration as the original login.
+        saveAuthData(data, current.remember);
+        return data.data.accessToken;
+    })();
+    try {
+        return await refreshInFlight;
+    } finally {
+        refreshInFlight = null;
+    }
 }
 // LOGOUT
 const logoutButton = document.getElementById("logoutButton");
@@ -158,6 +228,7 @@ if (logoutButton) {
     });
 }
 function logout() {
+    deleteCookie("authData");
     localStorage.removeItem("authData");
     sessionStorage.removeItem("authData");
     window.location.href = "../auth/login.html";

@@ -1850,50 +1850,49 @@ removePermissionForm.addEventListener(
             "logoutButton"
         );
     if (logoutButton) {
-        logoutButton.addEventListener(
-            "click",
-            function () {
-                localStorage.removeItem(
-                    "authData"
-                );
-                localStorage.removeItem(
-                    "token"
-                );
-                localStorage.removeItem(
-                    "user"
-                );
-                localStorage.removeItem(
-                    "role"
-                );
-                localStorage.removeItem(
-                    "email"
-                );
-                window.location.href =
-                    "../auth/login.html";
-            }
-        );
+       logoutButton.addEventListener(
+    "click",
+    function () {
+        if (typeof logout === "function") {
+            logout();
+            return;
+        }
+        if (typeof deleteCookie === "function") {
+            deleteCookie("authData");
+        }
+        localStorage.removeItem("authData");
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        localStorage.removeItem("role");
+        localStorage.removeItem("email");
+        window.location.href =
+            "../auth/login.html";
+    }
+);
     }
     // DROPDOWN LOGOUT
     const dropdownLogoutButton =
         document.getElementById("dropdownLogoutButton");
     if (dropdownLogoutButton) {
-        dropdownLogoutButton.addEventListener("click", function () {
-            if (typeof logout === "function") {
-                logout();
-                return;
-            }
-            localStorage.clear();
-            sessionStorage.clear();
-            window.location.href =
-                "../auth/login.html";
-        });
+      dropdownLogoutButton.addEventListener("click", function () {
+    if (typeof logout === "function") {
+        logout();
+        return;
+    }
+    if (typeof deleteCookie === "function") {
+        deleteCookie("authData");
+    }
+    localStorage.clear();
+    sessionStorage.clear();
+    window.location.href =
+        "../auth/login.html";
+});
     }
     // =========================================
     // ADMIN DASHBOARD - RESET PASSWORD
     // Uses ACTUAL API
     // POST /api/auth/change-password
-    // =========================================
-    // =========================================
+
     // CLICK HANDLER
     // Handles:
     // 1. Reset Password button
