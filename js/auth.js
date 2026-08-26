@@ -135,7 +135,6 @@ function getCookie(name) {
         if (c.indexOf(cname) === 0) {
             return decodeURIComponent(c.substring(cname.length));
         }
-<<<<<<< HEAD
     }
     return null;
 }
@@ -175,10 +174,9 @@ function getAuthData() {
     }
     return null;
 }
-=======
-    }
-    return null;
-}
+    
+  
+
 function deleteCookie(name) {
     document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax";
 }
@@ -261,7 +259,7 @@ async function refreshAccessToken() {
         refreshInFlight = null;
     }
 }
->>>>>>> 6709f2a67eb4e1ab7c815be9aa3b6a44cefea7e4
+
 // LOGOUT
 const logoutButton = document.getElementById("logoutButton");
 if (logoutButton) {
@@ -274,9 +272,8 @@ function logout() {
     localStorage.removeItem("authData");
     sessionStorage.removeItem("authData");
     window.location.href = "../auth/login.html";
-<<<<<<< HEAD
+
 }
  
-=======
-}
->>>>>>> 6709f2a67eb4e1ab7c815be9aa3b6a44cefea7e4
+
+

@@ -15,27 +15,21 @@ async function apiRequest(endpoint, options = {}, _isRetry = false) {
         }
  
         const token = authData ? authData.token : null;
-<<<<<<< HEAD
- 
-=======
+
+
         const skipAuthHandling = AUTH_ENDPOINTS_NO_REFRESH.includes(endpoint);
 
->>>>>>> 6709f2a67eb4e1ab7c815be9aa3b6a44cefea7e4
+
         const headers = {
             "Content-Type": "application/json",
             ...(options.headers || {})
         };
  
         // Add JWT only when a token exists
-<<<<<<< HEAD
-        // and this is NOT the login request
- 
-        if (token && endpoint !== "/api/auth/login") {
-=======
         // and this is NOT the login/refresh request
 
         if (token && !skipAuthHandling) {
->>>>>>> 6709f2a67eb4e1ab7c815be9aa3b6a44cefea7e4
+
             headers["Authorization"] = `Bearer ${token}`;
         }
  
@@ -58,9 +52,8 @@ async function apiRequest(endpoint, options = {}, _isRetry = false) {
         // console.log("API URL:", API_BASE_URL + endpoint);
         console.log("API Status:", response.status);
         console.log("API Response:", data);
-<<<<<<< HEAD
+
  
-=======
 
         // TOKEN EXPIRED -> try a silent refresh, then retry this
         // request exactly once. Only applies to real API calls, not
@@ -85,7 +78,7 @@ async function apiRequest(endpoint, options = {}, _isRetry = false) {
             }
         }
 
->>>>>>> 6709f2a67eb4e1ab7c815be9aa3b6a44cefea7e4
+
         // if (!response.ok) {
         //     throw new Error(
         //         data.message ||
