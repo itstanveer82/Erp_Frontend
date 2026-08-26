@@ -1,6 +1,3 @@
-// Endpoints that must never trigger the refresh-and-retry flow -
-// refreshing on a failed login attempt or a failed refresh call
-// itself would either be meaningless or cause an infinite loop.
 const AUTH_ENDPOINTS_NO_REFRESH = [
     "/api/auth/login",
     "/api/auth/refresh-token"
@@ -8,64 +5,65 @@ const AUTH_ENDPOINTS_NO_REFRESH = [
 
 async function apiRequest(endpoint, options = {}, _isRetry = false) {
     try {
+        // Get current auth data
         let authData = null;
-        // Only call getAuthData if the function exists
+
         if (typeof getAuthData === "function") {
             authData = getAuthData();
         }
- 
-        const token = authData ? authData.token : null;
-<<<<<<< HEAD
- 
-=======
-        const skipAuthHandling = AUTH_ENDPOINTS_NO_REFRESH.includes(endpoint);
 
->>>>>>> 6709f2a67eb4e1ab7c815be9aa3b6a44cefea7e4
+        const token = authData?.token || null;
+
+        // These endpoints must never trigger refresh + retry
+        const skipAuthHandling =
+            AUTH_ENDPOINTS_NO_REFRESH.includes(endpoint);
+
+        // Build headers
         const headers = {
             "Content-Type": "application/json",
             ...(options.headers || {})
         };
- 
-        // Add JWT only when a token exists
-<<<<<<< HEAD
-        // and this is NOT the login request
- 
-        if (token && endpoint !== "/api/auth/login") {
-=======
-        // and this is NOT the login/refresh request
 
-        if (token && !skipAuthHandling) {
->>>>>>> 6709f2a67eb4e1ab7c815be9aa3b6a44cefea7e4
+        // Add JWT when available.
+        // Login does not need an Authorization header.
+        if (token && endpoint !== "/api/auth/login") {
             headers["Authorization"] = `Bearer ${token}`;
         }
- 
+
+        // IMPORTANT:
+        // fetch must NOT be inside `if (token)`.
+        // Login and unauthenticated requests must also be sent.
         const response = await fetch(
             API_BASE_URL + endpoint,
             {
                 ...options,
-                headers: headers
+                headers
             }
         );
- 
+
+        // Parse response
         let data = {};
- 
+
         try {
             data = await response.json();
         } catch (error) {
+            // Response may have no JSON body
             data = {};
         }
- 
-        // console.log("API URL:", API_BASE_URL + endpoint);
+
+        console.log("API URL:", API_BASE_URL + endpoint);
         console.log("API Status:", response.status);
         console.log("API Response:", data);
-<<<<<<< HEAD
- 
-=======
 
-        // TOKEN EXPIRED -> try a silent refresh, then retry this
-        // request exactly once. Only applies to real API calls, not
-        // to the login/refresh endpoints themselves, and only when
-        // we actually have a token to have expired in the first place.
+        // =========================================================
+        // TOKEN EXPIRED
+        // Refresh only:
+        // 1. For a 401 response
+        // 2. Not for login/refresh endpoints
+        // 3. Only on the first attempt
+        // 4. Only when we actually had a token
+        // 5. Only when refreshAccessToken exists
+        // =========================================================
         if (
             response.status === 401 &&
             !skipAuthHandling &&
@@ -75,42 +73,52 @@ async function apiRequest(endpoint, options = {}, _isRetry = false) {
         ) {
             try {
                 await refreshAccessToken();
-                return apiRequest(endpoint, options, true);
+
+                // Retry the original request exactly once
+                return await apiRequest(
+                    endpoint,
+                    options,
+                    true
+                );
+
             } catch (refreshError) {
-                console.error("Token refresh failed:", refreshError);
+                console.error(
+                    "Token refresh failed:",
+                    refreshError
+                );
+
                 if (typeof logout === "function") {
                     logout();
                 }
+
                 throw refreshError;
             }
         }
 
->>>>>>> 6709f2a67eb4e1ab7c815be9aa3b6a44cefea7e4
-        // if (!response.ok) {
-        //     throw new Error(
-        //         data.message ||
-        //         `Request failed with status ${response.status}`
-        //     );
-        // }
- 
-        // Edit by Araj
- 
+        // =========================================================
+        // HANDLE OTHER API ERRORS
+        // =========================================================
         if (!response.ok) {
             const apiError = new Error(
-                data.message ||
+                data?.message ||
+                data?.error ||
                 `Request failed with status ${response.status}`
             );
+
+            // Keep the complete API response available
             apiError.responseData = data;
+            apiError.status = response.status;
+
             throw apiError;
         }
- 
+
+        // =========================================================
+        // SUCCESS
+        // =========================================================
         return data;
- 
+
     } catch (error) {
- 
         console.error("API Error:", error);
- 
         throw error;
     }
 }
- 

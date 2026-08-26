@@ -1451,6 +1451,36 @@ document.addEventListener("DOMContentLoaded", function () {
     // =========================
     showView("dashboard");
 
+    // ==============================
+    // Mobile View Responsive 
+    // ==============================
+    const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+    const dashboardSidebarEl = document.getElementById("dashboardSidebar");
+
+    if (mobileMenuBtn && dashboardSidebarEl) {
+        mobileMenuBtn.addEventListener("click", function (e) {
+            e.stopPropagation();
+            dashboardSidebarEl.classList.toggle("mobile-open");
+        });
+
+        document.addEventListener("click", function (e) {
+            if (
+                dashboardSidebarEl.classList.contains("mobile-open") &&
+                !dashboardSidebarEl.contains(e.target) &&
+                e.target !== mobileMenuBtn
+            ) {
+                dashboardSidebarEl.classList.remove("mobile-open");
+            }
+        });
+
+        dashboardSidebarEl.querySelectorAll("[data-view]").forEach(function (btn) {
+            btn.addEventListener("click", function () {
+                if (window.innerWidth < 768) {
+                    dashboardSidebarEl.classList.remove("mobile-open");
+                }
+            });
+        });
+    }
     function refreshSidebarProfileImage() {
         const sidebarImage = document.getElementById("sidebarProfileImage");
         const sidebarInitials = document.getElementById("sidebarInitials");
