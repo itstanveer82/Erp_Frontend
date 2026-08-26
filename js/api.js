@@ -1,6 +1,3 @@
-// Endpoints that must never trigger the refresh-and-retry flow -
-// refreshing on a failed login attempt or a failed refresh call
-// itself would either be meaningless or cause an infinite loop.
 const AUTH_ENDPOINTS_NO_REFRESH = [
     "/api/auth/login",
     "/api/auth/refresh-token"
@@ -8,18 +5,15 @@ const AUTH_ENDPOINTS_NO_REFRESH = [
 
 async function apiRequest(endpoint, options = {}, _isRetry = false) {
     try {
+        // Get current auth data
         let authData = null;
-        // Only call getAuthData if the function exists
+
         if (typeof getAuthData === "function") {
             authData = getAuthData();
         }
  
         const token = authData ? authData.token : null;
-
-
         const skipAuthHandling = AUTH_ENDPOINTS_NO_REFRESH.includes(endpoint);
-
-
         const headers = {
             "Content-Type": "application/json",
             ...(options.headers || {})
@@ -29,31 +23,33 @@ async function apiRequest(endpoint, options = {}, _isRetry = false) {
         // and this is NOT the login/refresh request
 
         if (token && !skipAuthHandling) {
-
             headers["Authorization"] = `Bearer ${token}`;
         }
- 
+
+        // IMPORTANT:
+        // fetch must NOT be inside `if (token)`.
+        // Login and unauthenticated requests must also be sent.
         const response = await fetch(
             API_BASE_URL + endpoint,
             {
                 ...options,
-                headers: headers
+                headers
             }
         );
- 
+
+        // Parse response
         let data = {};
- 
+
         try {
             data = await response.json();
         } catch (error) {
+            // Response may have no JSON body
             data = {};
         }
- 
-        // console.log("API URL:", API_BASE_URL + endpoint);
+
+        console.log("API URL:", API_BASE_URL + endpoint);
         console.log("API Status:", response.status);
         console.log("API Response:", data);
-
- 
 
         // TOKEN EXPIRED -> try a silent refresh, then retry this
         // request exactly once. Only applies to real API calls, not
@@ -68,16 +64,27 @@ async function apiRequest(endpoint, options = {}, _isRetry = false) {
         ) {
             try {
                 await refreshAccessToken();
-                return apiRequest(endpoint, options, true);
+
+                // Retry the original request exactly once
+                return await apiRequest(
+                    endpoint,
+                    options,
+                    true
+                );
+
             } catch (refreshError) {
-                console.error("Token refresh failed:", refreshError);
+                console.error(
+                    "Token refresh failed:",
+                    refreshError
+                );
+
                 if (typeof logout === "function") {
                     logout();
                 }
-                throw refreshError;
-            }
-        }
 
+                throw refreshError;
+                }
+        }
 
         // if (!response.ok) {
         //     throw new Error(
@@ -90,20 +97,25 @@ async function apiRequest(endpoint, options = {}, _isRetry = false) {
  
         if (!response.ok) {
             const apiError = new Error(
-                data.message ||
+                data?.message ||
+                data?.error ||
                 `Request failed with status ${response.status}`
             );
+
+            // Keep the complete API response available
             apiError.responseData = data;
+            apiError.status = response.status;
+
             throw apiError;
         }
- 
+
+        // =========================================================
+        // SUCCESS
+        // =========================================================
         return data;
- 
+
     } catch (error) {
- 
         console.error("API Error:", error);
- 
         throw error;
     }
 }
- 

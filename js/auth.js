@@ -8,59 +8,137 @@ const loginButton = document.getElementById("loginButton");
 const loginButtonText = document.getElementById("loginButtonText");
 const loginLoader = document.getElementById("loginLoader");
 const loginError = document.getElementById("loginError");
+
+
+// ============================================================
 // SHOW / HIDE PASSWORD
+// ============================================================
+
 if (togglePassword) {
     togglePassword.addEventListener("click", function () {
+
         if (passwordInput.type === "password") {
             passwordInput.type = "text";
-            togglePasswordText.textContent = "Hide";
-            togglePassword.setAttribute("aria-label", "Hide password");
+
+            if (togglePasswordText) {
+                togglePasswordText.textContent = "Hide";
+            }
+
+            togglePassword.setAttribute(
+                "aria-label",
+                "Hide password"
+            );
+
         } else {
             passwordInput.type = "password";
-            togglePasswordText.textContent = "Show";
-            togglePassword.setAttribute("aria-label", "Show password");
+
+            if (togglePasswordText) {
+                togglePasswordText.textContent = "Show";
+            }
+
+            togglePassword.setAttribute(
+                "aria-label",
+                "Show password"
+            );
         }
     });
 }
+
+
+// ============================================================
 // LOGIN FORM SUBMIT
+// ============================================================
+
 if (loginForm) {
+
     loginForm.addEventListener("submit", function (e) {
+
         e.preventDefault();
-        loginError.classList.add("d-none");
-        loginError.textContent = "";
-        emailInput.classList.remove("is-invalid");
-        passwordInput.classList.remove("is-invalid");
+
+        // Clear previous errors
+        if (loginError) {
+            loginError.classList.add("d-none");
+            loginError.textContent = "";
+        }
+
+        if (emailInput) {
+            emailInput.classList.remove("is-invalid");
+        }
+
+        if (passwordInput) {
+            passwordInput.classList.remove("is-invalid");
+        }
+
         let isValid = true;
-        const email = emailInput.value.trim();
-        const password = passwordInput.value.trim();
-        // Email validation
+
+        const email = emailInput
+            ? emailInput.value.trim()
+            : "";
+
+        const password = passwordInput
+            ? passwordInput.value
+            : "";
+
+
+        // ========================================================
+        // EMAIL VALIDATION
+        // ========================================================
+
         if (email === "") {
+
             emailInput.classList.add("is-invalid");
             isValid = false;
+
         } else if (!isValidEmail(email)) {
+
             emailInput.classList.add("is-invalid");
             isValid = false;
         }
-        // Password validation
+
+
+        // ========================================================
+        // PASSWORD VALIDATION
+        // ========================================================
+
         if (password === "") {
+
             passwordInput.classList.add("is-invalid");
             isValid = false;
         }
+
+
+        // Stop if validation failed
         if (!isValid) {
+
             showLoginError(
                 "Please enter a valid email address and password."
             );
+
             return;
         }
+
+
+        // ========================================================
         // LOGIN LOADING STATE
-        loginButton.disabled = true;
+        // ========================================================
+
+        if (loginButton) {
+            loginButton.disabled = true;
+        }
+
         if (loginButtonText) {
             loginButtonText.textContent = "Logging in...";
         }
+
         if (loginLoader) {
             loginLoader.classList.remove("d-none");
         }
-        // API REQUEST
+
+
+        // ========================================================
+        // LOGIN API REQUEST
+        // ========================================================
+
         apiRequest("/api/auth/login", {
             method: "POST",
             body: JSON.stringify({
@@ -68,212 +146,534 @@ if (loginForm) {
                 password: password
             })
         })
+
             .then(function (data) {
-                console.log("LOGIN FULL RESPONSE:", data);
-                console.log("LOGIN DATA:", data.data);
-                console.log("LOGIN TOKEN:", data.data?.accessToken);
-                // Save authentication data
-                saveAuthData(data, rememberMe.checked);
-                // Redirect after successful login
-                // window.location.href = "../admin/dashboard.html";
-                // Edit by Araj
-                const roles = data.data.user?.roles || [];
-                if (roles.includes("ROLE_EMPLOYEE") && !roles.includes("ROLE_ADMIN")) {
-                    window.location.href = "../employee/employee-dashboard.html";
-                } else {
-                    window.location.href = "../admin/dashboard.html";
-                }
-            })
-            .catch(function (error) {
-                console.error("Login failed:", error);
-                showLoginError(
-                    error.message || "Login failed. Please try again."
+
+                console.log(
+                    "LOGIN FULL RESPONSE:",
+                    data
                 );
-                // Reset button
-                loginButton.disabled = false;
+
+                console.log(
+                    "LOGIN DATA:",
+                    data?.data
+                );
+
+                console.log(
+                    "LOGIN TOKEN:",
+                    data?.data?.accessToken
+                );
+
+
+                // ==================================================
+                // VALIDATE LOGIN RESPONSE
+                // ==================================================
+
+                if (!data || !data.data) {
+                    throw new Error(
+                        "Invalid login response from server."
+                    );
+                }
+
+                if (!data.data.accessToken) {
+                    throw new Error(
+                        "Access token was not returned by the server."
+                    );
+                }
+
+
+                // ==================================================
+                // SAVE AUTH DATA
+                // ==================================================
+
+                saveAuthData(
+                    data,
+                    rememberMe ? rememberMe.checked : false
+                );
+
+
+                // ==================================================
+                // GET USER ROLES
+                // ==================================================
+
+                const roles =
+                    Array.isArray(data.data.user?.roles)
+                        ? data.data.user.roles
+                        : [];
+
+
+                console.log(
+                    "USER ROLES:",
+                    roles
+                );
+
+
+                // ==================================================
+                // REDIRECT BASED ON ROLE
+                // ==================================================
+
+                if (
+                    roles.includes("ROLE_EMPLOYEE") &&
+                    !roles.includes("ROLE_ADMIN")
+                ) {
+
+                    window.location.href =
+                        "../employee/employee-dashboard.html";
+
+                } else {
+
+                    window.location.href =
+                        "../admin/dashboard.html";
+                }
+
+            })
+
+            .catch(function (error) {
+
+                console.error(
+                    "Login failed:",
+                    error
+                );
+
+
+                showLoginError(
+                    error.message ||
+                    "Login failed. Please try again."
+                );
+
+
+                // ==================================================
+                // RESET LOGIN BUTTON
+                // ==================================================
+
+                if (loginButton) {
+                    loginButton.disabled = false;
+                }
+
                 if (loginButtonText) {
                     loginButtonText.textContent = "Login";
                 }
+
                 if (loginLoader) {
                     loginLoader.classList.add("d-none");
                 }
             });
     });
 }
+
+
+// ============================================================
 // EMAIL VALIDATION
+// ============================================================
+
 function isValidEmail(email) {
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    const emailPattern =
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
     return emailPattern.test(email);
 }
+
+
+// ============================================================
 // SHOW LOGIN ERROR
+// ============================================================
+
 function showLoginError(message) {
+
+    if (!loginError) {
+        return;
+    }
+
     loginError.textContent = message;
     loginError.classList.remove("d-none");
 }
-// ---- COOKIE HELPERS ----
-// Set a cookie. If days is omitted/null, it becomes a session cookie
-// (browser deletes it automatically when the browser is closed).
+
+
+// ============================================================
+// COOKIE HELPERS
+// ============================================================
+
+// Set cookie.
+//
+// If days is null/undefined/0,
+// the cookie becomes a session cookie.
+
 function setCookie(name, value, days) {
+
     let expires = "";
-    if (days) {
+
+    if (
+        days !== null &&
+        days !== undefined &&
+        days > 0
+    ) {
+
         const date = new Date();
-        date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
-        expires = "; expires=" + date.toUTCString();
+
+        date.setTime(
+            date.getTime() +
+            days * 24 * 60 * 60 * 1000
+        );
+
+        expires =
+            "; expires=" +
+            date.toUTCString();
     }
-    const secureFlag = location.protocol === "https:" ? "; Secure" : "";
+
+
+    const secureFlag =
+        location.protocol === "https:"
+            ? "; Secure"
+            : "";
+
+
     document.cookie =
-        name + "=" + encodeURIComponent(value) +
+        name +
+        "=" +
+        encodeURIComponent(value) +
         expires +
-        "; path=/; SameSite=Lax" +
+        "; path=/" +
+        "; SameSite=Lax" +
         secureFlag;
 }
+
+
+// ============================================================
+// GET COOKIE
+// ============================================================
+
 function getCookie(name) {
-    const cname = name + "=";
-    const parts = document.cookie.split(";");
-    for (let i = 0; i < parts.length; i++) {
-        let c = parts[i].trim();
-        if (c.indexOf(cname) === 0) {
-            return decodeURIComponent(c.substring(cname.length));
+    const cookieName = name + "=";
+
+    const cookies = document.cookie.split(";");
+
+    for (let i = 0; i < cookies.length; i++) {
+
+        const cookie = cookies[i].trim();
+
+        if (cookie.indexOf(cookieName) === 0) {
+
+            return decodeURIComponent(
+                cookie.substring(cookieName.length)
+            );
         }
     }
+
     return null;
 }
-function deleteCookie(name) {
-    document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax";
-}
-// SAVE AUTHENTICATION DATA
-function saveAuthData(data, remember) {
-    const loginData = data.data;
-    const authData = {
-        token: loginData.accessToken,
-        refreshToken: loginData.refreshToken,
-        tokenType: loginData.tokenType,
-        expiresIn: loginData.expiresIn,
-        user: loginData.user,
-        email: loginData.user?.email || "",
-        role: Array.isArray(loginData.user?.roles)
-            ? loginData.user.roles[0] || ""
-            : ""
-    };
-    // "Remember me" checked -> cookie persists 7 days.
-    // Unchecked -> session cookie, cleared when the browser closes.
-    setCookie("authData", JSON.stringify(authData), remember ? 7 : null);
-    // Clean up any old localStorage/sessionStorage data from before this change.
-    localStorage.removeItem("authData");
-    sessionStorage.removeItem("authData");
-}
-// GET AUTHENTICATION DATA
-function getAuthData() {
-    const cookieData = getCookie("authData");
-    if (cookieData) {
-        try {
-            return JSON.parse(cookieData);
-        } catch (e) {
-            return null;
-        }
-    }
-    return null;
-}
-    
-  
+
+// ============================================================
+// DELETE COOKIE
+// ============================================================
 
 function deleteCookie(name) {
-    document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Lax";
+
+    document.cookie =
+        name +
+        "=; expires=Thu, 01 Jan 1970 00:00:00 UTC;" +
+        " path=/; SameSite=Lax";
 }
+
+
+// ============================================================
 // SAVE AUTHENTICATION DATA
+// ============================================================
+
 function saveAuthData(data, remember) {
-    const loginData = data.data;
+
+    const loginData = data?.data;
+
+    if (!loginData) {
+        throw new Error(
+            "Invalid authentication data."
+        );
+    }
+
+
     const authData = {
-        token: loginData.accessToken,
-        refreshToken: loginData.refreshToken,
-        tokenType: loginData.tokenType,
-        expiresIn: loginData.expiresIn,
-        user: loginData.user,
-        email: loginData.user?.email || "",
-        role: Array.isArray(loginData.user?.roles)
-            ? loginData.user.roles[0] || ""
-            : "",
-        // Remember whether this was a "remember me" login so a later
-        // silent token refresh can re-apply the same cookie lifetime.
+
+        token: loginData.accessToken || null,
+
+        refreshToken:
+            loginData.refreshToken || null,
+
+        tokenType:
+            loginData.tokenType || "Bearer",
+
+        expiresIn:
+            loginData.expiresIn || null,
+
+        user:
+            loginData.user || null,
+
+        email:
+            loginData.user?.email || "",
+
+        role:
+            Array.isArray(loginData.user?.roles)
+                ? loginData.user.roles[0] || ""
+                : "",
+
+        // Remember-me state is needed when
+        // the access token is refreshed.
         remember: !!remember
     };
-    // "Remember me" checked -> cookie persists 7 days.
-    // Unchecked -> session cookie, cleared when the browser closes.
-    setCookie("authData", JSON.stringify(authData), remember ? 7 : null);
-    // Clean up any old localStorage/sessionStorage data from before this change.
+
+
+    // Remember me checked:
+    // persistent cookie for 7 days.
+    //
+    // Remember me unchecked:
+    // session cookie.
+
+    setCookie(
+        "authData",
+        JSON.stringify(authData),
+        remember ? 7 : null
+    );
+
+
+    // Remove old storage-based auth data
     localStorage.removeItem("authData");
     sessionStorage.removeItem("authData");
 }
+
+
+// ============================================================
 // GET AUTHENTICATION DATA
+// ============================================================
+
 function getAuthData() {
-    const cookieData = getCookie("authData");
-    if (cookieData) {
-        try {
-            return JSON.parse(cookieData);
-        } catch (e) {
-            return null;
-        }
+
+    const cookieData =
+        getCookie("authData");
+
+
+    if (!cookieData) {
+        return null;
     }
-    return null;
+
+
+    try {
+
+        return JSON.parse(cookieData);
+
+    } catch (error) {
+
+        console.error(
+            "Invalid authData cookie:",
+            error
+        );
+
+        // Remove corrupted cookie
+        deleteCookie("authData");
+
+        return null;
+    }
 }
+
+
+// ============================================================
 // REFRESH ACCESS TOKEN
-// Calls POST /api/auth/refresh-token using the stored refreshToken,
-// then overwrites the authData cookie with the new tokens.
-// Uses a plain fetch (not apiRequest) so it never sends the old,
-// possibly-expired access token and never triggers api.js's own
-// 401-retry logic recursively.
+// ============================================================
+//
+// IMPORTANT:
+//
+// Do NOT call apiRequest() here.
+//
+// We intentionally use fetch() directly so that:
+//
+// /api/auth/refresh-token
+//
+// does not trigger another refresh attempt.
+//
+// This prevents an infinite refresh loop.
+//
+
 let refreshInFlight = null;
+
+
 async function refreshAccessToken() {
+
     const current = getAuthData();
-    if (!current || !current.refreshToken) {
-        throw new Error("No refresh token available");
+
+
+    // ----------------------------------------------------------
+    // No refresh token
+    // ----------------------------------------------------------
+
+    if (
+        !current ||
+        !current.refreshToken
+    ) {
+
+        throw new Error(
+            "No refresh token available."
+        );
     }
-    // If a refresh is already running (e.g. two API calls failed with
-    // 401 at the same time), share the same promise instead of firing
-    // the refresh endpoint twice.
+
+
+    // ----------------------------------------------------------
+    // If another refresh request is already running,
+    // reuse its promise.
+    // ----------------------------------------------------------
+
     if (refreshInFlight) {
+
         return refreshInFlight;
     }
-    refreshInFlight = (async () => {
-        const response = await fetch(API_BASE_URL + "/api/auth/refresh-token", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ refreshToken: current.refreshToken })
-        });
+
+
+    // ----------------------------------------------------------
+    // Start refresh request
+    // ----------------------------------------------------------
+
+    refreshInFlight = (async function () {
+
+        const response = await fetch(
+            API_BASE_URL +
+            "/api/auth/refresh-token",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
+
+                body: JSON.stringify({
+                    refreshToken:
+                        current.refreshToken
+                })
+            }
+        );
+
+
+        // ------------------------------------------------------
+        // Parse response
+        // ------------------------------------------------------
+
         let data = {};
+
         try {
+
             data = await response.json();
-        } catch (e) {
+
+        } catch (error) {
+
             data = {};
         }
-        if (!response.ok || !data.success) {
-            throw new Error(data.message || "Session expired. Please log in again.");
+
+
+        console.log(
+            "REFRESH STATUS:",
+            response.status
+        );
+
+        console.log(
+            "REFRESH RESPONSE:",
+            data
+        );
+
+
+        // ------------------------------------------------------
+        // Refresh failed
+        // ------------------------------------------------------
+
+        if (
+            !response.ok ||
+            data?.success === false
+        ) {
+
+            throw new Error(
+                data?.message ||
+                "Session expired. Please log in again."
+            );
         }
-        // Re-save with the same "remember me" duration as the original login.
-        saveAuthData(data, current.remember);
-        return data.data.accessToken;
+
+
+        // ------------------------------------------------------
+        // Validate new access token
+        // ------------------------------------------------------
+
+        const newAccessToken =
+            data?.data?.accessToken;
+
+
+        if (!newAccessToken) {
+
+            throw new Error(
+                "Refresh response did not contain an access token."
+            );
+        }
+
+
+        // ------------------------------------------------------
+        // Save new authentication data
+        //
+        // Keep the original remember-me setting.
+        // ------------------------------------------------------
+
+        saveAuthData(
+            data,
+            current.remember
+        );
+
+
+        return newAccessToken;
+
     })();
+
+
+    // ----------------------------------------------------------
+    // Always clear the shared promise after completion
+    // ----------------------------------------------------------
+
     try {
+
         return await refreshInFlight;
+
     } finally {
+
         refreshInFlight = null;
     }
 }
 
+// ============================================================
 // LOGOUT
-const logoutButton = document.getElementById("logoutButton");
+// ============================================================
+
+const logoutButton =
+    document.getElementById("logoutButton");
+
+
 if (logoutButton) {
-    logoutButton.addEventListener("click", function () {
-        logout();
-    });
+
+    logoutButton.addEventListener(
+        "click",
+        function () {
+
+            logout();
+        }
+    );
 }
+
+
+// ============================================================
+// LOGOUT FUNCTION
+// ============================================================
+
 function logout() {
+
+    // Delete authentication cookie
     deleteCookie("authData");
+
+    // Clean up any old storage data
     localStorage.removeItem("authData");
     sessionStorage.removeItem("authData");
-    window.location.href = "../auth/login.html";
 
+    // Go back to login page
+    window.location.href =
+        "../auth/login.html";
 }
- 
-
-
