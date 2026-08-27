@@ -7,61 +7,56 @@
 // ================================
 
 function fetchCurrentUserProfile() {
-  return Promise.all([
-    apiRequest("/api/users/me"),
-    apiRequest("/api/profiles/me").catch(function (error) {
-      if (error.message && error.message.includes("No profile found")) {
-        // Expected case — employee ne extended profile abhi tak fill nahi kiya
-        return { data: {} };
-      }
-      // console.error("Unexpected error fetching extended profile:", error);
-      return { data: {} };
-    }),
-    demoGetProfile(),
-    getRealProfilePhotoUrl(),
-  ])
-    .then(function (results) {
-      const u = results[0].data || {};
-      const ext = results[1].data || {};
-      const d = results[2].data || {};
-      const realPhotoUrl = results[3];
+    return Promise.all([
+        apiRequest("/api/users/me"),
+        apiRequest("/api/profiles/me").catch(function (error) {
+            if (error.message && error.message.includes("No profile found")) {
+                // Expected case — employee ne extended profile abhi tak fill nahi kiya
+                return { data: {} };
+            }
+            // console.error("Unexpected error fetching extended profile:", error);
+            return { data: {} };
+        }),
+        demoGetProfile(),
+        getRealProfilePhotoUrl()
+    ]).then(function (results) {
 
-      return {
-        success: true,
-        data: {
-          employeeCode: u.employeeCode || d.employeeCode || "--",
-          firstName: u.firstName || d.firstName || "",
-          lastName: u.lastName || d.lastName || "",
-          email: u.email || d.email || "--",
-          phone: u.phone || d.phone || "--",
+        const u = results[0].data || {};
+        const ext = results[1].data || {};
+        const d = results[2].data || {};
+        const realPhotoUrl = results[3];
 
-          departmentName:
-            u.departmentName || d.departmentName || "Not available",
-          designation: u.designation || d.designation || "Not available",
-          joiningDate: u.joiningDate || d.joiningDate || "Not available",
-          reportingManager:
-            u.reportingManager || d.reportingManager || "Not available",
+        return {
+            success: true,
+            data: {
+                employeeCode: u.employeeCode || d.employeeCode || "--",
+                firstName: u.firstName || d.firstName || "",
+                lastName: u.lastName || d.lastName || "",
+                email: u.email || d.email || "--",
+                phone: u.phone || d.phone || "--",
 
-          profileImage:
-            overriddenProfileImage ||
-            realPhotoUrl ||
-            u.profileImage ||
-            d.profileImage ||
-            null,
+                departmentName: u.departmentName || d.departmentName || "Not available",
+                designation: u.designation || d.designation || "Not available",
+                joiningDate: u.joiningDate || d.joiningDate || "Not available",
+                reportingManager: u.reportingManager || d.reportingManager || "Not available",
 
-          dateOfBirth:
-            ext.dateOfBirth ||
-            u.dateOfBirth ||
-            d.dateOfBirth ||
-            "Not available",
-          gender: ext.gender || u.gender || d.gender || "Not available",
-        },
-      };
+                profileImage:
+                    overriddenProfileImage ||
+                    realPhotoUrl ||
+                    u.profileImage ||
+                    d.profileImage ||
+                    null,
+
+                dateOfBirth: ext.dateOfBirth || u.dateOfBirth || d.dateOfBirth || "Not available",
+                gender: ext.gender || u.gender || d.gender || "Not available"
+            }
+        };
     })
-    .catch(function (error) {
-      return demoGetProfile();
-    });
+        .catch(function (error) {
+            return demoGetProfile();
+        });
 }
+
 
 // =========================================
 // PROFILE PHOTO (alag microservice, port 8084)
@@ -76,165 +71,165 @@ let realPhotoFetchedOnce = false;
 // Fetches real profile photo once, caches the blob-URL,
 // returns null silently if no photo uploaded yet (404) or on error.
 function getRealProfilePhotoUrl() {
-  if (realPhotoFetchedOnce) {
-    return Promise.resolve(cachedRealPhotoUrl);
-  }
+    if (realPhotoFetchedOnce) {
+        return Promise.resolve(cachedRealPhotoUrl);
+    }
 
-  // console.log("Fetching profile photo metadata...");
+    // console.log("Fetching profile photo metadata...");
 
-  return photoApiRequest("/api/profile-photos/me")
-    .then(function (res) {
-      const photo = res.data;
+    return photoApiRequest("/api/profile-photos/me")
+        .then(function (res) {
+            const photo = res.data;
 
-      if (!photo || !photo.id) {
-        return null;
-      }
+            if (!photo || !photo.id) {
+                return null;
+            }
 
-      //  downloadUrl backend se lene ki jagah, hardcode "/me/download" —
-      // kyunki ye hamesha logged-in user ki apni photo hai, koi permission nahi chahiye
-      const downloadPath = "/api/profile-photos/me/download";
-      console.log("Downloading photo binary from:", downloadPath);
+            //  downloadUrl backend se lene ki jagah, hardcode "/me/download" —
+            // kyunki ye hamesha logged-in user ki apni photo hai, koi permission nahi chahiye
+            const downloadPath = "/api/profile-photos/me/download";
+            console.log("Downloading photo binary from:", downloadPath);
 
-      return fetchProfilePhotoAsObjectUrl(downloadPath).then(
-        function (blobUrl) {
-          console.log("Photo blob URL created:", blobUrl);
-          return blobUrl;
-        },
-      );
-    })
-    .catch(function (error) {
-      console.warn("Could not load real profile photo:", error);
-      return null;
-    })
-    .then(function (url) {
-      cachedRealPhotoUrl = url;
-      realPhotoFetchedOnce = true;
-      return url;
-    });
+            return fetchProfilePhotoAsObjectUrl(downloadPath)
+                .then(function (blobUrl) {
+                    console.log("Photo blob URL created:", blobUrl);
+                    return blobUrl;
+                });
+        })
+        .catch(function (error) {
+            console.warn("Could not load real profile photo:", error);
+            return null;
+        })
+        .then(function (url) {
+            cachedRealPhotoUrl = url;
+            realPhotoFetchedOnce = true;
+            return url;
+        });
 }
 
 function resetProfilePhotoCache() {
-  realPhotoFetchedOnce = false;
+    realPhotoFetchedOnce = false;
 }
 
 function setOverriddenProfileImage(imageUrl) {
-  overriddenProfileImage = imageUrl;
+    overriddenProfileImage = imageUrl;
 }
 
 async function photoApiRequest(endpoint, options = {}) {
-  let authData = null;
-  if (typeof getAuthData === "function") {
-    authData = getAuthData();
-  }
-  const token = authData ? authData.token : null;
+    let authData = null;
+    if (typeof getAuthData === "function") {
+        authData = getAuthData();
+    }
+    const token = authData ? authData.token : null;
 
-  const headers = {
-    "Content-Type": "application/json",
-    ...(options.headers || {}),
-  };
+    const headers = {
+        "Content-Type": "application/json",
+        ...(options.headers || {})
+    };
 
-  if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
-  }
+    if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+    }
 
-  const response = await fetch(API_BASE_URL + endpoint, {
-    ...options,
-    headers: headers,
-    cache: "no-store",
-  });
+    const response = await fetch(API_BASE_URL + endpoint, {
+        ...options,
+        headers: headers,
+        cache: "no-store"
+    });
 
-  let data = {};
-  try {
-    data = await response.json();
-  } catch (error) {
-    data = {};
-  }
+    let data = {};
+    try {
+        data = await response.json();
+    } catch (error) {
+        data = {};
+    }
 
-  if (!response.ok) {
-    const apiError = new Error(
-      data.message || `Request failed with status ${response.status}`,
-    );
-    apiError.responseData = data;
-    throw apiError;
-  }
+    if (!response.ok) {
+        const apiError = new Error(
+            data.message || `Request failed with status ${response.status}`
+        );
+        apiError.responseData = data;
+        throw apiError;
+    }
 
-  return data;
+    return data;
 }
 
 // Downloads the actual image bytes (with auth header) and
 // converts them into a temporary browser URL for <img src>
 async function fetchProfilePhotoAsObjectUrl(downloadPath) {
-  let authData = null;
-  if (typeof getAuthData === "function") {
-    authData = getAuthData();
-  }
-  const token = authData ? authData.token : null;
+    let authData = null;
+    if (typeof getAuthData === "function") {
+        authData = getAuthData();
+    }
+    const token = authData ? authData.token : null;
 
-  const headers = {};
-  if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
-  }
+    const headers = {};
+    if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+    }
 
-  const response = await fetch(API_BASE_URL + downloadPath, {
-    headers,
-    cache: "no-store", // sirf ye rakho, URL me query param mat jodo
-  });
+    const response = await fetch(API_BASE_URL + downloadPath, {
+        headers,
+        cache: "no-store"   // sirf ye rakho, URL me query param mat jodo
+    });
 
-  if (!response.ok) {
-    throw new Error(`Failed to load photo (status ${response.status})`);
-  }
+    if (!response.ok) {
+        throw new Error(`Failed to load photo (status ${response.status})`);
+    }
 
-  const blob = await response.blob();
-  return URL.createObjectURL(blob);
+    const blob = await response.blob();
+    return URL.createObjectURL(blob);
 }
 
 // Suggested endpoint — CONFIRM with backend developer:
 // POST http://<photo-service>/api/profile-photos  (multipart/form-data, field name "file")
 async function uploadProfilePhoto(file) {
-  let authData = null;
-  if (typeof getAuthData === "function") {
-    authData = getAuthData();
-  }
-  const token = authData ? authData.token : null;
+    let authData = null;
+    if (typeof getAuthData === "function") {
+        authData = getAuthData();
+    }
+    const token = authData ? authData.token : null;
 
-  const formData = new FormData();
-  formData.append("file", file);
+    const formData = new FormData();
+    formData.append("file", file);
 
-  const headers = {};
-  if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
-  }
+    const headers = {};
+    if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+    }
 
-  const response = await fetch(API_BASE_URL + "/api/profile-photos/me", {
-    method: "POST",
-    headers: headers,
-    body: formData,
-  });
+    const response = await fetch(API_BASE_URL + "/api/profile-photos/me", {
+        method: "POST",
+        headers: headers,
+        body: formData
+    });
 
-  let data = {};
-  try {
-    data = await response.json();
-  } catch (error) {
-    data = {};
-  }
+    let data = {};
+    try {
+        data = await response.json();
+    } catch (error) {
+        data = {};
+    }
 
-  if (!response.ok) {
-    const apiError = new Error(
-      data.message || `Upload failed with status ${response.status}`,
-    );
-    apiError.responseData = data;
-    throw apiError;
-  }
+    if (!response.ok) {
+        const apiError = new Error(
+            data.message || `Upload failed with status ${response.status}`
+        );
+        apiError.responseData = data;
+        throw apiError;
+    }
 
-  return data;
+    return data;
 }
 
 // Real endpoint: DELETE /api/profile-photos/me
 function deleteProfilePhoto() {
-  return photoApiRequest("/api/profile-photos/me", {
-    method: "DELETE",
-  });
+    return photoApiRequest("/api/profile-photos/me", {
+        method: "DELETE"
+    });
 }
+
 
 // =========================================
 // SESSIONS
@@ -243,14 +238,15 @@ function deleteProfilePhoto() {
 // =========================================
 
 function getEmployeeSessions() {
-  return apiRequest("/api/sessions");
+    return apiRequest("/api/sessions");
 }
 
 function revokeEmployeeSession(sessionId) {
-  return apiRequest(`/api/sessions/${sessionId}`, {
-    method: "DELETE",
-  });
+    return apiRequest(`/api/sessions/${sessionId}`, {
+        method: "DELETE"
+    });
 }
+
 
 // =========================================
 // CHANGE PASSWORD
@@ -258,13 +254,13 @@ function revokeEmployeeSession(sessionId) {
 // =========================================
 
 function changeEmployeePassword(oldPassword, newPassword) {
-  return apiRequest("/api/auth/change-password", {
-    method: "POST",
-    body: JSON.stringify({
-      oldPassword: oldPassword,
-      newPassword: newPassword,
-    }),
-  });
+    return apiRequest("/api/auth/change-password", {
+        method: "POST",
+        body: JSON.stringify({
+            oldPassword: oldPassword,
+            newPassword: newPassword
+        })
+    });
 }
 
 // =========================================
@@ -272,34 +268,31 @@ function changeEmployeePassword(oldPassword, newPassword) {
 // Real endpoint: GET /api/emergency-contacts/me
 // =========================================
 function fetchMyEmergencyContacts() {
-  return apiRequest("/api/emergency-contacts/me").catch(function (error) {
-    console.error(
-      "❌ Emergency contacts fetch failed:",
-      error.message,
-      error.responseData,
-    );
-    return { success: false, data: [] };
-  });
+    return apiRequest("/api/emergency-contacts/me")
+        .catch(function (error) {
+            console.error("❌ Emergency contacts fetch failed:", error.message, error.responseData);
+            return { success: false, data: [] };
+        });
 }
 // Real endpoint: POST /api/emergency-contacts/me
 function addMyEmergencyContact(payload) {
-  return apiRequest("/api/emergency-contacts/me", {
-    method: "POST",
-    body: JSON.stringify(payload),
-  });
+    return apiRequest("/api/emergency-contacts/me", {
+        method: "POST",
+        body: JSON.stringify(payload)
+    });
 }
 
 // Real endpoint: PUT /api/emergency-contacts/me/{contactId}
 function updateMyEmergencyContact(contactId, payload) {
-  return apiRequest(`/api/emergency-contacts/me/${contactId}`, {
-    method: "PUT",
-    body: JSON.stringify(payload),
-  });
+    return apiRequest(`/api/emergency-contacts/me/${contactId}`, {
+        method: "PUT",
+        body: JSON.stringify(payload)
+    });
 }
 
 // Real endpoint: DELETE /api/emergency-contacts/me/{contactId}
 function deleteMyEmergencyContact(contactId) {
-  return apiRequest(`/api/emergency-contacts/me/${contactId}`, {
-    method: "DELETE",
-  });
+    return apiRequest(`/api/emergency-contacts/me/${contactId}`, {
+        method: "DELETE"
+    });
 }
