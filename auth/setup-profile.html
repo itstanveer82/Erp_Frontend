@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Your Profile | Attendance & Payroll ERP</title>
+
+    <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/admin-dashboard.css">
+    <link rel="stylesheet" href="../css/setup-profile.css">
+</head>
+
+<body>
+
+    <!-- TOP BAR -->
+    <nav class="navbar admin-navbar">
+        <div class="container-fluid">
+            <span class="navbar-brand admin-brand">
+                <span class="brand-logo">AP</span>
+                <span class="brand-text">
+                    <strong>Attendance & Payroll</strong>
+                    <small>Employee Onboarding · Step 2 of 3</small>
+                </span>
+            </span>
+            <button type="button" id="exitOnboardingButton" class="secondary-action-btn">
+                Save & Exit
+            </button>
+        </div>
+    </nav>
+
+    <div class="container-fluid py-4">
+
+        <div class="page-header">
+            <p class="page-label">ACCOUNT SETUP</p>
+            <h1>Complete Your Profile</h1>
+            <p>
+                Add at least one entry to each section below. Once every
+                section is checked off, you can continue to set your
+                password and start using your account.
+            </p>
+        </div>
+
+        <div class="row g-4">
+
+            <!-- PROGRESS CHECKLIST -->
+            <div class="col-lg-3">
+                <div class="management-card p-3">
+                    <h6 class="mb-3">Your Progress</h6>
+                    <ul class="onboarding-checklist" id="onboardingChecklist">
+                        <li data-section="personal" class="active"><span class="check-dot">✓</span> Personal Information</li>
+                        <li data-section="emergency"><span class="check-dot">✓</span> Emergency Contact</li>
+                        <li data-section="bank"><span class="check-dot">✓</span> Bank Information</li>
+                        <li data-section="family"><span class="check-dot">✓</span> Family Information</li>
+                        <li data-section="education"><span class="check-dot">✓</span> Education</li>
+                        <li data-section="experience"><span class="check-dot">✓</span> Experience</li>
+                        <li data-section="nominee"><span class="check-dot">✓</span> Nomination</li>
+                        <li data-section="skills"><span class="check-dot">✓</span> Skills</li>
+                    </ul>
+                    <button type="button" id="continueToPasswordButton" class="primary-action-btn w-100 mt-3">
+                        Continue to Set Password
+                    </button>
+                    <p class="text-muted small mt-2 mb-0">
+                        You can also continue with sections incomplete; you'll
+                        be told exactly what's still missing.
+                    </p>
+                </div>
+            </div>
+
+            <!-- FORM SECTIONS -->
+            <div class="col-lg-9">
+                <div class="management-card p-4">
+
+                    <ul class="nav nav-pills" id="onboardTab" role="tablist">
+                        <li class="nav-item">
+                            <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tab-personal" data-section="personal" type="button">1. Personal</button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-emergency" data-section="emergency" type="button">2. Emergency Contact</button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-bank" data-section="bank" type="button">3. Bank</button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-family" data-section="family" type="button">4. Family</button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-education" data-section="education" type="button">5. Education</button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-experience" data-section="experience" type="button">6. Experience</button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-nominee" data-section="nominee" type="button">7. Nomination</button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-skills" data-section="skills" type="button">8. Skills</button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content pt-4">
+
+                        <!-- 1. PERSONAL INFORMATION (singleton) -->
+                        <div class="tab-pane fade show active" id="tab-personal">
+                            <div id="personalMessage"></div>
+                            <form id="personalForm">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Date of Birth</label>
+                                        <input type="date" id="personalDob" class="form-control">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Gender</label>
+                                        <select id="personalGender" class="form-control">
+                                            <option value="">Select gender</option>
+                                            <option value="MALE">Male</option>
+                                            <option value="FEMALE">Female</option>
+                                            <option value="OTHER">Other</option>
+                                            <option value="PREFER_NOT_TO_SAY">Prefer not to say</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Marital Status</label>
+                                        <select id="personalMaritalStatus" class="form-control">
+                                            <option value="">Select status</option>
+                                            <option value="SINGLE">Single</option>
+                                            <option value="MARRIED">Married</option>
+                                            <option value="DIVORCED">Divorced</option>
+                                            <option value="WIDOWED">Widowed</option>
+                                            <option value="PREFER_NOT_TO_SAY">Prefer not to say</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Blood Group</label>
+                                        <input type="text" id="personalBloodGroup" class="form-control" maxlength="10" placeholder="e.g. O+">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Occupation Title</label>
+                                        <input type="text" id="personalOccupation" class="form-control" maxlength="100">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Nationality</label>
+                                        <input type="text" id="personalNationality" class="form-control" maxlength="100">
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label">Short Bio</label>
+                                        <textarea id="personalBio" class="form-control" rows="3" maxlength="500"></textarea>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <button type="submit" class="primary-action-btn">Save Personal Information</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- 2. EMERGENCY CONTACT (repeatable) -->
+                        <div class="tab-pane fade" id="tab-emergency">
+                            <div id="emergencyMessage"></div>
+                            <div id="emergencyList" class="mb-3"></div>
+                            <form id="emergencyForm">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Full Name <span class="required-star">*</span></label>
+                                        <input type="text" id="emergencyName" class="form-control" required maxlength="100">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Relationship <span class="required-star">*</span></label>
+                                        <input type="text" id="emergencyRelationship" class="form-control" required maxlength="50">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Phone <span class="required-star">*</span></label>
+                                        <input type="text" id="emergencyPhone" class="form-control" required maxlength="20">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Email</label>
+                                        <input type="email" id="emergencyEmail" class="form-control" maxlength="150">
+                                    </div>
+                                    <div class="col-md-8">
+                                        <label class="form-label">Address</label>
+                                        <input type="text" id="emergencyAddress" class="form-control" maxlength="255">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Priority</label>
+                                        <input type="number" id="emergencyPriority" class="form-control" min="0" value="1">
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <button type="submit" class="primary-action-btn">Add Emergency Contact</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- 3. BANK INFORMATION (singleton) -->
+                        <div class="tab-pane fade" id="tab-bank">
+                            <div id="bankMessage"></div>
+                            <form id="bankForm">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Account Holder Name <span class="required-star">*</span></label>
+                                        <input type="text" id="bankAccountHolderName" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Bank Name <span class="required-star">*</span></label>
+                                        <input type="text" id="bankName" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Account Number <span class="required-star">*</span></label>
+                                        <input type="text" id="bankAccountNumber" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">IFSC Code <span class="required-star">*</span></label>
+                                        <input type="text" id="bankIfscCode" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Branch Name</label>
+                                        <input type="text" id="bankBranchName" class="form-control">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Account Type</label>
+                                        <input type="text" id="bankAccountType" class="form-control" placeholder="e.g. Savings, Current">
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <button type="submit" class="primary-action-btn">Save Bank Information</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- 4. FAMILY (repeatable) -->
+                        <div class="tab-pane fade" id="tab-family">
+                            <div id="familyMessage"></div>
+                            <div id="familyList" class="mb-3"></div>
+                            <form id="familyForm">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Name <span class="required-star">*</span></label>
+                                        <input type="text" id="familyName" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Relationship <span class="required-star">*</span></label>
+                                        <input type="text" id="familyRelationship" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Date of Birth</label>
+                                        <input type="date" id="familyDob" class="form-control">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Occupation</label>
+                                        <input type="text" id="familyOccupation" class="form-control">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Phone</label>
+                                        <input type="text" id="familyPhone" class="form-control">
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="form-check">
+                                            <input type="checkbox" class="form-check-input" id="familyDependent">
+                                            <label class="form-check-label" for="familyDependent">Dependent on employee</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <button type="submit" class="primary-action-btn">Add Family Member</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- 5. EDUCATION (repeatable) -->
+                        <div class="tab-pane fade" id="tab-education">
+                            <div id="educationMessage"></div>
+                            <div id="educationList" class="mb-3"></div>
+                            <form id="educationForm">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Degree <span class="required-star">*</span></label>
+                                        <input type="text" id="educationDegree" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Institution <span class="required-star">*</span></label>
+                                        <input type="text" id="educationInstitution" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Board / University</label>
+                                        <input type="text" id="educationBoard" class="form-control">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Year of Passing <span class="required-star">*</span></label>
+                                        <input type="number" id="educationYear" class="form-control" required min="1950" max="2100">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Percentage / Grade</label>
+                                        <input type="text" id="educationGrade" class="form-control">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Specialization</label>
+                                        <input type="text" id="educationSpecialization" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <button type="submit" class="primary-action-btn">Add Education Detail</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- 6. EXPERIENCE (repeatable) -->
+                        <div class="tab-pane fade" id="tab-experience">
+                            <div id="experienceMessage"></div>
+                            <div id="experienceList" class="mb-3"></div>
+                            <form id="experienceForm">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Company Name <span class="required-star">*</span></label>
+                                        <input type="text" id="experienceCompany" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Designation <span class="required-star">*</span></label>
+                                        <input type="text" id="experienceDesignation" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">From Date <span class="required-star">*</span></label>
+                                        <input type="date" id="experienceFromDate" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">To Date</label>
+                                        <input type="date" id="experienceToDate" class="form-control">
+                                    </div>
+                                    <div class="col-md-4 d-flex align-items-end">
+                                        <div class="form-check">
+                                            <input type="checkbox" class="form-check-input" id="experienceCurrent">
+                                            <label class="form-check-label" for="experienceCurrent">Current job</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label">Responsibilities</label>
+                                        <textarea id="experienceResponsibilities" class="form-control" rows="2"></textarea>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <button type="submit" class="primary-action-btn">Add Experience</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- 7. NOMINEE (repeatable) -->
+                        <div class="tab-pane fade" id="tab-nominee">
+                            <div id="nomineeMessage"></div>
+                            <div id="nomineeList" class="mb-3"></div>
+                            <form id="nomineeForm">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Name <span class="required-star">*</span></label>
+                                        <input type="text" id="nomineeName" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Relationship <span class="required-star">*</span></label>
+                                        <input type="text" id="nomineeRelationship" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Date of Birth</label>
+                                        <input type="date" id="nomineeDob" class="form-control">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Share % <span class="required-star">*</span></label>
+                                        <input type="number" id="nomineeShare" class="form-control" required min="1" max="100">
+                                    </div>
+                                    <div class="col-md-4 d-flex align-items-end">
+                                        <div class="form-check">
+                                            <input type="checkbox" class="form-check-input" id="nomineeMinor">
+                                            <label class="form-check-label" for="nomineeMinor">Nominee is a minor</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Address</label>
+                                        <input type="text" id="nomineeAddress" class="form-control">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Guardian Name (if minor)</label>
+                                        <input type="text" id="nomineeGuardianName" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <button type="submit" class="primary-action-btn">Add Nominee</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- 8. SKILLS (repeatable) -->
+                        <div class="tab-pane fade" id="tab-skills">
+                            <div id="skillsMessage"></div>
+                            <div id="skillsList" class="mb-3"></div>
+                            <form id="skillsForm">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Skill Name <span class="required-star">*</span></label>
+                                        <input type="text" id="skillName" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Proficiency</label>
+                                        <select id="skillProficiency" class="form-control">
+                                            <option value="">Select proficiency</option>
+                                            <option value="BEGINNER">Beginner</option>
+                                            <option value="INTERMEDIATE">Intermediate</option>
+                                            <option value="ADVANCED">Advanced</option>
+                                            <option value="EXPERT">Expert</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Years of Experience</label>
+                                        <input type="number" id="skillYears" class="form-control" min="0">
+                                    </div>
+                                    <div class="col-md-6 d-flex align-items-end">
+                                        <div class="form-check">
+                                            <input type="checkbox" class="form-check-input" id="skillCertified">
+                                            <label class="form-check-label" for="skillCertified">Certified</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <button type="submit" class="primary-action-btn">Add Skill</button>
+                                </div>
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../assets/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/onboarding-session.js"></script>
+    <script src="../js/setup-profile.js"></script>
+
+</body>
+
+</html>
