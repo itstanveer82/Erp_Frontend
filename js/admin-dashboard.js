@@ -20,8 +20,11 @@ document.addEventListener("DOMContentLoaded", function () {
         authData.email ||
         localStorage.getItem("email") ||
         "";
+
+    // for testing purposes, log the authData and email to the console
     console.log("email:", email);
     console.log("authdataaaaaaa:", authData);
+
     const fullName =
         user.name ||
         user.fullName ||
@@ -30,35 +33,41 @@ document.addEventListener("DOMContentLoaded", function () {
         `${firstName} ${lastName}`.trim() ||
         email ||
         "System Admin";
-    // GET ROLES
+
+
+    // Get roles from user object, authData object, or localStorage
+
     let userRoles = [];
-    if (Array.isArray(user.roles)) {
+    if (Array.isArray(user.roles) && user.roles.length > 0) {
         userRoles = user.roles;
-    } else if (Array.isArray(authData.roles)) {
+    } else if (Array.isArray(authData.roles) && authData.roles.length > 0) {
         userRoles = authData.roles;
     } else if (authData.role) {
         userRoles = [authData.role];
     } else {
-        const storedRole =
-            localStorage.getItem("role");
+        const storedRole = localStorage.getItem("role");
+
         if (storedRole) {
             userRoles = [storedRole];
         }
     }
-    // GET PERMISSIONS
+
+    // Get permissions from user object, authData object, or localStorage
     let userPermissions = [];
     if (Array.isArray(user.permissions)) {
         userPermissions = user.permissions;
     } else if (Array.isArray(authData.permissions)) {
         userPermissions = authData.permissions;
     }
-    // DEBUG
+
+    // FOR DEBUGGING PURPOSES, LOG USER DATA TO CONSOLE
     console.log("Auth Data:", authData);
     console.log("User:", user);
     console.log("Full Name:", fullName);
     console.log("Email:", email);
     console.log("Roles:", userRoles);
     console.log("Permissions:", userPermissions);
+
     // USER INFORMATION ELEMENTS
     const userName =
         document.getElementById("userName");
@@ -122,6 +131,7 @@ document.addEventListener("DOMContentLoaded", function () {
         initials = "AD";
     }
     initials = initials.toUpperCase();
+
     // ADMIN PROFILE DROPDOWN
     const adminProfileButton =
         document.getElementById("adminProfileButton");
@@ -305,6 +315,17 @@ document.addEventListener("DOMContentLoaded", function () {
         profileInitials.textContent =
             initials;
     }
+
+
+    const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+    const dashboardSidebar = document.getElementById("dashboardSidebar");
+    if (mobileMenuBtn && dashboardSidebar) {
+        mobileMenuBtn.addEventListener("click", function (e) {
+            e.stopPropagation();
+            dashboardSidebar.classList.toggle("show");
+        });
+    }
+
     // PROFILE ROLES
     function renderProfileRoles() {
         if (!profileRoles) {
@@ -871,18 +892,18 @@ document.addEventListener("DOMContentLoaded", function () {
     // LOAD ALL PERMISSIONS
     // GET /api/permissions
     // ==============================
-  async function loadPermissions() {
-    const permissionsTableBody =
-        document.getElementById(
-            "permissionsTableBody"
-        );
-    if (!permissionsTableBody) {
-        console.error(
-            "permissionsTableBody not found"
-        );
-        return;
-    }
-    permissionsTableBody.innerHTML = `
+    async function loadPermissions() {
+        const permissionsTableBody =
+            document.getElementById(
+                "permissionsTableBody"
+            );
+        if (!permissionsTableBody) {
+            console.error(
+                "permissionsTableBody not found"
+            );
+            return;
+        }
+        permissionsTableBody.innerHTML = `
         <tr>
             <td colspan="4"
                 class="text-center py-4">
@@ -890,21 +911,21 @@ document.addEventListener("DOMContentLoaded", function () {
             </td>
         </tr>
     `;
-    try {
-        const response =
-            await apiRequest(
-                "/api/permissions"
+        try {
+            const response =
+                await apiRequest(
+                    "/api/permissions"
+                );
+            console.log(
+                "Permissions API Response:",
+                response
             );
-        console.log(
-            "Permissions API Response:",
-            response
-        );
-        const permissions =
-            Array.isArray(response.data)
-                ? response.data
-                : [];
-        if (permissions.length === 0) {
-            permissionsTableBody.innerHTML = `
+            const permissions =
+                Array.isArray(response.data)
+                    ? response.data
+                    : [];
+            if (permissions.length === 0) {
+                permissionsTableBody.innerHTML = `
                 <tr>
                     <td colspan="4"
                         class="text-center py-4 text-muted">
@@ -912,31 +933,31 @@ document.addEventListener("DOMContentLoaded", function () {
                     </td>
                 </tr>
             `;
-            return;
-        }
-        permissionsTableBody.innerHTML = "";
-        permissions.forEach(
-            function (permission) {
-                const row =
-                    document.createElement("tr");
-                row.innerHTML = `
+                return;
+            }
+            permissionsTableBody.innerHTML = "";
+            permissions.forEach(
+                function (permission) {
+                    const row =
+                        document.createElement("tr");
+                    row.innerHTML = `
                     <td>
                         ${escapeHtml(
-                    permission.id
-                )}
+                        permission.id
+                    )}
                     </td>
                     <td class="table-permission-name">
                         ${escapeHtml(
-                    getDisplayName(
-                        permission
-                    )
-                )}
+                        getDisplayName(
+                            permission
+                        )
+                    )}
                     </td>
                     <td class="table-description">
                         ${escapeHtml(
-                    permission.description ||
-                    "--"
-                )}
+                        permission.description ||
+                        "--"
+                    )}
                     </td>
                     <td>
                         <button type="button"
@@ -948,222 +969,222 @@ document.addEventListener("DOMContentLoaded", function () {
                         </button>
                     </td>
                 `;
-                permissionsTableBody.appendChild(row);
-            }
-        );
-    } catch (error) {
-        console.error(
-            "Failed to fetch permissions:",
-            error
-        );
-        permissionsTableBody.innerHTML = `
+                    permissionsTableBody.appendChild(row);
+                }
+            );
+        } catch (error) {
+            console.error(
+                "Failed to fetch permissions:",
+                error
+            );
+            permissionsTableBody.innerHTML = `
             <tr>
                 <td colspan="4"
                     class="text-center py-4 text-danger">
                     ${escapeHtml(
-            error.message ||
-            "Failed to load permissions"
-        )}
+                error.message ||
+                "Failed to load permissions"
+            )}
                 </td>
             </tr>
         `;
+        }
     }
-}
     const addPermissionModal =
-    new bootstrap.Modal(
-        document.getElementById(
-            "addPermissionModal"
-        )
-    );
-document
-    .getElementById("addPermissionButton")
-    .addEventListener(
-        "click",
-        function () {
-            addPermissionModal.show();
-        }
-    );
-document
-    .getElementById("addPermissionForm")
-    .addEventListener(
-        "submit",
-        async function (event) {
-            event.preventDefault();
-            await apiRequest(
-                "/api/permissions",
-                {
-                    method: "POST",
-                    body: JSON.stringify({
-                        name:
-                            document.getElementById(
-                                "permissionName"
-                            ).value,
-                        description:
-                            document.getElementById(
-                                "permissionDescription"
-                            ).value
-                    })
-                }
-            );
-            addPermissionMessage.innerHTML =`<div class="custom-alert success">Permission added successfully.</div>`;
-            loadPermissions();
-            setTimeout(function () {
-                addPermissionModal.hide();
-                addPermissionMessage.innerHTML = "";
-                addPermissionForm.reset();
-            }, 1200);
-        }
-    );
+        new bootstrap.Modal(
+            document.getElementById(
+                "addPermissionModal"
+            )
+        );
+    document
+        .getElementById("addPermissionButton")
+        .addEventListener(
+            "click",
+            function () {
+                addPermissionModal.show();
+            }
+        );
+    document
+        .getElementById("addPermissionForm")
+        .addEventListener(
+            "submit",
+            async function (event) {
+                event.preventDefault();
+                await apiRequest(
+                    "/api/permissions",
+                    {
+                        method: "POST",
+                        body: JSON.stringify({
+                            name:
+                                document.getElementById(
+                                    "permissionName"
+                                ).value,
+                            description:
+                                document.getElementById(
+                                    "permissionDescription"
+                                ).value
+                        })
+                    }
+                );
+                addPermissionMessage.innerHTML = `<div class="custom-alert success">Permission added successfully.</div>`;
+                loadPermissions();
+                setTimeout(function () {
+                    addPermissionModal.hide();
+                    addPermissionMessage.innerHTML = "";
+                    addPermissionForm.reset();
+                }, 1200);
+            }
+        );
 
     // EDIT PERMISSION
-let selectedPermissionId = null;
-const editPermissionModalElement =
-    document.getElementById("editPermissionModal");
-const editPermissionForm =
-    document.getElementById("editPermissionForm");
-if (editPermissionModalElement && editPermissionForm) {
-    const editPermissionModal =
-        new bootstrap.Modal(editPermissionModalElement);
+    let selectedPermissionId = null;
+    const editPermissionModalElement =
+        document.getElementById("editPermissionModal");
+    const editPermissionForm =
+        document.getElementById("editPermissionForm");
+    if (editPermissionModalElement && editPermissionForm) {
+        const editPermissionModal =
+            new bootstrap.Modal(editPermissionModalElement);
 
-    document
-        .getElementById("permissionsTableBody")
-        .addEventListener("click", function (event) {
-            const editButton =
-                event.target.closest(".edit-permission-btn");
-            if (!editButton) {
-                return;
-            }
-            selectedPermissionId =
-                editButton.dataset.permissionId;
-            document.getElementById("editPermissionName").value =
-                editButton.dataset.permissionName || "";
-            document.getElementById("editPermissionDescription").value =
-                editButton.dataset.permissionDescription || "";
-            document.getElementById("editPermissionMessage").innerHTML = "";
-            editPermissionModal.show();
-        });
+        document
+            .getElementById("permissionsTableBody")
+            .addEventListener("click", function (event) {
+                const editButton =
+                    event.target.closest(".edit-permission-btn");
+                if (!editButton) {
+                    return;
+                }
+                selectedPermissionId =
+                    editButton.dataset.permissionId;
+                document.getElementById("editPermissionName").value =
+                    editButton.dataset.permissionName || "";
+                document.getElementById("editPermissionDescription").value =
+                    editButton.dataset.permissionDescription || "";
+                document.getElementById("editPermissionMessage").innerHTML = "";
+                editPermissionModal.show();
+            });
 
-    editPermissionForm.addEventListener(
-        "submit",
-        async function (event) {
-            event.preventDefault();
-            const editPermissionMessage =
-                document.getElementById("editPermissionMessage");
-            editPermissionMessage.innerHTML = "";
-            const name =
-                document.getElementById("editPermissionName")
-                    .value.trim();
-            const description =
-                document.getElementById("editPermissionDescription")
-                    .value.trim();
-            if (!name || !description) {
-                editPermissionMessage.innerHTML =
-                    `<div class="custom-alert error">
+        editPermissionForm.addEventListener(
+            "submit",
+            async function (event) {
+                event.preventDefault();
+                const editPermissionMessage =
+                    document.getElementById("editPermissionMessage");
+                editPermissionMessage.innerHTML = "";
+                const name =
+                    document.getElementById("editPermissionName")
+                        .value.trim();
+                const description =
+                    document.getElementById("editPermissionDescription")
+                        .value.trim();
+                if (!name || !description) {
+                    editPermissionMessage.innerHTML =
+                        `<div class="custom-alert error">
                     Please fill all fields.
                 </div>`;
-                return;
-            }
-            try {
-                const response =
-                    await apiRequest(
-                        `/api/permissions/${selectedPermissionId}`,
-                        {
-                            method: "PUT",
-                            body: JSON.stringify({
-                                name: name,
-                                description: description
-                            })
-                        }
-                    );
-                if (response.success === false) {
-                    throw new Error(
-                        response.message ||
-                        "Failed to update permission"
-                    );
+                    return;
                 }
-                editPermissionMessage.innerHTML =
-                    `<div class="custom-alert success">
+                try {
+                    const response =
+                        await apiRequest(
+                            `/api/permissions/${selectedPermissionId}`,
+                            {
+                                method: "PUT",
+                                body: JSON.stringify({
+                                    name: name,
+                                    description: description
+                                })
+                            }
+                        );
+                    if (response.success === false) {
+                        throw new Error(
+                            response.message ||
+                            "Failed to update permission"
+                        );
+                    }
+                    editPermissionMessage.innerHTML =
+                        `<div class="custom-alert success">
                     Permission updated successfully.
                 </div>`;
-                await loadPermissions();
-                setTimeout(function () {
-                    editPermissionModal.hide();
-                    editPermissionMessage.innerHTML = "";
-                }, 1000);
-            } catch (error) {
-                editPermissionMessage.innerHTML =
-                    `<div class="custom-alert error">
+                    await loadPermissions();
+                    setTimeout(function () {
+                        editPermissionModal.hide();
+                        editPermissionMessage.innerHTML = "";
+                    }, 1000);
+                } catch (error) {
+                    editPermissionMessage.innerHTML =
+                        `<div class="custom-alert error">
                     ${escapeHtml(
-                        error.responseData?.message ||
-                        error.message ||
-                        "Failed to update permission."
-                    )}
+                            error.responseData?.message ||
+                            error.message ||
+                            "Failed to update permission."
+                        )}
                 </div>`;
-            }
-        }
-    );
-}
-const removePermissionModalElement =
-    document.getElementById("removePermissionModal");
-const removePermissionButton =
-    document.getElementById("removePermissionButton");
-const removePermissionForm =
-    document.getElementById("removePermissionForm");
-if (
-    removePermissionModalElement &&
-    removePermissionButton &&
-    removePermissionForm
-) {
-    const removePermissionModal =
-        new bootstrap.Modal(removePermissionModalElement);
-    removePermissionButton.addEventListener(
-        "click",
-        function () {
-            removePermissionModal.show();
-        }
-    );
-removePermissionForm.addEventListener(
-    "submit",
-    async function (event) {
-        event.preventDefault();
-        const permissionId =
-            document.getElementById(
-                "removePermissionId"
-            ).value;
-        const removePermissionMessage =
-            document.getElementById("removePermissionMessage");
-        removePermissionMessage.innerHTML = "";
-        try {
-            await apiRequest(
-                `/api/permissions/${permissionId}`,
-                {
-                    method: "DELETE"
                 }
-            );
-            removePermissionMessage.innerHTML =
-                `<div class="custom-alert success">
+            }
+        );
+    }
+    const removePermissionModalElement =
+        document.getElementById("removePermissionModal");
+    const removePermissionButton =
+        document.getElementById("removePermissionButton");
+    const removePermissionForm =
+        document.getElementById("removePermissionForm");
+    if (
+        removePermissionModalElement &&
+        removePermissionButton &&
+        removePermissionForm
+    ) {
+        const removePermissionModal =
+            new bootstrap.Modal(removePermissionModalElement);
+        removePermissionButton.addEventListener(
+            "click",
+            function () {
+                removePermissionModal.show();
+            }
+        );
+        removePermissionForm.addEventListener(
+            "submit",
+            async function (event) {
+                event.preventDefault();
+                const permissionId =
+                    document.getElementById(
+                        "removePermissionId"
+                    ).value;
+                const removePermissionMessage =
+                    document.getElementById("removePermissionMessage");
+                removePermissionMessage.innerHTML = "";
+                try {
+                    await apiRequest(
+                        `/api/permissions/${permissionId}`,
+                        {
+                            method: "DELETE"
+                        }
+                    );
+                    removePermissionMessage.innerHTML =
+                        `<div class="custom-alert success">
                 Permission deleted successfully.
             </div>`;
-            loadPermissions();
-            setTimeout(function () {
-                removePermissionModal.hide();
-                removePermissionMessage.innerHTML = "";
-                removePermissionForm.reset();
-            }, 1200);
-        } catch (error) {
-            removePermissionMessage.innerHTML =
-                `<div class="custom-alert error">
+                    loadPermissions();
+                    setTimeout(function () {
+                        removePermissionModal.hide();
+                        removePermissionMessage.innerHTML = "";
+                        removePermissionForm.reset();
+                    }, 1200);
+                } catch (error) {
+                    removePermissionMessage.innerHTML =
+                        `<div class="custom-alert error">
                 ${escapeHtml(
-                    error.responseData?.message ||
-                    "Cannot delete permission: it is assigned to a role."
-                )}
+                            error.responseData?.message ||
+                            "Cannot delete permission: it is assigned to a role."
+                        )}
             </div>`;
-        }
+                }
+            }
+        );
+
+
     }
-);
-
-
-}
     //for roles modal
     const userRolesModalElement =
         document.getElementById(
@@ -1850,43 +1871,43 @@ removePermissionForm.addEventListener(
             "logoutButton"
         );
     if (logoutButton) {
-       logoutButton.addEventListener(
-    "click",
-    function () {
-        if (typeof logout === "function") {
-            logout();
-            return;
-        }
-        if (typeof deleteCookie === "function") {
-            deleteCookie("authData");
-        }
-        localStorage.removeItem("authData");
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        localStorage.removeItem("role");
-        localStorage.removeItem("email");
-        window.location.href =
-            "../auth/login.html";
-    }
-);
+        logoutButton.addEventListener(
+            "click",
+            function () {
+                if (typeof logout === "function") {
+                    logout();
+                    return;
+                }
+                if (typeof deleteCookie === "function") {
+                    deleteCookie("authData");
+                }
+                localStorage.removeItem("authData");
+                localStorage.removeItem("token");
+                localStorage.removeItem("user");
+                localStorage.removeItem("role");
+                localStorage.removeItem("email");
+                window.location.href =
+                    "../auth/login.html";
+            }
+        );
     }
     // DROPDOWN LOGOUT
     const dropdownLogoutButton =
         document.getElementById("dropdownLogoutButton");
     if (dropdownLogoutButton) {
-      dropdownLogoutButton.addEventListener("click", function () {
-    if (typeof logout === "function") {
-        logout();
-        return;
-    }
-    if (typeof deleteCookie === "function") {
-        deleteCookie("authData");
-    }
-    localStorage.clear();
-    sessionStorage.clear();
-    window.location.href =
-        "../auth/login.html";
-});
+        dropdownLogoutButton.addEventListener("click", function () {
+            if (typeof logout === "function") {
+                logout();
+                return;
+            }
+            if (typeof deleteCookie === "function") {
+                deleteCookie("authData");
+            }
+            localStorage.clear();
+            sessionStorage.clear();
+            window.location.href =
+                "../auth/login.html";
+        });
     }
     // =========================================
     // ADMIN DASHBOARD - RESET PASSWORD
@@ -2181,52 +2202,52 @@ removePermissionForm.addEventListener(
 const addEmployeeForm = document.getElementById("addEmployeeForm");
 if (addEmployeeForm) {
     addEmployeeForm.addEventListener("submit", async function (event) {
-    event.preventDefault();
-    const selectedRms = Array.from(
-        document.getElementById("rms").selectedOptions
-    ).map(option => option.value);
-    const request = {
-        empName: document.getElementById("empName").value.trim(),
-        empEmail: document.getElementById("empEmail").value.trim(),
-        dateOfBirth: document.getElementById("dateOfBirth").value,
-        phone: document.getElementById("phone").value.trim(),
-        gender: document.getElementById("gender").value,
-        shift: document.getElementById("shift").value,
-        rms: selectedRms,
-        address: document.getElementById("address").value.trim(),
-        salary: Number(document.getElementById("salary").value)
-    };
-    try {
-        const response = await fetch("/api/employees", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(request)
-        });
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || "Failed to create employee");
+        event.preventDefault();
+        const selectedRms = Array.from(
+            document.getElementById("rms").selectedOptions
+        ).map(option => option.value);
+        const request = {
+            empName: document.getElementById("empName").value.trim(),
+            empEmail: document.getElementById("empEmail").value.trim(),
+            dateOfBirth: document.getElementById("dateOfBirth").value,
+            phone: document.getElementById("phone").value.trim(),
+            gender: document.getElementById("gender").value,
+            shift: document.getElementById("shift").value,
+            rms: selectedRms,
+            address: document.getElementById("address").value.trim(),
+            salary: Number(document.getElementById("salary").value)
+        };
+        try {
+            const response = await fetch("/api/employees", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(request)
+            });
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || "Failed to create employee");
+            }
+            const employee = await response.json();
+            console.log("Employee created:", employee);
+            alert(
+                "Employee created successfully!\nEmployee Code: "
+                + employee.empCode
+            );
+            // Close modal
+            const modalElement =
+                document.getElementById("addEmployeeModal");
+            const modal =
+                bootstrap.Modal.getInstance(modalElement);
+            modal.hide();
+            // Reset form
+            document.getElementById("addEmployeeForm").reset();
+            // Optional: reload employee table
+            // loadEmployees();
+        } catch (error) {
+            console.error(error);
+            alert(error.message);
         }
-        const employee = await response.json();
-        console.log("Employee created:", employee);
-        alert(
-            "Employee created successfully!\nEmployee Code: "
-            + employee.empCode
-        );
-        // Close modal
-        const modalElement =
-            document.getElementById("addEmployeeModal");
-        const modal =
-            bootstrap.Modal.getInstance(modalElement);
-        modal.hide();
-        // Reset form
-        document.getElementById("addEmployeeForm").reset();
-        // Optional: reload employee table
-        // loadEmployees();
-    } catch (error) {
-        console.error(error);
-        alert(error.message);
-    }
     });
 }

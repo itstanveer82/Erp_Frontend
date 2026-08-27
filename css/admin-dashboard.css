@@ -733,11 +733,11 @@ body {
         overflow-y: auto;
         z-index: 1030;
     }
-    .dashboard-sidebar.collapse:not(.show) {
-        display: none;
+    .dashboard-sidebar {
+        display: none; /* hidden by default on mobile */
     }
-    .dashboard-sidebar.collapse.show {
-        display: block;
+    .dashboard-sidebar.show {
+        display: block; /* opens instantly at full width, no height animation */
     }
     .dashboard-main {
         width: 100%;
