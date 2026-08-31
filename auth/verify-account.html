@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Activate Account | Attendance & Payroll ERP</title>
+
+    <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/reset-password.css">
+</head>
+
+<body class="reset-password-page">
+
+    <div class="reset-wrapper">
+
+        <!-- Left Branding Section -->
+        <div class="reset-brand-section">
+
+            <div class="brand-content">
+
+                <div class="brand-logo">
+                    <span>AP</span>
+                </div>
+
+                <span class="brand-label">
+                    ATTENDANCE & PAYROLL
+                </span>
+
+                <h1>Activate Your New Account.</h1>
+
+                <p>
+                    Your admin has created your employee account. Enter the
+                    verification code sent to your email to get started.
+                </p>
+
+                <div class="brand-features">
+
+                    <div class="brand-feature">
+                        <span class="feature-icon">✓</span>
+                        <span>Secure Account Activation</span>
+                    </div>
+
+                    <div class="brand-feature">
+                        <span class="feature-icon">✓</span>
+                        <span>One-Time Verification Code</span>
+                    </div>
+
+                    <div class="brand-feature">
+                        <span class="feature-icon">✓</span>
+                        <span>Guided Profile Setup</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Right Form Section -->
+        <div class="reset-form-section">
+
+            <div class="reset-card">
+
+                <!-- Mobile Logo -->
+                <div class="mobile-logo">
+                    <div class="mobile-logo-icon">AP</div>
+                    <span>Attendance & Payroll ERP</span>
+                </div>
+
+                <!-- Header -->
+                <div class="reset-header">
+                    <h2>Activate Account</h2>
+                    <p>
+                        Enter your email and the 6-digit code we sent you to
+                        continue setting up your account.
+                    </p>
+                </div>
+
+                <!-- Verify Form -->
+                <form id="verifyAccountForm" novalidate>
+
+                    <!-- Email -->
+                    <div class="form-group-custom">
+                        <label for="email">Email Address</label>
+
+                        <div class="input-wrapper">
+                            <span class="input-icon">@</span>
+                            <input type="email" class="form-control" id="email" name="email"
+                                placeholder="Enter your registered email" autocomplete="email" required>
+                        </div>
+
+                        <div id="emailError" class="form-error"></div>
+                    </div>
+
+                    <!-- OTP -->
+                    <div class="form-group-custom">
+                        <label for="otp">Verification Code</label>
+
+                        <div class="input-wrapper otp-wrapper">
+                            <span class="input-icon">🔐</span>
+                            <input type="text" class="form-control otp-input" id="otp" name="otp"
+                                placeholder="Enter 6-digit code" inputmode="numeric" maxlength="6"
+                                autocomplete="one-time-code" required>
+                        </div>
+
+                        <div id="otpMessage" class="otp-message"></div>
+                        <div id="otpError" class="form-error"></div>
+                    </div>
+
+                    <!-- Verify Button -->
+                    <button type="submit" class="reset-btn" id="verifyButton">
+                        <span id="verifyButtonText">Verify & Continue</span>
+                        <span id="verifyLoader" class="spinner-border spinner-border-sm d-none" aria-hidden="true"></span>
+                    </button>
+
+                    <!-- Resend OTP -->
+                    <div class="text-center mt-3">
+                        <button type="button" id="resendOtpButton" class="btn btn-link p-0"
+                            style="font-size: 14px; text-decoration: none;">
+                            Didn't get a code? Resend
+                        </button>
+                    </div>
+
+                    <!-- Success Message -->
+                    <div id="successMessage" class="success-message d-none" role="alert"></div>
+
+                    <!-- Error Message -->
+                    <div id="verifyError" class="form-error text-center mt-3"></div>
+
+                </form>
+
+                <!-- Back to Login -->
+                <div class="back-login">
+                    <a href="login.html">← Back to Login</a>
+                </div>
+
+                <div class="reset-footer">
+                    Secure Employee Management System
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="../assets/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/verify-account.js"></script>
+
+</body>
+
+</html>

@@ -12,11 +12,11 @@
 </head>
 
 <body>
-    <!-- TOP NAVBAR -->
+    <!-- TOP NAVBAR: fixed header — brand logo/name on the left, admin profile dropdown on the right -->
     <nav class="navbar admin-navbar">
         <div class="container-fluid">
-            <!-- Brand -->
-            <a class="navbar-brand admin-brand" href="dashboard.html">
+            <!-- Brand: clicking logo/name reloads the dashboard -->
+            <a class="navbar-brand admin-brand" href="dashboard.html" id="brandToggle">
                 <span class="brand-logo">
                     AP
                 </span>
@@ -29,7 +29,8 @@
                     </small>
                 </span>
             </a>
-            <!-- ADMIN PROFILE -->
+
+            <!-- ADMIN PROFILE: avatar + name/role button that opens the dropdown menu below -->
             <div class="admin-profile-wrapper">
                 <button type="button" id="adminProfileButton" class="admin-profile-button">
                     <div class="admin-profile-avatar">
@@ -40,6 +41,8 @@
                         <small id="headerAdminRole">ADMIN</small>
                     </div>
                 </button>
+
+                <!-- Profile dropdown: quick links to My Profile / Session Management / Logout -->
                 <div id="adminProfileDropdown" class="admin-profile-dropdown">
                     <div class="admin-dropdown-header">
                         <div class="admin-dropdown-avatar">
@@ -54,12 +57,17 @@
                             </span>
                         </div>
                     </div>
+
+
+                    <!-- Opens the Profile view (#profileView) -->
                     <button type="button" id="profileViewButton" class="admin-profile-menu-btn">
                         ◍ &nbsp; My Profile
                     </button>
+                    <!-- Opens the Session Management modal (#sessionsModal) -->
                     <button type="button" id="sessionsButton" class="admin-profile-menu-btn">
                         ◷ &nbsp; Session Management
                     </button>
+                    <!-- Logs the admin out (clears auth + redirects to login) -->
                     <button type="button" id="dropdownLogoutButton"
                         class="admin-profile-menu-btn admin-logout-menu-btn">
                         ⇥ &nbsp; Logout
@@ -69,15 +77,13 @@
         </div>
         </div>
     </nav>
-    <!-- DASHBOARD LAYOUT -->
+
+
+    <!-- DASHBOARD LAYOUT: two-column shell — sidebar nav on the left, main content on the right -->
     <div class="dashboard-layout">
         <!-- Mobile Sidebar Button -->
-        <div class="mobile-menu-container">
-            <button class="mobile-menu-btn" type="button" data-bs-toggle="collapse" data-bs-target="#dashboardSidebar">
-                ☰ <span>Menu</span>
-            </button>
-        </div>
-        <!-- SIDEBAR -->
+    
+        <!-- SIDEBAR: view-switcher nav — each button's data-view maps to a <section id="...View"> below -->
         <aside class="dashboard-sidebar collapse d-md-block" id="dashboardSidebar">
             <div class="sidebar-header">
                 <span>
@@ -85,60 +91,60 @@
                 </span>
             </div>
             <div class="sidebar-menu">
-                <!-- Dashboard -->
+                <!-- Dashboard: shows #dashboardView (default active view) -->
                 <button class="sidebar-item active" type="button" data-view="dashboard">
                     <span class="menu-icon">
                         ▦
                     </span>
                     Dashboard
                 </button>
-                <!-- Employees -->
+                <!-- Employees: shows #employeesView -->
                 <button class="sidebar-item" type="button" data-view="employees">
                     <span class="menu-icon">
                         ♙
                     </span>
                     Employees
                 </button>
-                <!-- Attendance -->
+                <!-- Attendance: shows #attendanceView -->
                 <button class="sidebar-item" type="button" data-view="attendance">
                     <span class="menu-icon">
                         ◷
                     </span>
                     Attendance
                 </button>
-                <!-- Payroll -->
+                <!-- Payroll: shows #payrollView -->
                 <button class="sidebar-item" type="button" data-view="payroll">
                     <span class="menu-icon">
                         ₹
                     </span>
                     Payroll
                 </button>
-                <!-- Reports -->
+                <!-- Reports: shows #reportsView -->
                 <button class="sidebar-item" type="button" data-view="reports">
                     <span class="menu-icon">
                         ▤
                     </span>
                     Reports
                 </button>
-                <!-- ADMINISTRATION HEADER -->
+                <!-- ADMINISTRATION HEADER: section divider label, not clickable -->
                 <div class="sidebar-section-title">
                     ADMINISTRATION
                 </div>
-                <!-- Users -->
+                <!-- Users: shows #usersView, id used by JS to gate visibility by permission -->
                 <button class="sidebar-item administration-item" id="usersMenuButton" type="button" data-view="users">
                     <span class="menu-icon">
                         ♙
                     </span>
                     Users
                 </button>
-                <!-- Roles -->
+                <!-- Roles: shows #rolesView, id used by JS to gate visibility by permission -->
                 <button class="sidebar-item administration-item" id="rolesMenuButton" type="button" data-view="roles">
                     <span class="menu-icon">
                         ◉
                     </span>
                     Roles
                 </button>
-                <!-- Permissions -->
+                <!-- Permissions: shows #permissionsView, id used by JS to gate visibility by permission -->
                 <button class="sidebar-item administration-item" id="permissionsMenuButton" type="button"
                     data-view="permissions">
                     <span class="menu-icon">
@@ -146,7 +152,8 @@
                     </span>
                     Permissions
                 </button>
-                <!-- Sidebar User -->
+
+                <!-- Sidebar User: bottom-of-sidebar logout button -->
                 <div class="sidebar-user">
                     <div>
                         <button type="button" id="logoutButton" class="logout-btn">
@@ -155,11 +162,15 @@
                     </div>
                 </div>
         </aside>
-        <!-- MAIN CONTENT -->
+
+
+        <!-- ----------------MAIN -------------------------------------->
+
+        <!-- MAIN CONTENT: holds every content-view <section> — JS toggles which one is visible -->
         <main class="dashboard-main">
-            <!-- DASHBOARD VIEW -->
+            <!-- DASHBOARD VIEW: landing view — welcome banner, 4 KPI stat cards, quick actions, "your access" summary -->
             <section id="dashboardView" class="content-view">
-                <!-- Welcome -->
+                <!-- Welcome: greeting text + a badge showing the admin's current role -->
                 <div class="dashboard-welcome">
                     <div>
                         <p class="page-label">
@@ -182,7 +193,9 @@
                         </strong>
                     </div>
                 </div>
-                <!-- Dashboard Cards -->
+
+
+                <!-- Dashboard Cards: 4 KPI stat cards (Total Employees / Present / Absent / Late Today) filled by JS -->
                 <div class="row g-3 stats-row">
                     <div class="col-12 col-sm-6 col-xl-3">
                         <div class="dashboard-card">
@@ -245,7 +258,9 @@
                         </div>
                     </div>
                 </div>
-                <!-- Quick Actions -->
+
+
+                <!-- Quick Actions: 4 shortcut buttons that jump straight to Employees/Roles/Permissions/Reports views -->
                 <section class="dashboard-section">
                     <div class="section-heading">
                         <div>
@@ -258,7 +273,7 @@
                         </div>
                     </div>
                     <div class="row g-3">
-                        <!-- Employees -->
+                        <!-- Employees: shortcut to #employeesView -->
                         <div class="col-12 col-sm-6 col-xl-3">
                             <button class="quick-action-card quick-action-button" type="button" data-view="employees">
                                 <strong>
@@ -269,7 +284,9 @@
                                 </span>
                             </button>
                         </div>
-                        <!-- Roles -->
+
+
+                        <!-- Roles: shortcut to #rolesView -->
                         <div class="col-12 col-sm-6 col-xl-3">
                             <button class="quick-action-card quick-action-button" type="button" data-view="roles">
                                 <strong>
@@ -280,7 +297,9 @@
                                 </span>
                             </button>
                         </div>
-                        <!-- Permissions -->
+
+
+                        <!-- Permissions: shortcut to #permissionsView -->
                         <div class="col-12 col-sm-6 col-xl-3">
                             <button class="quick-action-card quick-action-button" type="button" data-view="permissions">
                                 <strong>
@@ -291,7 +310,9 @@
                                 </span>
                             </button>
                         </div>
-                        <!-- Reports -->
+
+
+                        <!-- Reports: shortcut to #reportsView -->
                         <div class="col-12 col-sm-6 col-xl-3">
                             <button class="quick-action-card quick-action-button" type="button" data-view="reports">
                                 <strong>
@@ -304,7 +325,9 @@
                         </div>
                     </div>
                 </section>
-                <!-- Logged In Access -->
+
+
+                <!-- Logged In Access: shows the logged-in admin's own roles + permission tags, filled by JS -->
                 <section class="dashboard-section access-section">
                     <div class="section-heading">
                         <div>
@@ -322,6 +345,7 @@
                                 <span class="access-title">
                                     Assigned Roles
                                 </span>
+                                <!-- Role badges injected here by JS (renderDashboardRoles) -->
                                 <div id="dashboardRoles" class="role-badges">
                                 </div>
                             </div>
@@ -335,13 +359,16 @@
                                     0
                                 </span>
                             </div>
+                            <!-- Permission tags injected here by JS (renderDashboardPermissions) -->
                             <div id="dashboardPermissions" class="permission-tags">
                             </div>
                         </div>
                     </div>
                 </section>
             </section>
-            <!-- // PROFILE VIEW -->
+
+
+            <!-- // PROFILE VIEW: admin's own profile — basic info, contact, roles, permissions, password reset -->
             <section id="profileView" class="content-view d-none">
                 <div class="page-header">
                     <div>
@@ -356,9 +383,11 @@
                         </p>
                     </div>
                 </div>
-                <!-- ADMIN PROFILE CARD -->
+
+
+                <!-- ADMIN PROFILE CARD: wraps every profile sub-section below -->
                 <div class="admin-profile-page-card">
-                    <!-- PROFILE HEADER -->
+                    <!-- PROFILE HEADER: large avatar + name + role badge -->
                     <div class="profile-header">
                         <div class="profile-avatar">
                             <span id="profileInitials">
@@ -378,7 +407,9 @@
                             </span>
                         </div>
                     </div>
-                    <!-- BASIC INFORMATION -->
+
+
+                    <!-- BASIC INFORMATION: read-only full name + primary role -->
                     <div class="profile-section">
                         <div class="profile-section-title">
                             <span class="profile-section-icon">
@@ -412,7 +443,9 @@
                             </div>
                         </div>
                     </div>
-                    <!-- CONTACT INFORMATION -->
+
+
+                    <!-- CONTACT INFORMATION: email display + button that reveals the password-reset form below it -->
                     <div class="profile-section">
                         <div class="profile-section-title">
                             <span class="profile-section-icon">
@@ -440,11 +473,19 @@
                                 <span class="profile-label">
                                     Password
                                 </span>
+                                <!-- Toggles #resetPasswordFormWrapper (first instance, inline variant) open/closed -->
                                 <button type="button" id="resetPasswordToggleButton" class="btn-reset-password">
                                     Reset Password
                                 </button>
                             </div>
-                            <!-- RESET PASSWORD FORM -->
+
+
+                            <!-- RESET PASSWORD FORM (inline variant, hidden by default): current/new/confirm password fields
+                                 NOTE: id="resetPasswordFormWrapper" and its inner ids (#resetPasswordForm,
+                                 #resetPasswordMessage, #currentPasswordField, #newPasswordField, #confirmPasswordField)
+                                 are duplicated again further down (the "management-card" variant) — duplicate IDs
+                                 are invalid HTML and only the first match will be found by getElementById. -->
+
                             <div id="resetPasswordFormWrapper" class="reset-password-form-wrapper d-none">
                                 <form id="resetPasswordForm">
                                     <div id="resetPasswordMessage"></div>
@@ -478,7 +519,8 @@
                             </div>
                         </div>
                     </div>
-                    <!-- ROLE INFORMATION -->
+
+                    <!-- ROLE INFORMATION: role tags for this admin account, injected by JS (renderProfileRoles) -->
                     <div class="profile-section">
                         <div class="profile-section-title">
                             <span class="profile-section-icon">
@@ -496,7 +538,8 @@
                         <div id="profileRoles" class="profile-access-tags">
                         </div>
                     </div>
-                    <!-- PERMISSIONS -->
+
+                    <!-- PERMISSIONS: permission tags for this admin account, injected by JS (renderProfilePermissions) -->
                     <div class="profile-section">
                         <div class="profile-section-title">
                             <span class="profile-section-icon">
@@ -523,7 +566,9 @@
                         </div>
                     </div>
                 </div>
-                <!-- RESET PASSWORD -->
+
+
+                <!-- RESET PASSWORD (second, duplicate-id variant — dead/unreachable via getElementById, see note above) -->
                 <div id="resetPasswordFormWrapper" class="d-none management-card admin-reset-password-card">
                     <div class="admin-reset-password-header">
                         <div>
@@ -570,12 +615,14 @@
                     </form>
                 </div>
             </section>
-            <!-- SESSION MANAGEMENT MODAL -->
+
+
+            <!-- SESSION MANAGEMENT MODAL: lists active login sessions/devices for this account, with revoke actions -->
             <div class="modal fade" id="sessionsModal" tabindex="-1" aria-labelledby="sessionsModalLabel"
                 aria-hidden="true">
                 <div class="modal-dialog modal-xl modal-dialog-scrollable">
                     <div class="modal-content">
-                        <!-- HEADER -->
+                        <!-- HEADER: modal title + close button -->
                         <div class="modal-header">
                             <div>
                                 <p class="page-label mb-1">
@@ -591,12 +638,12 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
                             </button>
                         </div>
-                        <!-- BODY -->
+                        <!-- BODY: status message + the session list, both filled/populated by JS (loadSessions) -->
                         <div class="modal-body">
-                            <!-- MESSAGE -->
+                            <!-- MESSAGE: success/error banner for session actions -->
                             <div id="sessionsMessage" class="mb-3">
                             </div>
-                            <!-- SESSION LIST -->
+                            <!-- SESSION LIST: one card per active session, injected by JS -->
                             <div id="sessionsList" class="sessions-list">
                                 <div class="text-center py-4">
                                     Loading sessions...
@@ -606,9 +653,11 @@
                     </div>
                 </div>
             </div>
-            <!-- EMPLOYEES VIEW -->
+
+            <!-- using api/auth/employee  -->
+            <!-- EMPLOYEES VIEW: employee list with search/filter, "Add Employee" entry point, table filled by JS -->
             <section id="employeesView" class="content-view d-none">
-                <div class="page-header d-flex justify-content-between align-items-center">
+                <div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <div>
                         <p class="page-label">
                             EMPLOYEE MANAGEMENT
@@ -622,25 +671,254 @@
                         </p>
                     </div>
                     <div>
-                        <button type="button" class="btn btn-primary">
-                            <i class="bi bi-plus-lg"></i>
-                            Add Employee
+                        <!-- Opens #addEmployeeModal -->
+                        <button type="button" id="addEmployeeButton" class="primary-action-btn">
+                            + Add Employee
                         </button>
                     </div>
                 </div>
+
+
+                <!-- FILTER BAR: search-by-name/code/email input + "include inactive" checkbox, drives table filtering -->
                 <div class="management-card">
-                    <div class="p-4">
-                        <h5 class="mb-2">
-                            Employee Management
-                        </h5>
-                        <p class="text-muted mb-0">
-                            Employee list, search, filters, add and edit
-                            employee features will appear here.
-                        </p>
+                    <div class="p-3 d-flex flex-wrap gap-3 align-items-center justify-content-between">
+                        <input type="search" id="employeeSearchInput" class="form-control" style="max-width: 320px;"
+                            placeholder="Search by name, code or email...">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="employeeIncludeInactive">
+                            <label class="form-check-label" for="employeeIncludeInactive">
+                                Include inactive employees
+                            </label>
+                        </div>
                     </div>
+
+
+                    <!-- Employee table: rows injected by JS into #employeesTableBody; pagination controls in #employeesPagination -->
+                    <div class="table-responsive">
+                        <table class="table management-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Emp Code</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Role</th>
+                                    <th>Login Account</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="employeesTableBody">
+                                <tr>
+                                    <td colspan="8" class="text-center py-5">
+                                        Loading employees...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="p-3 d-flex justify-content-end" id="employeesPagination"></div>
                 </div>
             </section>
-            <!-- USERS VIEW -->
+
+            <!-- ADD EMPLOYEE MODAL: full new-hire form (identity, contact, role, job/shift/company, salary, RM assignment) -->
+            <div class="modal fade" id="addEmployeeModal" tabindex="-1" aria-labelledby="addEmployeeModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
+                    <div class="modal-content role-modal-content add-employee-modal-content">
+                        <div class="modal-header">
+                            <div>
+                                <p class="page-label mb-1">EMPLOYEE MANAGEMENT</p>
+                                <h5 class="modal-title" id="addEmployeeModalLabel">Add Employee</h5>
+                            </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form id="addEmployeeForm">
+                            <div class="modal-body">
+                                <div id="addEmployeeMessage"></div>
+                                <div class="row g-3">
+                                    <!-- Identity fields: name, DOB, gender -->
+                                    <div class="col-md-6">
+                                        <label class="form-label">First Name <span
+                                                class="required-star">*</span></label>
+                                        <input type="text" id="addEmpFirstName" class="form-control" required
+                                            maxlength="60">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Last Name</label>
+                                        <input type="text" id="addEmpLastName" class="form-control" maxlength="60">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Date of Birth <span
+                                                class="required-star">*</span></label>
+                                        <input type="date" id="addEmpDob" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Gender <span class="required-star">*</span></label>
+                                        <select id="addEmpGender" class="form-control" required>
+                                            <option value="">Select gender</option>
+                                        </select>
+                                    </div>
+                                    <!-- Contact fields: work/personal email, phone -->
+                                    <div class="col-md-6">
+                                        <label class="form-label">Work Email <span
+                                                class="required-star">*</span></label>
+                                        <input type="email" id="addEmpEmail" class="form-control" required
+                                            maxlength="150">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Personal Email</label>
+                                        <input type="email" id="addEmpPersonalEmail" class="form-control"
+                                            maxlength="150">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Phone</label>
+                                        <input type="text" id="addEmpPhone" class="form-control" maxlength="20">
+                                    </div>
+                                    <!-- Role: system role assigned to the new login account -->
+                                    <div class="col-md-6">
+                                        <label class="form-label">Role</label>
+                                        <select id="addEmpRole" class="form-control">
+                                            <option value="ROLE_EMPLOYEE">Employee</option>
+                                            <option value="ROLE_HR">HR</option>
+                                            <option value="ROLE_ADMIN">Admin</option>
+                                            <option value="ROLE_PAYROLL_ADMIN">Payroll Admin</option>
+                                            <option value="ROLE_RM">Reporting Manager</option>
+                                            <option value="ROLE_GUARD">Guard</option>
+                                            <option value="ROLE_SUPER_ADMIN">Super Admin</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label">Address</label>
+                                        <textarea id="addEmpAddress" class="form-control" rows="2"></textarea>
+                                    </div>
+                                    <!-- Job/employment fields: joining date, shift, level, company, status, salary -->
+                                    <div class="col-md-6">
+                                        <label class="form-label">Joining Date</label>
+                                        <input type="date" id="addEmpJoiningDate" class="form-control">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Shift <span class="required-star">*</span></label>
+                                        <select id="addEmpShift" class="form-control" required>
+                                            <option value="">Select shift</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Employee Level</label>
+                                        <select id="addEmpLevel" class="form-control">
+                                            <option value="">Select level (optional)</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Company <span class="required-star">*</span></label>
+                                        <select id="addEmpCompany" class="form-control" required>
+                                            <option value="">Select company</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Employee Status <span
+                                                class="required-star">*</span></label>
+                                        <select id="addEmpStatus" class="form-control" required>
+                                            <option value="">Select status</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Salary</label>
+                                        <input type="number" id="addEmpSalary" class="form-control" min="0" step="0.01">
+                                    </div>
+                                    <!-- Reporting-manager assignment: primary (required) + secondary (optional) RM by emp code -->
+                                    <div class="col-md-6">
+                                        <label class="form-label">Reporting Manager (Emp Code) <span
+                                                class="required-star">*</span></label>
+                                        <input type="text" id="addEmpRm1" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Secondary RM (Emp Code)</label>
+                                        <input type="text" id="addEmpRm2" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="secondary-action-btn"
+                                    data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="primary-action-btn">Create Employee</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW EMPLOYEE MODAL: read-only employee detail panel, content injected into #viewEmployeeBody by JS -->
+            <div class="modal fade" id="viewEmployeeModal" tabindex="-1" aria-labelledby="viewEmployeeModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
+                    <div class="modal-content role-modal-content">
+                        <div class="modal-header">
+                            <div>
+                                <p class="page-label mb-1">EMPLOYEE MANAGEMENT</p>
+                                <h5 class="modal-title" id="viewEmployeeModalLabel">Employee Details</h5>
+                            </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div id="viewEmployeeBody">Loading...</div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="secondary-action-btn" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EDIT EMPLOYEE MODAL: limited-field edit form — only name, work email, employee code and salary -->
+            <div class="modal fade" id="editEmployeeModal" tabindex="-1" aria-labelledby="editEmployeeModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content role-modal-content">
+                        <div class="modal-header">
+                            <div>
+                                <p class="page-label mb-1">EMPLOYEE MANAGEMENT</p>
+                                <h5 class="modal-title" id="editEmployeeModalLabel">Edit Employee</h5>
+                                <p class="mb-0 text-muted small">
+                                    Only name, work email, employee code and salary can be updated here.
+                                </p>
+                            </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form id="editEmployeeForm">
+                            <div class="modal-body">
+                                <div id="editEmployeeMessage"></div>
+                                <div class="mb-3">
+                                    <label class="form-label">Full Name <span class="required-star">*</span></label>
+                                    <input type="text" id="editEmpName" class="form-control" required maxlength="100">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Work Email <span class="required-star">*</span></label>
+                                    <input type="email" id="editEmpEmail" class="form-control" required maxlength="150">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Employee Code <span class="required-star">*</span></label>
+                                    <input type="text" id="editEmpCode" class="form-control" required
+                                        pattern="^[A-Za-z0-9_-]{2,30}$">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Salary <span class="required-star">*</span></label>
+                                    <input type="number" id="editEmpSalary" class="form-control" min="0" step="0.01"
+                                        required>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="secondary-action-btn"
+                                    data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="primary-action-btn">Save Changes</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- USERS VIEW: table of system user accounts + their roles, table filled by JS -->
             <section id="usersView" class="content-view d-none">
                 <div class="page-header">
                     <div>
@@ -680,7 +958,9 @@
                     </div>
                 </div>
             </section>
-            <!-- USER ROLES MODAL -->
+
+
+            <!-- USER ROLES MODAL: assign/remove roles for a single user, list populated by JS, saved via #saveUserRolesButton -->
             <div class="modal fade" id="userRolesModal" tabindex="-1" aria-labelledby="userRolesModalLabel"
                 aria-hidden="true">
                 <div class="modal-dialog">
@@ -693,7 +973,7 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
                             </button>
                         </div>
-                        <!-- BODY -->
+                        <!-- BODY: checkbox list of all roles, injected by JS -->
                         <div class="modal-body">
                             <div id="userRolesList">
                                 Loading roles...
@@ -711,7 +991,9 @@
                     </div>
                 </div>
             </div>
-            <!-- ATTENDANCE VIEW -->
+
+
+            <!-- ATTENDANCE VIEW: placeholder — attendance records/management not yet implemented -->
             <section id="attendanceView" class="content-view d-none">
                 <div class="page-header">
                     <div>
@@ -738,7 +1020,9 @@
                     </div>
                 </div>
             </section>
-            <!-- ROLES VIEW -->
+
+
+            <!-- ROLES VIEW: role cards (create/edit/manage-permissions), cards injected by JS into #rolesCardsContainer -->
             <section id="rolesView" class="content-view d-none">
                 <div class="page-header">
                     <div>
@@ -752,6 +1036,7 @@
                             Create and manage roles available in the system.
                         </p>
                     </div>
+                    <!-- Opens #addRoleModal -->
                     <button type="button" id="addRoleButton" class="primary-action-btn">
                         + Add New Role
                     </button>
@@ -763,7 +1048,9 @@
                     </div>
                 </div>
             </section>
-            <!-- edit modal in roles -->
+
+
+            <!-- edit modal in roles: edit an existing role's name/description, saved via #saveEditRoleButton -->
             <div class="modal fade" id="editRoleModal" tabindex="-1">
                 <div class="modal-dialog">
                     <div class="modal-content">
@@ -800,7 +1087,9 @@
                     </div>
                 </div>
             </div>
-            <!-- permission modal in roles -->
+
+
+            <!-- permission modal in roles: toggle which permissions belong to a role, saved via #saveRolePermissionsButton -->
             <div class="modal fade" id="rolePermissionsModal" tabindex="-1">
                 <div class="modal-dialog">
                     <div class="modal-content">
@@ -826,7 +1115,9 @@
                     </div>
                 </div>
             </div>
-            <!-- ADD ROLE MODAL -->
+
+
+            <!-- ADD ROLE MODAL: name + description form, submitted via #addRoleForm -->
             <div class="modal fade" id="addRoleModal" tabindex="-1" aria-labelledby="addRoleModalLabel"
                 aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
@@ -874,7 +1165,9 @@
                     </div>
                 </div>
             </div>
-            <!-- PERMISSIONS VIEW -->
+
+
+            <!-- PERMISSIONS VIEW: table of all permissions, with add/remove entry points, rows filled by JS -->
             <section id="permissionsView" class="content-view d-none">
                 <div class="page-header">
                     <div>
@@ -889,9 +1182,11 @@
                         </p>
                     </div>
                     <div class="d-flex flex-column align-items-end gap-2">
+                        <!-- Opens #addPermissionModal -->
                         <button type="button" id="addPermissionButton" class="primary-action-btn">
                             + Add New Permission
                         </button>
+                        <!-- Opens #removePermissionModal -->
                         <button type="button" id="removePermissionButton" class="remove-permission-btn">
                             🗑 Remove Permission
                         </button>
@@ -920,7 +1215,9 @@
                     </div>
                 </div>
             </section>
-            <!-- ADD PERMISSION MODAL -->
+
+
+            <!-- ADD PERMISSION MODAL: name + description form, submitted via #addPermissionForm -->
             <div class="modal fade" id="addPermissionModal" tabindex="-1" aria-labelledby="addPermissionModalLabel"
                 aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
@@ -967,7 +1264,9 @@
                     </div>
                 </div>
             </div>
-            <!-- EDIT PERMISSION MODAL -->
+
+
+            <!-- EDIT PERMISSION MODAL: update an existing permission's name/description, submitted via #editPermissionForm -->
             <div class="modal fade" id="editPermissionModal" tabindex="-1" aria-labelledby="editPermissionModalLabel"
                 aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
@@ -1014,7 +1313,9 @@
                     </div>
                 </div>
             </div>
-            <!-- REMOVE PERMISSION MODAL -->
+
+
+            <!-- REMOVE PERMISSION MODAL: delete a permission by ID, submitted via #removePermissionForm -->
             <div class="modal fade" id="removePermissionModal" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content role-modal-content">
@@ -1053,7 +1354,9 @@
                     </div>
                 </div>
             </div>
-            <!-- PAYROLL VIEW -->
+
+
+            <!-- PAYROLL VIEW: placeholder — payroll/salary management not yet implemented -->
             <section id="payrollView" class="content-view d-none">
                 <div class="page-header">
                     <div>
@@ -1080,7 +1383,9 @@
                     </div>
                 </div>
             </section>
-            <!-- REPORTS VIEW -->
+
+
+            <!-- REPORTS VIEW: placeholder — reporting not yet implemented -->
             <section id="reportsView" class="content-view d-none">
                 <div class="page-header">
                     <div>
@@ -1109,7 +1414,10 @@
             </section>
         </main>
     </div>
-    <!-- ADD / EDIT ROLE MODAL -->
+
+    
+    <!-- ADD / EDIT ROLE MODAL: a second, unused-looking generic role form (id="roleModal") — appears to duplicate
+         the purpose of #addRoleModal/#editRoleModal above; check whether this is still wired to any button before keeping it -->
     <div class="modal fade" id="roleModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content role-modal-content">
@@ -1127,6 +1435,9 @@
                 </div>
                 <form id="roleForm">
                     <div class="modal-body">
+                        <!-- NOTE: id="roleId" and id="roleName"/"roleDescription" duplicate ids already used
+                             inside #addRoleModal above — duplicate ids across the page, only the first
+                             DOM match is reachable via getElementById. -->
                         <input type="hidden" id="roleId">
                         <div class="mb-3">
                             <label for="roleName" class="form-label">
@@ -1159,11 +1470,12 @@
             </div>
         </div>
     </div>
-    <!-- JavaScript -->
+    <!-- JavaScript: load order — Bootstrap JS, then config/api/auth (shared), then employees.js, then the page controller -->
     <script src="../assets/js/bootstrap.bundle.min.js"></script>
     <script src="../js/config.js"></script>
     <script src="../js/api.js"></script>
     <script src="../js/auth.js"></script>
+    <script src="../js/employees.js"></script>
     <script src="../js/admin-dashboard.js"></script>
 </body>
 

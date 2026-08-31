@@ -1,20 +1,16 @@
-// ================================
-// EMPLOYEE API (real backend calls)
-// Ye file employee se related saari REAL API calls
-// ek jagah rakhti hai — profile, photo, sessions, password.
-// UI/rendering code yahan nahi hota, wo employee-dashboard.js me hai.
-// Demo/fake data ke liye demo-api.js dekho.
-// ================================
-
+// ====================================================================
+//      Get the logged-in employee's user and profile details.
+//      GET /api/users/me  → Fetches basic logged-in user information.
+//      GET /api/profiles/me → Fetches employee profile details and profile photo.
+//      Used to display the current employee's profile information.
+// =====================================================================
 function fetchCurrentUserProfile() {
     return Promise.all([
         apiRequest("/api/users/me"),
         apiRequest("/api/profiles/me").catch(function (error) {
             if (error.message && error.message.includes("No profile found")) {
-                // Expected case — employee ne extended profile abhi tak fill nahi kiya
                 return { data: {} };
             }
-            // console.error("Unexpected error fetching extended profile:", error);
             return { data: {} };
         }),
         demoGetProfile(),
@@ -59,24 +55,20 @@ function fetchCurrentUserProfile() {
 
 
 // =========================================
-// PROFILE PHOTO (alag microservice, port 8084)
-// Real endpoint: GET /api/profile-photos/me
-// Real endpoint: POST /api/profile-photos (multipart, field "file")
+//      Get and download the logged-in employee's profile photo.
+//      GET /api/profile-photos/me          → Fetches the employee's profile photo details.
+//      GET /api/profile-photos/me/download → Downloads the employee's profile photo file.
+//      Used to display or download the current employee's profile photo.)
 // =========================================
-
 let overriddenProfileImage = null;
 let cachedRealPhotoUrl = null;
 let realPhotoFetchedOnce = false;
 
 // Fetches real profile photo once, caches the blob-URL,
-// returns null silently if no photo uploaded yet (404) or on error.
 function getRealProfilePhotoUrl() {
     if (realPhotoFetchedOnce) {
         return Promise.resolve(cachedRealPhotoUrl);
     }
-
-    // console.log("Fetching profile photo metadata...");
-
     return photoApiRequest("/api/profile-photos/me")
         .then(function (res) {
             const photo = res.data;
@@ -84,9 +76,6 @@ function getRealProfilePhotoUrl() {
             if (!photo || !photo.id) {
                 return null;
             }
-
-            //  downloadUrl backend se lene ki jagah, hardcode "/me/download" —
-            // kyunki ye hamesha logged-in user ki apni photo hai, koi permission nahi chahiye
             const downloadPath = "/api/profile-photos/me/download";
             console.log("Downloading photo binary from:", downloadPath);
 
@@ -107,14 +96,27 @@ function getRealProfilePhotoUrl() {
         });
 }
 
+// ==========================================================================================
+//      Clear the cached profile photo so the latest employee photo can be loaded.
+//      Used after updating or changing the profile photo.
+// ==========================================================================================
 function resetProfilePhotoCache() {
     realPhotoFetchedOnce = false;
 }
 
+// ==========================================================================================
+//      Set an override profile image for the logged-in employee.
+//      Used to display a custom image instead of the default profile photo.
+// ==========================================================================================
 function setOverriddenProfileImage(imageUrl) {
     overriddenProfileImage = imageUrl;
 }
 
+// =========================================================================================
+//      Common authenticated API request function for profile photo endpoints.
+//      Handles the request based on the endpoint provided.
+//      Used by profile photo APIs to avoid duplicating authentication/request logic.
+// =========================================================================================
 async function photoApiRequest(endpoint, options = {}) {
     let authData = null;
     if (typeof getAuthData === "function") {
@@ -130,7 +132,6 @@ async function photoApiRequest(endpoint, options = {}) {
     if (token) {
         headers["Authorization"] = `Bearer ${token}`;
     }
-
     const response = await fetch(API_BASE_URL + endpoint, {
         ...options,
         headers: headers,
@@ -143,7 +144,6 @@ async function photoApiRequest(endpoint, options = {}) {
     } catch (error) {
         data = {};
     }
-
     if (!response.ok) {
         const apiError = new Error(
             data.message || `Request failed with status ${response.status}`
@@ -155,8 +155,10 @@ async function photoApiRequest(endpoint, options = {}) {
     return data;
 }
 
-// Downloads the actual image bytes (with auth header) and
-// converts them into a temporary browser URL for <img src>
+// ============================================================================================
+//      Download the employee profile photo as binary data.
+//      Creates a Blob URL from the downloaded file for displaying or using the photo.
+// ============================================================================================
 async function fetchProfilePhotoAsObjectUrl(downloadPath) {
     let authData = null;
     if (typeof getAuthData === "function") {
@@ -182,8 +184,11 @@ async function fetchProfilePhotoAsObjectUrl(downloadPath) {
     return URL.createObjectURL(blob);
 }
 
-// Suggested endpoint — CONFIRM with backend developer:
-// POST http://<photo-service>/api/profile-photos  (multipart/form-data, field name "file")
+// =============================================================================================
+//      Upload the logged-in employee's profile photo.
+//      API: POST /api/profile-photos/me
+//      Sends the selected photo to the server and updates the employee's profile image.
+// =============================================================================================
 async function uploadProfilePhoto(file) {
     let authData = null;
     if (typeof getAuthData === "function") {
@@ -223,7 +228,11 @@ async function uploadProfilePhoto(file) {
     return data;
 }
 
-// Real endpoint: DELETE /api/profile-photos/me
+// =============================================================================================
+//      Delete the logged-in employee's profile photo.
+//      API: DELETE /api/profile-photos/me
+//      Removes the current profile photo from the employee's account.
+// =============================================================================================
 function deleteProfilePhoto() {
     return photoApiRequest("/api/profile-photos/me", {
         method: "DELETE"
@@ -231,28 +240,31 @@ function deleteProfilePhoto() {
 }
 
 
-// =========================================
-// SESSIONS
-// Real endpoint: GET /api/sessions
-// Real endpoint: DELETE /api/sessions/{id}
-// =========================================
-
+// ============================================================================================
+//      Get the logged-in employee's active sessions.
+//      API: GET /api/sessions
+//      Returns the sessions currently active for the employee.
+// ============================================================================================
 function getEmployeeSessions() {
     return apiRequest("/api/sessions");
 }
 
+// ============================================================================================
+//      Revoke a selected employee session.
+//      API: DELETE /api/sessions/{id}
+//      Ends the specified active session using its session ID.
+// ============================================================================================
 function revokeEmployeeSession(sessionId) {
     return apiRequest(`/api/sessions/${sessionId}`, {
         method: "DELETE"
     });
 }
 
-
-// =========================================
-// CHANGE PASSWORD
-// Real endpoint: POST /api/auth/change-password
-// =========================================
-
+// ===========================================================================================
+//      Change the logged-in employee's password.
+//      API: POST /api/auth/change-password
+//      Updates the employee's account password after validating the current password.
+// ===========================================================================================
 function changeEmployeePassword(oldPassword, newPassword) {
     return apiRequest("/api/auth/change-password", {
         method: "POST",
@@ -263,10 +275,11 @@ function changeEmployeePassword(oldPassword, newPassword) {
     });
 }
 
-// =========================================
-// EMERGENCY CONTACTS
-// Real endpoint: GET /api/emergency-contacts/me
-// =========================================
+// ===================================================================================================
+//      Get the logged-in employee's emergency contacts.
+//      API: GET /api/emergency-contacts/me
+//      Returns the emergency contact details saved for the employee.
+// ===================================================================================================
 function fetchMyEmergencyContacts() {
     return apiRequest("/api/emergency-contacts/me")
         .catch(function (error) {
@@ -274,7 +287,12 @@ function fetchMyEmergencyContacts() {
             return { success: false, data: [] };
         });
 }
-// Real endpoint: POST /api/emergency-contacts/me
+
+// =================================================================================================
+//      Add an emergency contact for the logged-in employee.
+//      API: POST /api/emergency-contacts/me
+//      Saves a new emergency contact to the employee's profile.
+// =================================================================================================
 function addMyEmergencyContact(payload) {
     return apiRequest("/api/emergency-contacts/me", {
         method: "POST",
@@ -282,7 +300,11 @@ function addMyEmergencyContact(payload) {
     });
 }
 
-// Real endpoint: PUT /api/emergency-contacts/me/{contactId}
+// ================================================================================================
+//      Update an existing emergency contact for the logged-in employee.
+//      API: PUT /api/emergency-contacts/me/{contactId}
+//      Updates the emergency contact details using the contact ID.
+// ================================================================================================
 function updateMyEmergencyContact(contactId, payload) {
     return apiRequest(`/api/emergency-contacts/me/${contactId}`, {
         method: "PUT",
@@ -290,7 +312,11 @@ function updateMyEmergencyContact(contactId, payload) {
     });
 }
 
-// Real endpoint: DELETE /api/emergency-contacts/me/{contactId}
+// ===============================================================================================
+//      Delete an emergency contact for the logged-in employee.
+//      API: DELETE /api/emergency-contacts/me/{contactId}
+//      Removes the selected emergency contact using the contact ID.
+// ===============================================================================================
 function deleteMyEmergencyContact(contactId) {
     return apiRequest(`/api/emergency-contacts/me/${contactId}`, {
         method: "DELETE"

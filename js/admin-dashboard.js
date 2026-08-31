@@ -317,12 +317,17 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+    const brandToggle = document.getElementById("brandToggle");
     const dashboardSidebar = document.getElementById("dashboardSidebar");
-    if (mobileMenuBtn && dashboardSidebar) {
-        mobileMenuBtn.addEventListener("click", function (e) {
-            e.stopPropagation();
-            dashboardSidebar.classList.toggle("show");
+
+    if (brandToggle && dashboardSidebar) {
+        brandToggle.addEventListener("click", function (e) {
+            // Only hijack the click on mobile widths; let desktop navigate normally
+            if (window.innerWidth <= 991) {
+                e.preventDefault();
+                e.stopPropagation();
+                dashboardSidebar.classList.toggle("show");
+            }
         });
     }
 
@@ -457,22 +462,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             });
         // CLOSE MOBILE SIDEBAR
+        // CLOSE MOBILE SIDEBAR
         if (window.innerWidth < 768) {
-            const sidebar =
-                document.getElementById(
-                    "dashboardSidebar"
-                );
-            if (
-                sidebar &&
-                sidebar.classList.contains("show")
-            ) {
-                const collapseInstance =
-                    bootstrap.Collapse.getInstance(
-                        sidebar
-                    );
-                if (collapseInstance) {
-                    collapseInstance.hide();
-                }
+            const sidebar = document.getElementById("dashboardSidebar");
+            if (sidebar) {
+                sidebar.classList.remove("show");
             }
         }
         window.scrollTo({
@@ -488,6 +482,9 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         if (viewName === "users") {
             loadUsers();
+        }
+        if (viewName === "employees" && typeof loadEmployees === "function") {
+            loadEmployees(0);
         }
     }
     // OPEN MY PROFILE
@@ -2251,3 +2248,9 @@ if (addEmployeeForm) {
         }
     });
 }
+// NOTE: Add/Edit/View Employee logic now lives in js/employees.js,
+// wired to the real employee-service endpoints (see that file for
+// the endpoint list). The old stub above used a made-up "/api/employees"
+// endpoint and fields (gender/shift as raw strings, "rms" array) that
+// never matched the actual CreateEmployeeRequest DTO, so it has been
+// removed in favor of the real implementation.

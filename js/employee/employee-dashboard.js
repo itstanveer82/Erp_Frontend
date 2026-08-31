@@ -150,15 +150,12 @@ document.addEventListener("DOMContentLoaded", function () {
     // nahi karna padega.
     // =========================================
 
-    // let overriddenProfileImage = null;
     let currentProfileInitials = "";
 
-    // let cachedRealPhotoUrl = null;
-    // let realPhotoFetchedOnce = false;
-    resetProfilePhotoCache();
 
-
-
+    // ======================================
+                // Employee Profile show
+    // ======================================
 
     function loadHeaderEmployeeProfile() {
         fetchCurrentUserProfile().then(function (res) {
@@ -226,13 +223,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // =========================
 
     function loadDashboardSummary() {
-        // demoGetProfile().then(function (res) {
         fetchCurrentUserProfile().then(function (res) {
             const p = res.data;
-            const fullName = `${p.firstName} ${p.lastName}`.trim();
-
-            // dashboardWelcomeEl.textContent = `Welcome back, ${p.firstName}!`;
-            // userInitialsEl.textContent = initials;
+            // const fullName = `${p.firstName} ${p.lastName}`.trim();
 
             const initials =
                 `${p.firstName || ""}${p.lastName || ""}`
@@ -244,6 +237,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     .join("")
                     .toUpperCase();
 
+            // Dashboard Title show on Welcome Back and Username-----
+
             safeSetText(
                 "dashboardWelcome",
                 `Welcome back, ${p.firstName || "Employee"}!`
@@ -251,7 +246,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             safeSetText(
                 "userInitials",
-                initials || "E"
+                initials || "Somthing Wrong"
             );
 
         });
@@ -289,6 +284,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    // ================================
+    //         Attendance Stat Cards
+    // ================================
     function renderAttendanceStats(rows) {
         const counts = { PRESENT: 0, LATE: 0, ABSENT: 0, LEAVE: 0 };
 
@@ -303,6 +301,9 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("attStatAbsent").textContent = counts.ABSENT;
         document.getElementById("attStatLeave").textContent = counts.LEAVE;
     }
+    // ===============================
+    //      Attendance table Show 
+    // ===============================
 
     function renderAttendanceTable(rows) {
         const tbody = document.getElementById("myAttendanceTableBody");
@@ -337,7 +338,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // =========================
-    // ATTENDANCE CALENDAR
+    // ATTENDANCE CALENDAR View data
     // =========================
     function loadAttendanceCalendar() {
         const container = document.getElementById("attendanceCalendar");
@@ -365,7 +366,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // =========================
-    // MY LEAVES
+    // MY LEAVES History
     // =========================
     function loadMyLeaves() {
         const tbody = document.getElementById("myLeavesTableBody");
@@ -395,7 +396,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // =========================
-    // APPLY LEAVE
+    // Apply leave type
     // =========================
     let ccSelectedList = [];
 
@@ -443,6 +444,10 @@ document.addEventListener("DOMContentLoaded", function () {
         ccSelectedList = [];
         renderCcChips();
     }
+
+    // =====================================
+    //      Apply leave from date-month
+    // ======================================
 
     function calculateLeaveDays() {
         const fromVal = document.getElementById("leaveFromDate").value;
@@ -508,6 +513,10 @@ document.addEventListener("DOMContentLoaded", function () {
         ccSelect.value = "";
     });
 
+    // =====================================================
+    //     Adds a CC To option in the Apply Leave form.
+    // =====================================================
+
     function renderCcChips() {
         const container = document.getElementById("ccChipsList");
 
@@ -564,9 +573,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    // =========================
-    // LEAVE BALANCE
-    // =========================
+    // =============================
+    //      Leave Balance Cards
+    // =============================
     function loadLeaveBalance() {
         const container = document.getElementById("leaveBalanceCards");
         container.innerHTML = `<p class="text-muted">Loading...</p>`;
@@ -585,9 +594,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // =========================
-    // MY PAYROLL
-    // =========================
+    // ===========================
+    //      Payroll Overview 
+    // ===========================
     let myPayrollData = [];
 
     function loadPayroll() {
@@ -667,6 +676,10 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    // ==============================================================
+    //      Opens the payslip modal for the selected record.
+    // ==============================================================
+
     function openPayrollSlipModal(p) {
         document.getElementById("payrollSlipModalTitle").textContent =
             `Payslip — ${p.month}`;
@@ -688,7 +701,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // =========================
-    // PAYSLIPS
+    //      Payslip List
     // =========================
     function loadPayslips() {
         const tbody = document.getElementById("payslipsTableBody");
@@ -735,6 +748,10 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
+    // ===================================================
+    //      Displays correction statistics in cards.
+    // ====================================================
+
     function renderCorrectionStats(rows) {
         const counts = { PENDING: 0, APPROVED: 0, REJECTED: 0 };
 
@@ -750,6 +767,10 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("corrStatRejected").textContent = counts.REJECTED;
         document.getElementById("corrStatTotal").textContent = rows.length;
     }
+
+    // ================================================
+    //      Shows attendance correction requests.
+    // ================================================
 
     function loadCorrections() {
         const tbody = document.getElementById("correctionsTableBody");
@@ -798,6 +819,10 @@ document.addEventListener("DOMContentLoaded", function () {
             showView("profile");
         });
     }
+
+    // ==========================================
+    //      Loads the employee profile section.
+    // ==========================================
 
     function loadProfile() {
         const card = document.getElementById("profileCard");
@@ -1046,9 +1071,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // =========================
-    // VIEW / UPLOAD PROFILE PHOTO
-    // =========================
+    // =======================================
+    //     View Phote Model in profile
+    // =======================================
 
     function openViewPhotoModal(imageUrl, initialsText) {
         const img = document.getElementById("viewPhotoImage");
@@ -1067,6 +1092,10 @@ document.addEventListener("DOMContentLoaded", function () {
         const modal = new bootstrap.Modal(document.getElementById("viewPhotoModal"));
         modal.show();
     }
+
+    // =========================================
+    //      Uploade Phote Model
+    // =========================================
 
     let selectedPhotoFile = null;
 
@@ -1136,7 +1165,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 uploadProfilePhoto(selectedPhotoFile).then(function () {
                     overriddenProfileImage = localPreviewUrl;
-                    resetProfilePhotoCache();
 
                     const modal = bootstrap.Modal.getInstance(document.getElementById("uploadPhotoModal"));
                     if (modal) modal.hide();
@@ -1165,9 +1193,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // =========================
-    // PROFILE OVERVIEW (all sections, one page)
-    // =========================
+    // =================================================================
+    //      Loads and displays the employee profile overview.
+    // =================================================================
 
     function loadProfileOverview() {
         const grid = document.getElementById("profileOverviewGrid");
@@ -1339,7 +1367,6 @@ document.addEventListener("DOMContentLoaded", function () {
     // =========================
     // RESET PASSWORD (from Profile)
     // RESET PASSWORD — SUBMIT (modal se)
-    // Toggle-button ka listener loadProfile() ke andar hai
     // =========================
     const resetPasswordForm =
         document.getElementById("resetPasswordForm");
@@ -1409,9 +1436,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // =========================
-    // LIVE PASSWORD MATCH CHECK
-    // =========================
+    // ==============================================================
+    //      Validates the password confirmation in real time.
+    // ==============================================================
 
     function checkPasswordMatchLive() {
         const newPasswordField = document.getElementById("newPasswordField");
@@ -1481,6 +1508,10 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         });
     }
+
+    // =======================================================================
+    //      Updates the sidebar avatar after the profile photo changes.
+    // =======================================================================
     function refreshSidebarProfileImage() {
         const sidebarImage = document.getElementById("sidebarProfileImage");
         const sidebarInitials = document.getElementById("sidebarInitials");
@@ -1495,9 +1526,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // =========================
-    // JOINING DETAILS
-    // =========================
+    // =====================================================
+    //      Opens the employee joining details modal.
+    // =====================================================
 
     let currentJoiningDetails = null;
 
@@ -1574,9 +1605,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // =========================
-    // WORK POSITION (view-only)
-    // =========================
+    // ===============================================
+    //      View work position only section
+    // ===============================================
 
     function loadWorkPosition() {
         const card = document.getElementById("workPositionCard");
@@ -1605,9 +1636,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // =========================
-    // EXIT DETAILS (view-only)
-    // =========================
+    // ===========================================
+    //      Exit details View only Section
+    // ===========================================
 
     function loadExitDetails() {
         const card = document.getElementById("exitDetailsCard");
@@ -1632,9 +1663,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // =========================
-    // NOMINATION INFORMATION
-    // =========================
+    // ==================================================================================================
+    //      Renders the nomination table and opens the nomination modal for a selected record.
+    // ==================================================================================================
 
     let nominationData = [];
 
@@ -1764,9 +1795,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // =========================
-    // SKILLS
-    // =========================
+    // =================================================================
+    //      Displays skills as chips and saves the updated skills.
+    // =================================================================
 
     let skillsList = [];
 
@@ -1830,9 +1861,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // =========================
-    // PERSONAL INFORMATION
-    // =========================
+    // =====================================================
+    //      Opens the personal information modal.
+    // =====================================================
 
     let currentPersonalInfo = null;
 
@@ -2117,9 +2148,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // =========================
-    // EDUCATION INFORMATION
-    // =========================
+    // ==========================================================================
+    //      Displays education details and opens the education modal.
+    // ==========================================================================
 
     let educationData = [];
     function loadEducationInformation() {
@@ -2279,9 +2310,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // =========================
-    // EXPERIENCE INFORMATION
-    // =========================
+    // ===================================================================================
+    //      Displays work experience and opens the experience modal.
+    // ===================================================================================
 
     let experienceData = [];
 
@@ -2429,9 +2460,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // =========================
-    // FAMILY INFORMATION
-    // =========================
+    // ========================================================
+    //      Displays the employee family details.
+    // ========================================================
 
     let familyMembersData = [];
 
@@ -2564,9 +2595,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // =========================
-    // SESSION MANAGEMENT
-    // =========================
+    // =============================================================================
+    //      Identifies device and browser details from the user agent.
+    // =============================================================================
 
     function parseDeviceInfo(ua) {
         if (!ua) return "Unknown device";
@@ -2601,6 +2632,10 @@ document.addEventListener("DOMContentLoaded", function () {
         return `${browser} on ${os}${isMobile ? " (Mobile)" : ""}`;
     }
 
+    // ==============================================
+    //      Formats session dates for display
+    // ==============================================
+
     function formatSessionDate(isoString) {
         if (!isoString) return "--";
 
@@ -2613,6 +2648,10 @@ document.addEventListener("DOMContentLoaded", function () {
             minute: "2-digit"
         });
     }
+
+    // ===================================================
+    //      Loads and displays the active session list
+    // ===================================================
 
     function loadSessions() {
         const body = document.getElementById("sessionsModalBody");
