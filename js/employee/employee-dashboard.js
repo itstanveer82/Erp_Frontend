@@ -7,16 +7,61 @@ document.addEventListener("DOMContentLoaded", function () {
         window.location.href = "../auth/login.html";
         return;
     }
+
+
+
+    // ===============================================================================================
+    //   FEATURED RECORD HELPER (per section)
+    //   Backend me "featured" field nahi hai, isliye localStorage
+    //   me client-side store kar rahe hain. Ek section me sirf
+    //   ek hi record featured ho sakta hai — Profile Overview
+    //   card isi record ko summary me dikhata hai.
+    // ===============================================================================================
+    const FEATURED_STORAGE_PREFIX = "erp_featured_";
+
+    function getFeaturedId(sectionKey) {
+        return localStorage.getItem(FEATURED_STORAGE_PREFIX + sectionKey);
+    }
+
+    function setFeaturedId(sectionKey, id) {
+        if (id === null || id === undefined) {
+            localStorage.removeItem(FEATURED_STORAGE_PREFIX + sectionKey);
+        } else {
+            localStorage.setItem(FEATURED_STORAGE_PREFIX + sectionKey, String(id));
+        }
+    }
+
+    function isFeatured(sectionKey, id) {
+        return String(getFeaturedId(sectionKey)) === String(id);
+    }
+
+    // Overview card ke liye: featured record milta hai, warna list ka pehla record
+    function getDisplayRecord(sectionKey, list) {
+        const featuredId = getFeaturedId(sectionKey);
+        if (featuredId) {
+            const found = list.find(function (item) {
+                return String(item.id) === String(featuredId);
+            });
+            if (found) return found;
+        }
+        return list.length ? list[0] : null;
+    }
+
+
+
+
     // =========================
     // NAVBAR / SIDEBAR USER INFO
     // (demo profile se bharenge; real backend aane par
     //  authData.user se bhi le sakte ho, admin-dashboard.js jaisa)
     // =========================
-    const userNameEl = document.getElementById("userName");
-    const userRoleEl = document.getElementById("userRole");
-    const sidebarUserNameEl = document.getElementById("sidebarUserName");
-    const sidebarUserEmailEl = document.getElementById("sidebarUserEmail");
-    const dashboardWelcomeEl = document.getElementById("dashboardWelcome");
+    // const userNameEl = document.getElementById("userName");
+    // const userRoleEl = document.getElementById("userRole");
+    // const sidebarUserNameEl = document.getElementById("sidebarUserName");
+    // const sidebarUserEmailEl = document.getElementById("sidebarUserEmail");
+    // const dashboardWelcomeEl = document.getElementById("dashboardWelcome");
+
+
     const userInitialsEl = document.getElementById("userInitials");
     const leavePolicyToggle = document.getElementById("leavePolicyToggle");
     const leavePolicyDropdown = document.querySelector(".leave-policy-dropdown");
@@ -68,6 +113,7 @@ document.addEventListener("DOMContentLoaded", function () {
         "skills": loadSkills,
 
         "family-information": loadFamilyInformation,
+        "bank-information": loadBankInformation,
         "my-attendance": loadMyAttendance,
         "attendance-calendar": loadAttendanceCalendar,
         "my-leaves": loadMyLeaves,
@@ -154,7 +200,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // ======================================
-                // Employee Profile show
+    //         Employee Profile show
     // ======================================
 
     function loadHeaderEmployeeProfile() {
@@ -218,9 +264,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    // =========================
-    // DASHBOARD OVERVIEW
-    // =========================
+    // =============================
+    //      DASHBOARD OVERVIEW
+    // =============================
 
     function loadDashboardSummary() {
         fetchCurrentUserProfile().then(function (res) {
@@ -254,8 +300,6 @@ document.addEventListener("DOMContentLoaded", function () {
             const el = document.getElementById(elementId);
             if (el) {
                 el.textContent = text;
-            } else {
-                console.warn(`Element #${elementId} not found — skipping textContent update.`);
             }
         }
 
@@ -269,7 +313,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // =========================
-    // MY ATTENDANCE
+    //      MY ATTENDANCE
     // =========================
     let myAttendanceData = [];
 
@@ -284,9 +328,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // ================================
+    // ====================================
     //         Attendance Stat Cards
-    // ================================
+    // ====================================
     function renderAttendanceStats(rows) {
         const counts = { PRESENT: 0, LATE: 0, ABSENT: 0, LEAVE: 0 };
 
@@ -337,9 +381,9 @@ document.addEventListener("DOMContentLoaded", function () {
         renderAttendanceTable(filtered);
     });
 
-    // =========================
-    // ATTENDANCE CALENDAR View data
-    // =========================
+    // ===============================================
+    //      ATTENDANCE CALENDAR View data
+    // ===============================================
     function loadAttendanceCalendar() {
         const container = document.getElementById("attendanceCalendar");
         container.innerHTML = `<p class="text-muted">Loading calendar...</p>`;
@@ -365,9 +409,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // =========================
-    // MY LEAVES History
-    // =========================
+    // ===================================
+    //      MY LEAVES History
+    // ===================================
     function loadMyLeaves() {
         const tbody = document.getElementById("myLeavesTableBody");
         tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4">Loading...</td></tr>`;
@@ -395,9 +439,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // =========================
-    // Apply leave type
-    // =========================
+    // =================================
+    //      Apply leave type
+    // =================================
     let ccSelectedList = [];
 
     function loadApplyLeaveForm() {
@@ -445,7 +489,7 @@ document.addEventListener("DOMContentLoaded", function () {
         renderCcChips();
     }
 
-    // =====================================
+    // ======================================
     //      Apply leave from date-month
     // ======================================
 
@@ -486,9 +530,9 @@ document.addEventListener("DOMContentLoaded", function () {
             balanceField.value = match ? `${match.remainingDays} / ${match.totalDays} days` : "N/A";
         });
     });
-    //=============================
-    // CC To — add / remove chips
-    //=============================
+    //============================================
+    //      CC To — add / remove chips
+    //============================================
     document.getElementById("addCcButton").addEventListener("click", function () {
         const ccSelect = document.getElementById("ccSelect");
 
@@ -513,9 +557,9 @@ document.addEventListener("DOMContentLoaded", function () {
         ccSelect.value = "";
     });
 
-    // =====================================================
+    // =======================================================
     //     Adds a CC To option in the Apply Leave form.
-    // =====================================================
+    // =======================================================
 
     function renderCcChips() {
         const container = document.getElementById("ccChipsList");
@@ -573,9 +617,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    // =============================
+    // ===============================
     //      Leave Balance Cards
-    // =============================
+    // ===============================
     function loadLeaveBalance() {
         const container = document.getElementById("leaveBalanceCards");
         container.innerHTML = `<p class="text-muted">Loading...</p>`;
@@ -594,9 +638,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // ===========================
+    // =============================
     //      Payroll Overview 
-    // ===========================
+    // =============================
     let myPayrollData = [];
 
     function loadPayroll() {
@@ -635,7 +679,6 @@ document.addEventListener("DOMContentLoaded", function () {
                         </button>
                     </td>
                 </tr>
-
             `;
             }).join("");
 
@@ -708,9 +751,9 @@ document.addEventListener("DOMContentLoaded", function () {
         tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4">Loading...</td></tr>`;
     }
 
-    // =========================
-    // ATTENDANCE CORRECTIONS
-    // =========================
+    // ======================================
+    //      ATTENDANCE CORRECTIONS
+    // ======================================
     const newCorrectionButton = document.getElementById("newCorrectionButton");
     const correctionForm = document.getElementById("correctionForm");
     const correctionFormMessage = document.getElementById("correctionFormMessage");
@@ -748,7 +791,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    // ===================================================
+    // ====================================================
     //      Displays correction statistics in cards.
     // ====================================================
 
@@ -809,7 +852,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // =========================
-    // PROFILE
+    //      PROFILE
     // =========================
     const profileViewButton =
         document.getElementById("profileViewButton");
@@ -820,9 +863,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // ==========================================
-    //      Loads the employee profile section.
-    // ==========================================
+    // ==============================================================================================
+    //               Loads the employee profile section.
+    // ==============================================================================================
 
     function loadProfile() {
         const card = document.getElementById("profileCard");
@@ -1071,9 +1114,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // =======================================
-    //     View Phote Model in profile
-    // =======================================
+    // ============================================================================================
+    //             View Phote Model in profile
+    // ============================================================================================
 
     function openViewPhotoModal(imageUrl, initialsText) {
         const img = document.getElementById("viewPhotoImage");
@@ -1093,9 +1136,9 @@ document.addEventListener("DOMContentLoaded", function () {
         modal.show();
     }
 
-    // =========================================
-    //      Uploade Phote Model
-    // =========================================
+    // =========================================================================================
+    //           Uploade Phote Model
+    // =========================================================================================
 
     let selectedPhotoFile = null;
 
@@ -1193,9 +1236,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // =================================================================
-    //      Loads and displays the employee profile overview.
-    // =================================================================
+    // =========================================================================================
+    //              Loads and displays the employee profile overview.
+    // =========================================================================================
 
     function loadProfileOverview() {
         const grid = document.getElementById("profileOverviewGrid");
@@ -1204,14 +1247,15 @@ document.addEventListener("DOMContentLoaded", function () {
         Promise.all([
             demoGetPersonalInformation(),
             fetchMyEmergencyContacts(),
-            demoGetFamilyMembers(),
-            demoGetEducation(),
-            demoGetExperience(),
+            fetchMyFamilyMembers(),
+            fetchMyEducationDetails(),
+            fetchMyExperienceDetails(),
             demoGetJoiningDetails(),
             demoGetWorkPosition(),
             demoGetExitDetails(),
-            demoGetNominations(),
-            demoGetSkills()
+            fetchMyNominees(),
+            fetchMySkills(),
+            fetchMyBankInformation()
         ]).then(function (results) {
 
             currentPersonalInfo = results[0].data;
@@ -1224,6 +1268,13 @@ document.addEventListener("DOMContentLoaded", function () {
             const exitDetails = results[7].data;
             const nominations = results[8].data;
             const skills = results[9].data;
+            const bankInfo = results[10].data;
+
+            const featuredEmergency = getDisplayRecord("emergency", emergencyContacts);
+            const featuredFamily = getDisplayRecord("family", familyMembers);
+            const featuredEducation = getDisplayRecord("education", education);
+            const featuredExperience = getDisplayRecord("experience", experience);
+            const featuredNomination = getDisplayRecord("nomination", nominations); 
 
             grid.innerHTML = `
 
@@ -1240,52 +1291,93 @@ document.addEventListener("DOMContentLoaded", function () {
                     </div>
                 </div>
 
-                <div class="overview-card">
+               <div class="overview-card">
                     <div class="overview-card-header">
                         <h5>Emergency Information</h5>
                         <button type="button" class="overview-nav-btn" data-goto-view="emergency-information" title="Manage">›</button>
                     </div>
                     <div class="overview-card-body">
-                        <p class="overview-summary-text">${emergencyContacts.length} contact(s) added${emergencyContacts.length ? " — " + escapeHtml(emergencyContacts[0].name) : ""}</p>
+                        ${featuredEmergency
+                    ? `<div class="overview-kv-grid">
+                                <div class="overview-kv"><span>Name</span><strong>${escapeHtml(featuredEmergency.name)}</strong></div>
+                                <div class="overview-kv"><span>Relationship</span><strong>${escapeHtml(featuredEmergency.relationship)}</strong></div>
+                                <div class="overview-kv"><span>Phone</span><strong>${escapeHtml(featuredEmergency.phone) || "--"}</strong></div>
+                                <div class="overview-kv"><span>Email</span><strong>${escapeHtml(featuredEmergency.email) || "--"}</strong></div>
+                            </div>`
+                    : `<p class="overview-summary-text text-muted">${emergencyContacts.length} contact(s) added.</p>`
+                }
                     </div>
                 </div>
 
-                <div class="overview-card">
+              <div class="overview-card">
                     <div class="overview-card-header">
                         <h5>Bank Information</h5>
+                        <button type="button" class="overview-nav-btn" data-goto-view="bank-information" title="Manage">›</button>
                     </div>
                     <div class="overview-card-body">
-                        <p class="overview-summary-text text-muted">Coming soon.</p>
+                        ${bankInfo && bankInfo.bankName
+                    ? `<div class="overview-kv-grid">
+                                <div class="overview-kv"><span>Holder Name</span><strong>${escapeHtml(bankInfo.accountHolderName) || "--"}</strong></div>
+                                <div class="overview-kv"><span>Bank Name</span><strong>${escapeHtml(bankInfo.bankName) || "--"}</strong></div>
+                                <div class="overview-kv"><span>Account No.</span><strong>XXXX XXXX ${escapeHtml((bankInfo.accountNumber || "").slice(-4))}</strong></div>
+                                <div class="overview-kv"><span>IFSC Code</span><strong>${escapeHtml(bankInfo.ifscCode) || "--"}</strong></div>
+                            </div>`
+                    : `<p class="overview-summary-text text-muted">Not added yet.</p>`
+                }
                     </div>
                 </div>
 
-                <div class="overview-card">
+               <div class="overview-card">
                     <div class="overview-card-header">
                         <h5>Family Information</h5>
                         <button type="button" class="overview-nav-btn" data-goto-view="family-information" title="Manage">›</button>
                     </div>
                     <div class="overview-card-body">
-                        <p class="overview-summary-text">${familyMembers.length} member(s) added${familyMembers.length ? " — " + escapeHtml(familyMembers[0].name) : ""}</p>
+                        ${featuredFamily
+                    ? `<div class="overview-kv-grid">
+                                <div class="overview-kv"><span>Name</span><strong>${escapeHtml(featuredFamily.name)}</strong></div>
+                                <div class="overview-kv"><span>Relationship</span><strong>${escapeHtml(featuredFamily.relationship)}</strong></div>
+                                <div class="overview-kv"><span>Date of Birth</span><strong>${escapeHtml(featuredFamily.dateOfBirth) || "--"}</strong></div>
+                                <div class="overview-kv"><span>Dependent</span><strong>${featuredFamily.dependent ? "Yes" : "No"}</strong></div>
+                            </div>`
+                    : `<p class="overview-summary-text text-muted">${familyMembers.length} member(s) added.</p>`
+                }
                     </div>
                 </div>
 
-                <div class="overview-card">
+              <div class="overview-card">
                     <div class="overview-card-header">
                         <h5>Education Information</h5>
                         <button type="button" class="overview-nav-btn" data-goto-view="education-information" title="Manage">›</button>
                     </div>
                     <div class="overview-card-body">
-                        <p class="overview-summary-text">${education.length} record(s)${education.length ? " — " + escapeHtml(education[0].qualification) : ""}</p>
+                        ${featuredEducation
+                    ? `<div class="overview-kv-grid">
+                                <div class="overview-kv"><span>Degree</span><strong>${escapeHtml(featuredEducation.degree)}</strong></div>
+                                <div class="overview-kv"><span>Institution</span><strong>${escapeHtml(featuredEducation.institution)}</strong></div>
+                                <div class="overview-kv"><span>Year Of Passing</span><strong>${featuredEducation.yearOfPassing || "--"}</strong></div>
+                                <div class="overview-kv"><span>Percentage/Grade</span><strong>${escapeHtml(featuredEducation.percentageOrGrade) || "--"}</strong></div>
+                            </div>`
+                    : `<p class="overview-summary-text text-muted">${education.length} record(s) added.</p>`
+                }
                     </div>
                 </div>
 
-                <div class="overview-card">
+              <div class="overview-card">
                     <div class="overview-card-header">
                         <h5>Experience Information</h5>
                         <button type="button" class="overview-nav-btn" data-goto-view="experience-information" title="Manage">›</button>
                     </div>
                     <div class="overview-card-body">
-                        <p class="overview-summary-text">${experience.length} record(s)${experience.length ? " — " + escapeHtml(experience[0].organization) : ""}</p>
+                        ${featuredExperience
+                    ? `<div class="overview-kv-grid">
+                                <div class="overview-kv"><span>Company</span><strong>${escapeHtml(featuredExperience.companyName)}</strong></div>
+                                <div class="overview-kv"><span>Designation</span><strong>${escapeHtml(featuredExperience.designation) || "--"}</strong></div>
+                                <div class="overview-kv"><span>From</span><strong>${escapeHtml(featuredExperience.fromDate)}</strong></div>
+                                <div class="overview-kv"><span>Status</span><strong>${featuredExperience.current ? "Current" : "Past"}</strong></div>
+                            </div>`
+                    : `<p class="overview-summary-text text-muted">${experience.length} record(s) added.</p>`
+                }
                     </div>
                 </div>
 
@@ -1320,24 +1412,32 @@ document.addEventListener("DOMContentLoaded", function () {
                     </div>
                 </div>
 
-                <div class="overview-card">
+               <div class="overview-card">
                     <div class="overview-card-header">
                         <h5>Nomination Information</h5>
                         <button type="button" class="overview-nav-btn" data-goto-view="nomination-information" title="Manage">›</button>
                     </div>
                     <div class="overview-card-body">
-                        <p class="overview-summary-text">${nominations.length} nomination(s) added</p>
+                        ${featuredNomination
+                            ? `<div class="overview-kv-grid">
+                                <div class="overview-kv"><span>Name</span><strong>${escapeHtml(featuredNomination.name)}</strong></div>
+                                <div class="overview-kv"><span>Relationship</span><strong>${escapeHtml(featuredNomination.relationship)}</strong></div>
+                                <div class="overview-kv"><span>Share %</span><strong>${featuredNomination.sharePercentage}%</strong></div>
+                                <div class="overview-kv"><span>Minor</span><strong>${featuredNomination.minor ? "Yes" : "No"}</strong></div>
+                            </div>`
+                            : `<p class="overview-summary-text text-muted">${nominations.length} nomination(s) added.</p>`
+                        }
                     </div>
                 </div>
 
-                <div class="overview-card">
+              <div class="overview-card">
                     <div class="overview-card-header">
                         <h5>Skills</h5>
                         <button type="button" class="overview-nav-btn" data-goto-view="skills" title="Manage">›</button>
                     </div>
                     <div class="overview-card-body">
                         ${skills.length
-                    ? `<div class="cc-chips">${skills.map(function (s) { return `<span class="cc-chip">${escapeHtml(s)}</span>`; }).join("")}</div>`
+                    ? `<div class="cc-chips">${skills.map(function (s) { return `<span class="cc-chip">${escapeHtml(s.skillName)}</span>`; }).join("")}</div>`
                     : `<p class="overview-summary-text text-muted">No skills added yet.</p>`
                 }
                     </div>
@@ -1364,10 +1464,10 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // =========================
-    // RESET PASSWORD (from Profile)
-    // RESET PASSWORD — SUBMIT (modal se)
-    // =========================
+    // ============================================================================================
+    //              RESET PASSWORD (from Profile)
+    //              RESET PASSWORD — SUBMIT (modal se)
+    // ============================================================================================
     const resetPasswordForm =
         document.getElementById("resetPasswordForm");
 
@@ -1396,14 +1496,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-            // apiRequest("/api/auth/change-password", {
-            //     method: "POST",
-            //     body: JSON.stringify({
-            //         oldPassword: currentPassword,
-            //         newPassword: newPassword
-            //     })
-
-            // }).then(function (res) {
             changeEmployeePassword(currentPassword, newPassword).then(function (res) {
 
                 const modalEl = document.getElementById("resetPasswordModal");
@@ -1436,9 +1528,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // ==============================================================
-    //      Validates the password confirmation in real time.
-    // ==============================================================
+    // ==========================================================================================
+    //              Validates the password confirmation in real time.
+    // ==========================================================================================
 
     function checkPasswordMatchLive() {
         const newPasswordField = document.getElementById("newPasswordField");
@@ -1473,14 +1565,14 @@ document.addEventListener("DOMContentLoaded", function () {
         confirmPasswordFieldForLiveCheck.addEventListener("input", checkPasswordMatchLive);
     }
 
-    // =========================
-    // INITIAL VIEW
-    // =========================
+    // ============================================================================================
+    //                  INITIAL VIEW
+    // ============================================================================================
     showView("dashboard");
 
-    // ==============================
-    // Mobile View Responsive 
-    // ==============================
+    // ============================================================================================
+    //                  Mobile View Responsive 
+    // ============================================================================================
     const mobileMenuBtn = document.getElementById("mobileMenuBtn");
     const dashboardSidebarEl = document.getElementById("dashboardSidebar");
 
@@ -1509,9 +1601,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // =======================================================================
-    //      Updates the sidebar avatar after the profile photo changes.
-    // =======================================================================
+    // ===========================================================================================
+    //           Updates the sidebar avatar after the profile photo changes.
+    // ===========================================================================================
     function refreshSidebarProfileImage() {
         const sidebarImage = document.getElementById("sidebarProfileImage");
         const sidebarInitials = document.getElementById("sidebarInitials");
@@ -1526,9 +1618,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // =====================================================
-    //      Opens the employee joining details modal.
-    // =====================================================
+    // ============================================================================================
+    //              Opens the employee joining details modal.
+    // ============================================================================================
 
     let currentJoiningDetails = null;
 
@@ -1558,9 +1650,9 @@ document.addEventListener("DOMContentLoaded", function () {
             `;
         });
     }
-    // =====================
-    // Open Joining Model
-    // =====================
+    // ==========================================================================================
+    //                  Open Joining Model
+    // ==========================================================================================
 
     function openJoiningDetailsModal() {
         if (!currentJoiningDetails) return;
@@ -1605,9 +1697,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // ===============================================
-    //      View work position only section
-    // ===============================================
+    // =============================================================================================
+    //                  View work position only section
+    // =============================================================================================
 
     function loadWorkPosition() {
         const card = document.getElementById("workPositionCard");
@@ -1636,9 +1728,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // ===========================================
-    //      Exit details View only Section
-    // ===========================================
+    // ============================================================================================
+    //               Exit details View only Section
+    // ============================================================================================
 
     function loadExitDetails() {
         const card = document.getElementById("exitDetailsCard");
@@ -1671,34 +1763,37 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function loadNominationInformation() {
         const tbody = document.getElementById("nominationTableBody");
-        tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4">Loading...</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4">Loading...</td></tr>`;
 
-        demoGetNominations().then(function (res) {
+        fetchMyNominees().then(function (res) {
             nominationData = res.data;
             renderNominationTable();
+        }).catch(function (error) {
+            tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-danger">${escapeHtml(error.message || "Failed to load nominations.")}</td></tr>`;
         });
     }
-
     function renderNominationTable() {
         const tbody = document.getElementById("nominationTableBody");
 
         if (nominationData.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-muted">No nominations added yet.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted">No nominations added yet.</td></tr>`;
             return;
         }
 
         tbody.innerHTML = nominationData.map(function (n) {
             return `
-                <tr>
-                    <td>${escapeHtml(n.nominationFor)}</td>
-                    <td>${escapeHtml(n.familyMember)}</td>
-                    <td>${n.percentage}%</td>
-                    <td>
-                        <button type="button" class="btn btn-sm btn-outline-primary" data-edit-nomination="${n.id}">Edit</button>
-                        <button type="button" class="btn btn-sm btn-outline-danger" data-delete-nomination="${n.id}">Delete</button>
-                    </td>
-                </tr>
-            `;
+            <tr>
+                <td>${escapeHtml(n.name)}</td>
+                <td>${escapeHtml(n.relationship)}</td>
+                <td>${escapeHtml(n.dateOfBirth) || "--"}</td>
+                <td>${n.sharePercentage}%</td>
+                <td>${n.minor ? "Yes" : "No"}</td>
+                <td>
+                    <button type="button" class="btn btn-sm btn-outline-primary" data-edit-nomination="${n.id}">Edit</button>
+                    <button type="button" class="btn btn-sm btn-outline-danger" data-delete-nomination="${n.id}">Delete</button>
+                </td>
+            </tr>
+        `;
         }).join("");
 
         tbody.querySelectorAll("[data-edit-nomination]").forEach(function (btn) {
@@ -1719,11 +1814,18 @@ document.addEventListener("DOMContentLoaded", function () {
                     confirmButtonColor: "#b3261e"
                 }).then(function (result) {
                     if (result.isConfirmed) {
-                        demoDeleteNomination(id).then(function () {
+                        deleteMyNominee(id).then(function () {
                             nominationData = nominationData.filter(function (n) {
                                 return String(n.id) !== String(id);
                             });
                             renderNominationTable();
+                        }).catch(function (error) {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Could not remove nomination",
+                                text: error.message,
+                                confirmButtonColor: "#17a2b8"
+                            });
                         });
                     }
                 });
@@ -1742,19 +1844,22 @@ document.addEventListener("DOMContentLoaded", function () {
 
             modalTitle.textContent = "Edit Nomination";
             document.getElementById("nominationId").value = record.id;
-            document.getElementById("nominationFor").value = record.nominationFor;
-            document.getElementById("nominationFamilyMember").value = record.familyMember;
-            document.getElementById("nominationPercentage").value = record.percentage;
+            document.getElementById("nominationName").value = record.name;
+            document.getElementById("nominationRelationship").value = record.relationship;
+            document.getElementById("nominationDob").value = record.dateOfBirth || "";
+            document.getElementById("nominationPercentage").value = record.sharePercentage;
+            document.getElementById("nominationMinor").checked = !!record.minor;
+            document.getElementById("nominationFeatured").checked = isFeatured("nomination", record.id);
         } else {
             modalTitle.textContent = "Add Nomination";
             document.getElementById("nominationForm").reset();
             document.getElementById("nominationId").value = "";
+            document.getElementById("nominationFeatured").checked = false;
         }
 
         const modal = new bootstrap.Modal(document.getElementById("nominationModal"));
         modal.show();
     }
-
     const addNominationButton = document.getElementById("addNominationButton");
     if (addNominationButton) {
         addNominationButton.addEventListener("click", function () {
@@ -1768,46 +1873,63 @@ document.addEventListener("DOMContentLoaded", function () {
             e.preventDefault();
 
             const id = document.getElementById("nominationId").value;
+            const messageBox = document.getElementById("nominationFormMessage");
+            messageBox.innerHTML = "";
+
+            const wantsFeatured = document.getElementById("nominationFeatured").checked;
 
             const payload = {
-                nominationFor: document.getElementById("nominationFor").value,
-                familyMember: document.getElementById("nominationFamilyMember").value.trim(),
-                percentage: Number(document.getElementById("nominationPercentage").value)
+                name: document.getElementById("nominationName").value.trim(),
+                relationship: document.getElementById("nominationRelationship").value.trim(),
+                dateOfBirth: document.getElementById("nominationDob").value || null,
+                sharePercentage: Number(document.getElementById("nominationPercentage").value),
+                minor: document.getElementById("nominationMinor").checked
             };
 
             const apiCall = id
-                ? demoUpdateNomination(id, payload)
-                : demoAddNomination(payload);
+                ? updateMyNominee(id, payload)
+                : addMyNominee(payload);
 
             apiCall.then(function (res) {
                 const modal = bootstrap.Modal.getInstance(document.getElementById("nominationModal"));
                 if (modal) modal.hide();
 
+                const savedId = id || (res.data && res.data.id);
+
+                if (wantsFeatured && savedId) {
+                    setFeaturedId("nomination", savedId);
+                } else if (!wantsFeatured && isFeatured("nomination", savedId)) {
+                    setFeaturedId("nomination", null);
+                }
+
                 Swal.fire({
                     icon: "success",
-                    title: res.data.message,
+                    title: res.message || "Nomination saved.",
                     confirmButtonColor: "#17a2b8"
                 });
 
                 loadNominationInformation();
+            }).catch(function (error) {
+                messageBox.innerHTML = `<div class="custom-alert error">${escapeHtml(error.message || "Something went wrong.")}</div>`;
             });
         });
     }
 
 
-    // =================================================================
-    //      Displays skills as chips and saves the updated skills.
-    // =================================================================
-
+    // ============================================================================================
+    //               Displays skills as chips and saves the updated skills.
+    // ============================================================================================
     let skillsList = [];
 
     function loadSkills() {
         const container = document.getElementById("skillsChipsList");
         container.innerHTML = `<p class="text-muted">Loading...</p>`;
 
-        demoGetSkills().then(function (res) {
+        fetchMySkills().then(function (res) {
             skillsList = res.data;
             renderSkillsChips();
+        }).catch(function (error) {
+            container.innerHTML = `<p class="text-danger">${escapeHtml(error.message || "Failed to load skills.")}</p>`;
         });
     }
 
@@ -1819,51 +1941,70 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        container.innerHTML = skillsList.map(function (skill, index) {
+        container.innerHTML = skillsList.map(function (skill) {
+            const certifiedTag = skill.certified ? " ✔" : "";
             return `
-                <span class="cc-chip">
-                    ${escapeHtml(skill)}
-                    <button type="button" data-remove-skill="${index}">&times;</button>
-                </span>
-            `;
+            <span class="cc-chip">
+                ${escapeHtml(skill.skillName)} — ${escapeHtml(skill.proficiency)}${certifiedTag}
+                <button type="button" data-remove-skill="${skill.id}">&times;</button>
+            </span>
+        `;
         }).join("");
 
         container.querySelectorAll("[data-remove-skill]").forEach(function (btn) {
             btn.addEventListener("click", function () {
-                const index = Number(this.dataset.removeSkill);
-                skillsList.splice(index, 1);
-                renderSkillsChips();
-                saveSkills();
+                const id = this.dataset.removeSkill;
+
+                deleteMySkill(id).then(function () {
+                    skillsList = skillsList.filter(function (s) {
+                        return String(s.id) !== String(id);
+                    });
+                    renderSkillsChips();
+                }).catch(function (error) {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Could not remove skill",
+                        text: error.message,
+                        confirmButtonColor: "#17a2b8"
+                    });
+                });
             });
         });
-    }
-
-    function saveSkills() {
-        demoUpdateSkills(skillsList);
     }
 
     const addSkillButton = document.getElementById("addSkillButton");
     if (addSkillButton) {
         addSkillButton.addEventListener("click", function () {
-            const input = document.getElementById("newSkillInput");
-            const value = input.value.trim();
+            const nameInput = document.getElementById("newSkillInput");
+            const proficiencySelect = document.getElementById("newSkillProficiency");
+            const certifiedCheckbox = document.getElementById("newSkillCertified");
+            const messageBox = document.getElementById("skillsMessage");
 
-            if (!value) return;
+            const skillName = nameInput.value.trim();
+            messageBox.innerHTML = "";
 
-            if (!skillsList.includes(value)) {
-                skillsList.push(value);
-                renderSkillsChips();
-                saveSkills();
-            }
+            if (!skillName) return;
 
-            input.value = "";
+            const payload = {
+                skillName: skillName,
+                proficiency: proficiencySelect.value,
+                certified: certifiedCheckbox.checked
+            };
+
+            addMySkill(payload).then(function () {
+                nameInput.value = "";
+                certifiedCheckbox.checked = false;
+                loadSkills();
+            }).catch(function (error) {
+                messageBox.innerHTML = `<div class="custom-alert error">${escapeHtml(error.message || "Failed to add skill.")}</div>`;
+            });
         });
     }
 
 
-    // =====================================================
-    //      Opens the personal information modal.
-    // =====================================================
+    // =============================================================================================
+    //               Opens the personal information modal.
+    // =============================================================================================
 
     let currentPersonalInfo = null;
 
@@ -1917,9 +2058,9 @@ document.addEventListener("DOMContentLoaded", function () {
             `;
         });
     }
-    // ==============================
-    // Profile Infomation model Open
-    // ==============================
+    // =============================================================================================
+    //                  Profile Infomation model Open
+    // =============================================================================================
 
     function openPersonalInfoModal() {
         if (!currentPersonalInfo) return;
@@ -1977,9 +2118,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // =========================
-    // EMERGENCY INFORMATION
-    // =========================
+    // ===========================================================================================
+    //              EMERGENCY INFORMATION
+    // ===========================================================================================
 
     let emergencyContactsData = [];
 
@@ -1992,6 +2133,10 @@ document.addEventListener("DOMContentLoaded", function () {
             renderEmergencyContactsTable();
         });
     }
+
+    // ============================================================================================
+    //              Emergency Contect Table Body
+    // ============================================================================================
 
     function renderEmergencyContactsTable() {
         const tbody = document.getElementById("emergencyContactsTableBody");
@@ -2074,8 +2219,18 @@ document.addEventListener("DOMContentLoaded", function () {
                     });
                 });
             });
+            tbody.querySelectorAll(".feature-checkbox").forEach(function (cb) {
+                cb.addEventListener("change", function () {
+                    setFeaturedId("emergency", this.checked ? this.dataset.id : null);
+                    renderEmergencyContactsTable();
+                });
+            });
         });
     }
+
+    // ========================================================================================
+    //          Emergency Cotect Model
+    // ========================================================================================
 
     function openEmergencyContactModal(id) {
         const modalTitle = document.getElementById("emergencyContactModalTitle");
@@ -2091,17 +2246,24 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("emergencyContactName").value = contact.name;
             document.getElementById("emergencyContactRelationship").value = contact.relationship;
             document.getElementById("emergencyContactPhone").value = contact.phone;
-            document.getElementById("emergencyContactAddress").value = contact.address;
+            document.getElementById("emergencyContactEmail").value = contact.email || "";
+            document.getElementById("emergencyContactAddress").value = contact.address || "";
+            document.getElementById("emergencyContactPriority").value = contact.priority || "";
+            document.getElementById("emergencyContactFeatured").checked = isFeatured("emergency", contact.id);
         } else {
             modalTitle.textContent = "Add Emergency Contact";
             document.getElementById("emergencyContactForm").reset();
             document.getElementById("emergencyContactId").value = "";
+            document.getElementById("emergencyContactFeatured").checked = false;
         }
 
         const modal = new bootstrap.Modal(document.getElementById("emergencyContactModal"));
         modal.show();
     }
 
+    // =============================================================================================
+    //              Emergency Contect Button
+    // =========================================================================================== 
     const addEmergencyContactButton = document.getElementById("addEmergencyContactButton");
     if (addEmergencyContactButton) {
         addEmergencyContactButton.addEventListener("click", function () {
@@ -2115,6 +2277,7 @@ document.addEventListener("DOMContentLoaded", function () {
             e.preventDefault();
 
             const id = document.getElementById("emergencyContactId").value;
+            const wantsFeatured = document.getElementById("emergencyContactFeatured").checked;
 
             const payload = {
                 name: document.getElementById("emergencyContactName").value.trim(),
@@ -2133,6 +2296,16 @@ document.addEventListener("DOMContentLoaded", function () {
                 const modal = bootstrap.Modal.getInstance(document.getElementById("emergencyContactModal"));
                 if (modal) modal.hide();
 
+                // Featured checkbox handle karo
+                const savedId = id || (res.data && res.data.id);
+
+                if (wantsFeatured && savedId) {
+                    setFeaturedId("emergency", savedId);
+                } else if (!wantsFeatured && isFeatured("emergency", savedId)) {
+                    // agar isi record ko unfeature kiya gaya, toh clear kar do
+                    setFeaturedId("emergency", null);
+                }
+
                 Swal.fire({
                     icon: "success",
                     title: res.message || "Emergency contact saved.",
@@ -2148,20 +2321,100 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // ==========================================================================
-    //      Displays education details and opens the education modal.
-    // ==========================================================================
+    // ===========================================================================================
+    //               Displays education details and opens the education modal.
+    // ===========================================================================================
 
     let educationData = [];
     function loadEducationInformation() {
         const container = document.getElementById("educationCardsList");
         container.innerHTML = `<p class="text-muted">Loading...</p>`;
 
-        demoGetEducation().then(function (res) {
+        fetchMyEducationDetails().then(function (res) {
             educationData = res.data;
             renderEducationCards();
+        }).catch(function (error) {
+            container.innerHTML = `<p class="text-danger">${escapeHtml(error.message || "Failed to load education details.")}</p>`;
         });
     }
+
+    // function renderEducationCards() {
+    //     const container = document.getElementById("educationCardsList");
+
+    //     if (educationData.length === 0) {
+    //         container.innerHTML = `<p class="text-muted">No education records added yet.</p>`;
+    //         return;
+    //     }
+
+    //     container.innerHTML = educationData.map(function (e) {
+    //         return `
+    //             <div class="education-card">
+
+    //                 <div class="education-card-actions">
+    //                     <button type="button" class="education-edit-btn" data-edit-education="${e.id}" title="Edit">✎</button>
+    //                     <button type="button" class="education-delete-btn" data-delete-education="${e.id}" title="Delete">🗑</button>
+    //                 </div>
+
+    //                 <div class="education-card-header">
+    //                     <div class="education-card-icon">🎓</div>
+    //                     <div class="education-card-title">
+    //                         <h5>${escapeHtml(e.qualification)}</h5>
+    //                         <p>${escapeHtml(e.institution)}</p>
+    //                     </div>
+    //                 </div>
+
+    //                 <div class="education-card-details">
+    //                     <div class="education-detail-item">
+    //                         <span>Roll Number</span>
+    //                         <strong>${escapeHtml(e.rollNumber) || "--"}</strong>
+    //                     </div>
+    //                     <div class="education-detail-item">
+    //                         <span>Year Of Passing</span>
+    //                         <strong>${escapeHtml(e.year) || "--"}</strong>
+    //                     </div>
+    //                     <div class="education-detail-item">
+    //                         <span>Subjects/Specialization</span>
+    //                         <strong>${escapeHtml(e.subjects) || "--"}</strong>
+    //                     </div>
+    //                     <div class="education-detail-item">
+    //                         <span>Percentage</span>
+    //                         <strong>${escapeHtml(e.percentage) || "--"}</strong>
+    //                     </div>
+    //                 </div>
+
+    //             </div>
+    //         `;
+    //     }).join("");
+
+    //     container.querySelectorAll("[data-edit-education]").forEach(function (btn) {
+    //         btn.addEventListener("click", function () {
+    //             openEducationModal(this.dataset.editEducation);
+    //         });
+    //     });
+
+    //     container.querySelectorAll("[data-delete-education]").forEach(function (btn) {
+    //         btn.addEventListener("click", function () {
+    //             const id = this.dataset.deleteEducation;
+
+    //             Swal.fire({
+    //                 icon: "warning",
+    //                 title: "Remove this education record?",
+    //                 showCancelButton: true,
+    //                 confirmButtonText: "Yes, remove",
+    //                 confirmButtonColor: "#b3261e"
+    //             }).then(function (result) {
+    //                 if (result.isConfirmed) {
+    //                     demoDeleteEducation(id).then(function () {
+    //                         educationData = educationData.filter(function (e) {
+    //                             return String(e.id) !== String(id);
+    //                         });
+    //                         renderEducationCards();
+    //                     });
+    //                 }
+    //             });
+    //         });
+    //     });
+    // }
 
     function renderEducationCards() {
         const container = document.getElementById("educationCardsList");
@@ -2173,42 +2426,42 @@ document.addEventListener("DOMContentLoaded", function () {
 
         container.innerHTML = educationData.map(function (e) {
             return `
-                <div class="education-card">
+            <div class="education-card">
 
-                    <div class="education-card-actions">
-                        <button type="button" class="education-edit-btn" data-edit-education="${e.id}" title="Edit">✎</button>
-                        <button type="button" class="education-delete-btn" data-delete-education="${e.id}" title="Delete">🗑</button>
-                    </div>
-
-                    <div class="education-card-header">
-                        <div class="education-card-icon">🎓</div>
-                        <div class="education-card-title">
-                            <h5>${escapeHtml(e.qualification)}</h5>
-                            <p>${escapeHtml(e.institution)}</p>
-                        </div>
-                    </div>
-
-                    <div class="education-card-details">
-                        <div class="education-detail-item">
-                            <span>Roll Number</span>
-                            <strong>${escapeHtml(e.rollNumber) || "--"}</strong>
-                        </div>
-                        <div class="education-detail-item">
-                            <span>Year Of Passing</span>
-                            <strong>${escapeHtml(e.year) || "--"}</strong>
-                        </div>
-                        <div class="education-detail-item">
-                            <span>Subjects/Specialization</span>
-                            <strong>${escapeHtml(e.subjects) || "--"}</strong>
-                        </div>
-                        <div class="education-detail-item">
-                            <span>Percentage</span>
-                            <strong>${escapeHtml(e.percentage) || "--"}</strong>
-                        </div>
-                    </div>
-
+                <div class="education-card-actions">
+                    <button type="button" class="education-edit-btn" data-edit-education="${e.id}" title="Edit">✎</button>
+                    <button type="button" class="education-delete-btn" data-delete-education="${e.id}" title="Delete">🗑</button>
                 </div>
-            `;
+
+                <div class="education-card-header">
+                    <div class="education-card-icon">🎓</div>
+                    <div class="education-card-title">
+                        <h5>${escapeHtml(e.degree)}</h5>
+                        <p>${escapeHtml(e.institution)}</p>
+                    </div>
+                </div>
+
+                <div class="education-card-details">
+                    <div class="education-detail-item">
+                        <span>Board/University</span>
+                        <strong>${escapeHtml(e.boardOrUniversity) || "--"}</strong>
+                    </div>
+                    <div class="education-detail-item">
+                        <span>Year Of Passing</span>
+                        <strong>${e.yearOfPassing || "--"}</strong>
+                    </div>
+                    <div class="education-detail-item">
+                        <span>Specialization</span>
+                        <strong>${escapeHtml(e.specialization) || "--"}</strong>
+                    </div>
+                    <div class="education-detail-item">
+                        <span>Percentage/Grade</span>
+                        <strong>${escapeHtml(e.percentageOrGrade) || "--"}</strong>
+                    </div>
+                </div>
+
+            </div>
+        `;
         }).join("");
 
         container.querySelectorAll("[data-edit-education]").forEach(function (btn) {
@@ -2229,17 +2482,53 @@ document.addEventListener("DOMContentLoaded", function () {
                     confirmButtonColor: "#b3261e"
                 }).then(function (result) {
                     if (result.isConfirmed) {
-                        demoDeleteEducation(id).then(function () {
+                        deleteMyEducationDetail(id).then(function () {
                             educationData = educationData.filter(function (e) {
                                 return String(e.id) !== String(id);
                             });
                             renderEducationCards();
+                        }).catch(function (error) {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Could not remove record",
+                                text: error.message,
+                                confirmButtonColor: "#17a2b8"
+                            });
                         });
                     }
                 });
             });
         });
     }
+
+
+    // function openEducationModal(id) {
+    //     const modalTitle = document.getElementById("educationModalTitle");
+    //     document.getElementById("educationFormMessage").innerHTML = "";
+
+    //     if (id) {
+    //         const record = educationData.find(function (e) {
+    //             return String(e.id) === String(id);
+    //         });
+
+    //         modalTitle.textContent = "Edit Education";
+    //         document.getElementById("educationId").value = record.id;
+    //         document.getElementById("educationQualification").value = record.qualification;
+    //         document.getElementById("educationInstitution").value = record.institution;
+    //         document.getElementById("educationRollNumber").value = record.rollNumber;
+    //         document.getElementById("educationSubjects").value = record.subjects;
+    //         document.getElementById("educationYear").value = record.year;
+    //         document.getElementById("educationPercentage").value = record.percentage;
+    //     } else {
+    //         modalTitle.textContent = "Add Education";
+    //         document.getElementById("educationForm").reset();
+    //         document.getElementById("educationId").value = "";
+    //     }
+
+    //     const modal = new bootstrap.Modal(document.getElementById("educationModal"));
+    //     modal.show();
+    // }
+
     function openEducationModal(id) {
         const modalTitle = document.getElementById("educationModalTitle");
         document.getElementById("educationFormMessage").innerHTML = "";
@@ -2251,16 +2540,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
             modalTitle.textContent = "Edit Education";
             document.getElementById("educationId").value = record.id;
-            document.getElementById("educationQualification").value = record.qualification;
+            document.getElementById("educationQualification").value = record.degree;
             document.getElementById("educationInstitution").value = record.institution;
-            document.getElementById("educationRollNumber").value = record.rollNumber;
-            document.getElementById("educationSubjects").value = record.subjects;
-            document.getElementById("educationYear").value = record.year;
-            document.getElementById("educationPercentage").value = record.percentage;
+            document.getElementById("educationBoardOrUniversity").value = record.boardOrUniversity || "";
+            document.getElementById("educationSubjects").value = record.specialization || "";
+            document.getElementById("educationYear").value = record.yearOfPassing || "";
+            document.getElementById("educationPercentage").value = record.percentageOrGrade || "";
+            document.getElementById("educationFeatured").checked = isFeatured("education", record.id);
         } else {
             modalTitle.textContent = "Add Education";
             document.getElementById("educationForm").reset();
             document.getElementById("educationId").value = "";
+            document.getElementById("educationFeatured").checked = false;
         }
 
         const modal = new bootstrap.Modal(document.getElementById("educationModal"));
@@ -2280,49 +2571,65 @@ document.addEventListener("DOMContentLoaded", function () {
             e.preventDefault();
 
             const id = document.getElementById("educationId").value;
+            const messageBox = document.getElementById("educationFormMessage");
+            messageBox.innerHTML = "";
+
+            const wantsFeatured = document.getElementById("educationFeatured").checked;
 
             const payload = {
-                qualification: document.getElementById("educationQualification").value.trim(),
+                degree: document.getElementById("educationQualification").value.trim(),
                 institution: document.getElementById("educationInstitution").value.trim(),
-                rollNumber: document.getElementById("educationRollNumber").value.trim(),
-                subjects: document.getElementById("educationSubjects").value.trim(),
-                year: document.getElementById("educationYear").value.trim(),
-                percentage: document.getElementById("educationPercentage").value.trim()
+                boardOrUniversity: document.getElementById("educationBoardOrUniversity").value.trim(),
+                specialization: document.getElementById("educationSubjects").value.trim(),
+                yearOfPassing: Number(document.getElementById("educationYear").value.trim()) || null,
+                percentageOrGrade: document.getElementById("educationPercentage").value.trim()
             };
 
             const apiCall = id
-                ? demoUpdateEducation(id, payload)
-                : demoAddEducation(payload);
+                ? updateMyEducationDetail(id, payload)
+                : addMyEducationDetail(payload);
 
             apiCall.then(function (res) {
                 const modal = bootstrap.Modal.getInstance(document.getElementById("educationModal"));
                 if (modal) modal.hide();
 
+                const savedId = id || (res.data && res.data.id);
+
+                if (wantsFeatured && savedId) {
+                    setFeaturedId("education", savedId);
+                } else if (!wantsFeatured && isFeatured("education", savedId)) {
+                    setFeaturedId("education", null);
+                }
+
                 Swal.fire({
                     icon: "success",
-                    title: res.data.message,
+                    title: res.message || "Education record saved.",
                     confirmButtonColor: "#17a2b8"
                 });
 
                 loadEducationInformation();
+            }).catch(function (error) {
+                messageBox.innerHTML = `<div class="custom-alert error">${escapeHtml(error.message || "Something went wrong.")}</div>`;
             });
         });
     }
 
 
-    // ===================================================================================
-    //      Displays work experience and opens the experience modal.
-    // ===================================================================================
+    // ============================================================================================
+    //             Displays work experience and opens the experience modal.
+    // ============================================================================================
 
     let experienceData = [];
 
     function loadExperienceInformation() {
         const tbody = document.getElementById("experienceTableBody");
-        tbody.innerHTML = `<tr><td colspan="10" class="text-center py-4">Loading...</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4">Loading...</td></tr>`;
 
-        demoGetExperience().then(function (res) {
+        fetchMyExperienceDetails().then(function (res) {
             experienceData = res.data;
             renderExperienceTable();
+        }).catch(function (error) {
+            tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-danger">${escapeHtml(error.message || "Failed to load experience details.")}</td></tr>`;
         });
     }
 
@@ -2330,28 +2637,24 @@ document.addEventListener("DOMContentLoaded", function () {
         const tbody = document.getElementById("experienceTableBody");
 
         if (experienceData.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="10" class="text-center py-4 text-muted">No experience records added yet.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted">No experience records added yet.</td></tr>`;
             return;
         }
 
         tbody.innerHTML = experienceData.map(function (x) {
             return `
-                <tr>
-                    <td>${escapeHtml(x.fromDate)}</td>
-                    <td>${escapeHtml(x.toDate)}</td>
-                    <td>${escapeHtml(x.organization)}</td>
-                    <td>${escapeHtml(x.position)}</td>
-                    <td>${escapeHtml(x.reasonOfLeaving)}</td>
-                    <td>${escapeHtml(x.lastCtc)}</td>
-                    <td>${escapeHtml(x.lastContactNo)}</td>
-                    <td>${escapeHtml(x.lastReferenceNo)}</td>
-                    <td>${escapeHtml(x.totalLength)}</td>
-                    <td>
-                        <button type="button" class="btn btn-sm btn-outline-primary" data-edit-experience="${x.id}">Edit</button>
-                        <button type="button" class="btn btn-sm btn-outline-danger" data-delete-experience="${x.id}">Delete</button>
-                    </td>
-                </tr>
-            `;
+            <tr>
+                <td>${escapeHtml(x.fromDate)}</td>
+                <td>${x.current ? "--" : escapeHtml(x.toDate || "--")}</td>
+                <td>${escapeHtml(x.companyName)}</td>
+                <td>${escapeHtml(x.designation)}</td>
+                <td>${x.current ? `<span class="badge text-bg-success">Current</span>` : `<span class="badge text-bg-secondary">Past</span>`}</td>
+                <td>
+                    <button type="button" class="btn btn-sm btn-outline-primary" data-edit-experience="${x.id}">Edit</button>
+                    <button type="button" class="btn btn-sm btn-outline-danger" data-delete-experience="${x.id}">Delete</button>
+                </td>
+            </tr>
+        `;
         }).join("");
 
         tbody.querySelectorAll("[data-edit-experience]").forEach(function (btn) {
@@ -2372,11 +2675,18 @@ document.addEventListener("DOMContentLoaded", function () {
                     confirmButtonColor: "#b3261e"
                 }).then(function (result) {
                     if (result.isConfirmed) {
-                        demoDeleteExperience(id).then(function () {
+                        deleteMyExperienceDetail(id).then(function () {
                             experienceData = experienceData.filter(function (x) {
                                 return String(x.id) !== String(id);
                             });
                             renderExperienceTable();
+                        }).catch(function (error) {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Could not remove record",
+                                text: error.message,
+                                confirmButtonColor: "#17a2b8"
+                            });
                         });
                     }
                 });
@@ -2395,31 +2705,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
             modalTitle.textContent = "Edit Experience";
             document.getElementById("experienceId").value = record.id;
+            document.getElementById("experienceOrganization").value = record.companyName;
+            document.getElementById("experiencePosition").value = record.designation || "";
             document.getElementById("experienceFromDate").value = record.fromDate;
-            document.getElementById("experienceToDate").value = record.toDate;
-            document.getElementById("experienceOrganization").value = record.organization;
-            document.getElementById("experiencePosition").value = record.position;
-            document.getElementById("experienceReasonOfLeaving").value = record.reasonOfLeaving;
-            document.getElementById("experienceLastCtc").value = record.lastCtc;
-            document.getElementById("experienceLastContactNo").value = record.lastContactNo;
-            document.getElementById("experienceLastReferenceNo").value = record.lastReferenceNo;
-            document.getElementById("experienceTotalLength").value = record.totalLength;
+            document.getElementById("experienceToDate").value = record.toDate || "";
+            document.getElementById("experienceCurrent").checked = !!record.current;
+            document.getElementById("experienceFeatured").checked = isFeatured("experience", record.id);
         } else {
             modalTitle.textContent = "Add Experience";
             document.getElementById("experienceForm").reset();
             document.getElementById("experienceId").value = "";
+            document.getElementById("experienceFeatured").checked = false;
         }
 
         const modal = new bootstrap.Modal(document.getElementById("experienceModal"));
         modal.show();
     }
 
-    const addExperienceButton = document.getElementById("addExperienceButton");
-    if (addExperienceButton) {
-        addExperienceButton.addEventListener("click", function () {
-            openExperienceModal(null);
-        });
-    }
 
     const experienceForm = document.getElementById("experienceForm");
     if (experienceForm) {
@@ -2427,42 +2729,56 @@ document.addEventListener("DOMContentLoaded", function () {
             e.preventDefault();
 
             const id = document.getElementById("experienceId").value;
+            const messageBox = document.getElementById("experienceFormMessage");
+            messageBox.innerHTML = "";
+
+            const isCurrent = document.getElementById("experienceCurrent").checked;
+            const wantsFeatured = document.getElementById("experienceFeatured").checked;
 
             const payload = {
+                companyName: document.getElementById("experienceOrganization").value.trim(),
+                designation: document.getElementById("experiencePosition").value.trim(),
                 fromDate: document.getElementById("experienceFromDate").value,
-                toDate: document.getElementById("experienceToDate").value,
-                organization: document.getElementById("experienceOrganization").value.trim(),
-                position: document.getElementById("experiencePosition").value.trim(),
-                reasonOfLeaving: document.getElementById("experienceReasonOfLeaving").value.trim(),
-                lastCtc: document.getElementById("experienceLastCtc").value.trim(),
-                lastContactNo: document.getElementById("experienceLastContactNo").value.trim(),
-                lastReferenceNo: document.getElementById("experienceLastReferenceNo").value.trim(),
-                totalLength: document.getElementById("experienceTotalLength").value.trim()
+                toDate: isCurrent ? null : (document.getElementById("experienceToDate").value || null),
+                current: isCurrent
             };
 
             const apiCall = id
-                ? demoUpdateExperience(id, payload)
-                : demoAddExperience(payload);
+                ? updateMyExperienceDetail(id, payload)
+                : addMyExperienceDetail(payload);
 
             apiCall.then(function (res) {
                 const modal = bootstrap.Modal.getInstance(document.getElementById("experienceModal"));
                 if (modal) modal.hide();
 
+                const savedId = id || (res.data && res.data.id);
+
+                if (wantsFeatured && savedId) {
+                    setFeaturedId("experience", savedId);
+                } else if (!wantsFeatured && isFeatured("experience", savedId)) {
+                    setFeaturedId("experience", null);
+                }
+
                 Swal.fire({
                     icon: "success",
-                    title: res.data.message,
+                    title: res.message || "Experience record saved.",
                     confirmButtonColor: "#17a2b8"
                 });
 
                 loadExperienceInformation();
+            }).catch(function (error) {
+                messageBox.innerHTML = `<div class="custom-alert error">${escapeHtml(error.message || "Something went wrong.")}</div>`;
             });
         });
     }
 
 
-    // ========================================================
-    //      Displays the employee family details.
-    // ========================================================
+
+
+
+    // ===========================================================================================
+    //               Displays the employee family details.
+    // ===========================================================================================
 
     let familyMembersData = [];
 
@@ -2470,12 +2786,17 @@ document.addEventListener("DOMContentLoaded", function () {
         const tbody = document.getElementById("familyMembersTableBody");
         tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4">Loading...</td></tr>`;
 
-        demoGetFamilyMembers().then(function (res) {
+        fetchMyFamilyMembers().then(function (res) {
             familyMembersData = res.data;
             renderFamilyTable();
+        }).catch(function (error) {
+            tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-danger">${escapeHtml(error.message || "Failed to load family members.")}</td></tr>`;
         });
     }
 
+    // ============================================================================================
+    //               Open Family Model form
+    // ============================================================================================
     function renderFamilyTable() {
         const tbody = document.getElementById("familyMembersTableBody");
 
@@ -2486,17 +2807,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
         tbody.innerHTML = familyMembersData.map(function (m) {
             return `
-                <tr>
-                    <td>${escapeHtml(m.name)}</td>
-                    <td>${escapeHtml(m.relationship)}</td>
-                    <td>${escapeHtml(m.dateOfBirth)}</td>
-                    <td>${escapeHtml(m.phone)}</td>
-                    <td>
-                        <button type="button" class="btn btn-sm btn-outline-primary" data-edit-family="${m.id}">Edit</button>
-                        <button type="button" class="btn btn-sm btn-outline-danger" data-delete-family="${m.id}">Delete</button>
-                    </td>
-                </tr>
-            `;
+            <tr>
+                <td>${escapeHtml(m.name)}</td>
+                <td>${escapeHtml(m.relationship)}</td>
+                <td>${escapeHtml(m.dateOfBirth)}</td>
+                <td>${m.dependent ? "Yes" : "No"}</td>
+                <td>
+                    <button type="button" class="btn btn-sm btn-outline-primary" data-edit-family="${m.id}">Edit</button>
+                    <button type="button" class="btn btn-sm btn-outline-danger" data-delete-family="${m.id}">Delete</button>
+                </td>
+            </tr>
+        `;
         }).join("");
 
         tbody.querySelectorAll("[data-edit-family]").forEach(function (btn) {
@@ -2517,17 +2838,27 @@ document.addEventListener("DOMContentLoaded", function () {
                     confirmButtonColor: "#b3261e"
                 }).then(function (result) {
                     if (result.isConfirmed) {
-                        demoDeleteFamilyMember(id).then(function () {
+                        deleteMyFamilyMember(id).then(function () {
                             familyMembersData = familyMembersData.filter(function (m) {
                                 return String(m.id) !== String(id);
                             });
                             renderFamilyTable();
+                        }).catch(function (error) {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Could not remove member",
+                                text: error.message,
+                                confirmButtonColor: "#17a2b8"
+                            });
                         });
                     }
                 });
             });
         });
     }
+    // ============================================================================================
+    //                      Family member open model box
+    // ============================================================================================
 
     function openFamilyMemberModal(id) {
         const modalTitle = document.getElementById("familyMemberModalTitle");
@@ -2542,12 +2873,14 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("familyMemberId").value = member.id;
             document.getElementById("familyMemberName").value = member.name;
             document.getElementById("familyMemberRelationship").value = member.relationship;
-            document.getElementById("familyMemberDob").value = member.dateOfBirth;
-            document.getElementById("familyMemberPhone").value = member.phone;
+            document.getElementById("familyMemberDob").value = member.dateOfBirth || "";
+            document.getElementById("familyMemberDependent").value = String(member.dependent);
+            document.getElementById("familyMemberFeatured").checked = isFeatured("family", member.id);
         } else {
             modalTitle.textContent = "Add Family Member";
             document.getElementById("familyMemberForm").reset();
             document.getElementById("familyMemberId").value = "";
+            document.getElementById("familyMemberFeatured").checked = false;
         }
 
         const modal = new bootstrap.Modal(document.getElementById("familyMemberModal"));
@@ -2560,45 +2893,108 @@ document.addEventListener("DOMContentLoaded", function () {
             openFamilyMemberModal(null);
         });
     }
-
+    // ===============================================================================================
+    //                  Family Member Details Get
+    // ===============================================================================================
     const familyMemberForm = document.getElementById("familyMemberForm");
     if (familyMemberForm) {
         familyMemberForm.addEventListener("submit", function (e) {
             e.preventDefault();
 
             const id = document.getElementById("familyMemberId").value;
+            const messageBox = document.getElementById("familyMemberFormMessage");
+            messageBox.innerHTML = "";
+
+            const wantsFeatured = document.getElementById("familyMemberFeatured").checked;
 
             const payload = {
                 name: document.getElementById("familyMemberName").value.trim(),
                 relationship: document.getElementById("familyMemberRelationship").value.trim(),
-                dateOfBirth: document.getElementById("familyMemberDob").value,
-                phone: document.getElementById("familyMemberPhone").value.trim()
+                dateOfBirth: document.getElementById("familyMemberDob").value || null,
+                dependent: document.getElementById("familyMemberDependent").value === "true"
             };
 
             const apiCall = id
-                ? demoUpdateFamilyMember(id, payload)
-                : demoAddFamilyMember(payload);
+                ? updateMyFamilyMember(id, payload)
+                : addMyFamilyMember(payload);
 
             apiCall.then(function (res) {
                 const modal = bootstrap.Modal.getInstance(document.getElementById("familyMemberModal"));
                 if (modal) modal.hide();
 
+                const savedId = id || (res.data && res.data.id);
+
+                if (wantsFeatured && savedId) {
+                    setFeaturedId("family", savedId);
+                } else if (!wantsFeatured && isFeatured("family", savedId)) {
+                    setFeaturedId("family", null);
+                }
+
                 Swal.fire({
                     icon: "success",
-                    title: res.data.message,
+                    title: res.message || "Family member saved.",
                     confirmButtonColor: "#17a2b8"
                 });
 
                 loadFamilyInformation();
+            }).catch(function (error) {
+                messageBox.innerHTML = `<div class="custom-alert error">${escapeHtml(error.message || "Something went wrong.")}</div>`;
             });
         });
     }
 
+    // ===================================================================================================
+    //                     Get Bank Detail
+    // ===================================================================================================
+    function loadBankInformation() {
+        const card = document.getElementById("bankInfoCard");
+        const messageBox = document.getElementById("bankInfoMessage");
+        if (messageBox) messageBox.innerHTML = "";
 
-    // =============================================================================
-    //      Identifies device and browser details from the user agent.
-    // =============================================================================
+        card.innerHTML = `<p class="text-muted">Loading...</p>`;
 
+        fetchMyBankInformation().then(function (res) {
+            const d = res.data;
+
+            if (!d) {
+                card.innerHTML = `<p class="text-muted">No bank information added yet.</p>`;
+                return;
+            }
+
+            // Account number ko masked dikhana behtar hai (last 4 digits visible)
+            const maskedAccount = d.accountNumber;
+
+
+            card.innerHTML = `
+            <div class="profile-info-grid">
+                <div class="profile-info-item">
+                    <span class="profile-label">Account Holder Name</span>
+                    <strong>${escapeHtml(d.accountHolderName) || "--"}</strong>
+                </div>
+                <div class="profile-info-item">
+                    <span class="profile-label">Bank Name</span>
+                    <strong>${escapeHtml(d.bankName) || "--"}</strong>
+                </div>
+                <div class="profile-info-item">
+                    <span class="profile-label">Account Number</span>
+                    <strong>${escapeHtml(maskedAccount)}</strong>
+                </div>
+                <div class="profile-info-item">
+                    <span class="profile-label">IFSC Code</span>
+                    <strong>${escapeHtml(d.ifscCode) || "--"}</strong>
+                </div>
+            </div>
+        `;
+        }).catch(function (error) {
+            card.innerHTML = `<div class="custom-alert error">${escapeHtml(error.message || "Failed to load bank information.")}</div>`;
+        });
+    }
+
+
+
+    // =============================================================================================
+    //      Identifies device and browser details from the user agent. -------- Upcomming
+    // =============================================================================================
     function parseDeviceInfo(ua) {
         if (!ua) return "Unknown device";
 
@@ -2632,10 +3028,9 @@ document.addEventListener("DOMContentLoaded", function () {
         return `${browser} on ${os}${isMobile ? " (Mobile)" : ""}`;
     }
 
-    // ==============================================
-    //      Formats session dates for display
-    // ==============================================
-
+    // ===========================================================================================
+    //               Formats session dates for display
+    // ===========================================================================================
     function formatSessionDate(isoString) {
         if (!isoString) return "--";
 
@@ -2649,10 +3044,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // ===================================================
-    //      Loads and displays the active session list
-    // ===================================================
-
+    // ============================================================================================
+    //               Loads and displays the active session list
+    // ============================================================================================
     function loadSessions() {
         const body = document.getElementById("sessionsModalBody");
         body.innerHTML = `<p class="text-muted text-center py-4">Loading sessions...</p>`;
@@ -2665,7 +3059,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 body.innerHTML = `<p class="text-muted text-center py-4">No active sessions found.</p>`;
                 return;
             }
-
             body.innerHTML = sessions.map(function (s) {
                 const isMobile = (s.deviceInfo || "").includes("Mobile");
                 const icon = isMobile ? "📱" : "🖥️";
@@ -2758,9 +3151,6 @@ document.addEventListener("DOMContentLoaded", function () {
             loadSessions();
         });
     }
-
-
-
 });
 
 const logoutPanel = document.getElementById("logoutPanel");

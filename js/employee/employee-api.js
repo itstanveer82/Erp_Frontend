@@ -322,3 +322,164 @@ function deleteMyEmergencyContact(contactId) {
         method: "DELETE"
     });
 }
+
+
+//  GET /api/family-members/me
+function fetchMyFamilyMembers() {
+    return apiRequest("/api/family-members/me");
+}
+// Real endpoint: POST /api/family-members/me
+function addMyFamilyMember(payload) {
+    return apiRequest("/api/family-members/me", {
+        method: "POST",
+        body: JSON.stringify(payload)
+    });
+}
+
+// Real endpoint: PUT /api/family-members/me/{id}
+function updateMyFamilyMember(id, payload) {
+    return apiRequest(`/api/family-members/me/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(payload)
+    });
+}
+
+// Real endpoint: DELETE /api/family-members/me/{id}
+function deleteMyFamilyMember(id) {
+    return apiRequest(`/api/family-members/me/${id}`, {
+        method: "DELETE"
+    });
+}
+
+// ==================================================================================================
+//              EDUCATION DETAILS
+// ==================================================================================================
+
+//  GET /api/education-details/me
+function fetchMyEducationDetails() {
+    return apiRequest("/api/education-details/me");
+}
+
+//  POST /api/education-details/me
+function addMyEducationDetail(payload) {
+    return apiRequest("/api/education-details/me", {
+        method: "POST",
+        body: JSON.stringify(payload)
+    });
+}
+
+//  PUT /api/education-details/me/{id}
+function updateMyEducationDetail(id, payload) {
+    return apiRequest(`/api/education-details/me/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(payload)
+    });
+}
+
+//  DELETE /api/education-details/me/{id}
+function deleteMyEducationDetail(id) {
+    return apiRequest(`/api/education-details/me/${id}`, {
+        method: "DELETE"
+    });
+}
+
+
+// ====================================================================================================
+//              EXPERIENCE DETAILS
+// ====================================================================================================
+
+//  GET /api/experience-details/me
+function fetchMyExperienceDetails() {
+    return apiRequest("/api/experience-details/me");
+}
+
+//  POST /api/experience-details/me
+function addMyExperienceDetail(payload) {
+    return apiRequest("/api/experience-details/me", {
+        method: "POST",
+        body: JSON.stringify(payload)
+    });
+}
+
+//  PUT /api/experience-details/me/{id}
+function updateMyExperienceDetail(id, payload) {
+    return apiRequest(`/api/experience-details/me/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(payload)
+    });
+}
+
+//  DELETE /api/experience-details/me/{id}
+function deleteMyExperienceDetail(id) {
+    return apiRequest(`/api/experience-details/me/${id}`, {
+        method: "DELETE"
+    });
+}
+
+
+// ===================================================================================================
+//                  EMPLOYEE SKILLS
+// ===================================================================================================
+
+//  GET /api/employee-skills/me
+function fetchMySkills() {
+    return apiRequest("/api/employee-skills/me");
+}
+
+//  POST /api/employee-skills/me
+function addMySkill(payload) {
+    return apiRequest("/api/employee-skills/me", {
+        method: "POST",
+        body: JSON.stringify(payload)
+    });
+}
+
+//  DELETE /api/employee-skills/me/{id}
+function deleteMySkill(id) {
+    return apiRequest(`/api/employee-skills/me/${id}`, {
+        method: "DELETE"
+    });
+}
+
+
+// ===================================================================================================
+//              NOMINEE DETAILS
+// ===================================================================================================
+
+//  GET /api/nominee-details/me
+function fetchMyNominees() {
+    return apiRequest("/api/nominee-details/me");
+}
+
+//  POST /api/nominee-details/me
+function addMyNominee(payload) {
+    return apiRequest("/api/nominee-details/me", {
+        method: "POST",
+        body: JSON.stringify(payload)
+    });
+}
+
+//  PUT /api/nominee-details/me/{id}
+function updateMyNominee(id, payload) {
+    return apiRequest(`/api/nominee-details/me/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(payload)
+    });
+}
+
+//  DELETE /api/nominee-details/me/{id}
+function deleteMyNominee(id) {
+    return apiRequest(`/api/nominee-details/me/${id}`, {
+        method: "DELETE"
+    });
+}
+
+
+// =================================================================================================
+//                  BANK INFORMATION
+// =================================================================================================
+
+//  GET /api/bank-information/me
+function fetchMyBankInformation() {
+    return apiRequest("/api/bank-information/me");
+}

@@ -935,13 +935,22 @@
                                         <label class="form-label">Email</label>
                                         <input type="email" id="emergencyContactEmail" class="form-control">
                                     </div>
-                                    <div class="mb-0">
+                                    <div class="mb-3">
                                         <label class="form-label">Address</label>
                                         <textarea id="emergencyContactAddress" class="form-control" rows="2"></textarea>
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label">Priority</label>
                                         <input type="number" id="emergencyContactPriority" class="form-control" min="1">
+                                    </div>
+
+                                    <div class="mb-0">
+                                        <div class="form-check">
+                                            <input type="checkbox" id="emergencyContactFeatured" class="form-check-input">
+                                            <label class="form-check-label" for="emergencyContactFeatured">
+                                                Show this contact in my Profile Overview card
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="modal-footer">
@@ -960,7 +969,8 @@
                             <h3>Bank Information</h3>
                         </div>
                     </div>
-                    <div class="erp-form-card text-muted">This section is coming soon.</div>
+                    <div id="bankInfoMessage"></div>
+                    <div id="bankInfoCard" class="erp-form-card"></div>
                 </section>
 
                 <!-- EDUCATION INFORMATION -->
@@ -980,7 +990,7 @@
                 </section>
 
                 <!-- EDUCATION MODAL -->
-                <div class="modal fade" id="educationModal" tabindex="-1" aria-hidden="true">
+              <div class="modal fade" id="educationModal" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content role-modal-content">
                             <div class="modal-header">
@@ -993,7 +1003,7 @@
                                     <input type="hidden" id="educationId">
 
                                     <div class="mb-3">
-                                        <label class="form-label">Qualification <span class="required-star">*</span></label>
+                                        <label class="form-label">Degree <span class="required-star">*</span></label>
                                         <input type="text" id="educationQualification" class="form-control" required>
                                     </div>
                                     <div class="mb-3">
@@ -1001,20 +1011,29 @@
                                         <input type="text" id="educationInstitution" class="form-control" required>
                                     </div>
                                     <div class="mb-3">
-                                        <label class="form-label">Roll Number</label>
-                                        <input type="text" id="educationRollNumber" class="form-control">
+                                        <label class="form-label">Board/University</label>
+                                        <input type="text" id="educationBoardOrUniversity" class="form-control">
                                     </div>
                                     <div class="mb-3">
-                                        <label class="form-label">Subjects/Specialization</label>
+                                        <label class="form-label">Specialization</label>
                                         <input type="text" id="educationSubjects" class="form-control">
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label">Year Of Passing</label>
-                                        <input type="text" id="educationYear" class="form-control" placeholder="e.g. 2020">
+                                        <input type="text" id="educationYear" class="form-control" placeholder="e.g. 2025">
                                     </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Percentage/Grade</label>
+                                        <input type="text" id="educationPercentage" class="form-control" placeholder="e.g. A or 78%">
+                                    </div>
+
                                     <div class="mb-0">
-                                        <label class="form-label">Percentage Of Marks</label>
-                                        <input type="text" id="educationPercentage" class="form-control" placeholder="e.g. 78%">
+                                        <div class="form-check">
+                                            <input type="checkbox" id="educationFeatured" class="form-check-input">
+                                            <label class="form-check-label" for="educationFeatured">
+                                                Show this record in my Profile Overview card
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="modal-footer">
@@ -1039,22 +1058,21 @@
 
                     <div id="experienceInfoMessage"></div>
 
-                    <div class="table-responsive">
-                        <table class="table erp-table align-middle">
-                            <thead>
-                                <tr>
-                                    <th>From Date</th><th>To Date</th><th>Organization</th><th>Position</th>
-                                    <th>Reason Of Leaving</th><th>Last CTC</th><th>Last Contact No</th>
-                                    <th>Last Reference No</th><th>Total Length Of Service</th><th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="experienceTableBody"></tbody>
-                        </table>
-                    </div>
+                        <div class="table-responsive">
+                            <table class="table erp-table align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>From Date</th><th>To Date</th><th>Company</th><th>Designation</th>
+                                        <th>Current</th><th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="experienceTableBody"></tbody>
+                            </table>
+                        </div>
                 </section>
 
                 <!-- EXPERIENCE MODAL -->
-                <div class="modal fade" id="experienceModal" tabindex="-1" aria-hidden="true">
+              <div class="modal fade" id="experienceModal" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered modal-lg">
                         <div class="modal-content role-modal-content">
                             <div class="modal-header">
@@ -1068,6 +1086,14 @@
 
                                     <div class="row g-3">
                                         <div class="col-md-6">
+                                            <label class="form-label">Company Name <span class="required-star">*</span></label>
+                                            <input type="text" id="experienceOrganization" class="form-control" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Designation</label>
+                                            <input type="text" id="experiencePosition" class="form-control">
+                                        </div>
+                                        <div class="col-md-6">
                                             <label class="form-label">From Date <span class="required-star">*</span></label>
                                             <input type="date" id="experienceFromDate" class="form-control" required>
                                         </div>
@@ -1076,32 +1102,19 @@
                                             <input type="date" id="experienceToDate" class="form-control">
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label">Organization <span class="required-star">*</span></label>
-                                            <input type="text" id="experienceOrganization" class="form-control" required>
+                                            <div class="form-check mt-4">
+                                                <input type="checkbox" id="experienceCurrent" class="form-check-input">
+                                                <label class="form-check-label" for="experienceCurrent">Currently working here</label>
+                                            </div>
                                         </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Position</label>
-                                            <input type="text" id="experiencePosition" class="form-control">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Reason Of Leaving</label>
-                                            <input type="text" id="experienceReasonOfLeaving" class="form-control">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Last CTC</label>
-                                            <input type="text" id="experienceLastCtc" class="form-control">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Last Contact No</label>
-                                            <input type="text" id="experienceLastContactNo" class="form-control">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Last Reference No</label>
-                                            <input type="text" id="experienceLastReferenceNo" class="form-control">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Total Length Of Service</label>
-                                            <input type="text" id="experienceTotalLength" class="form-control" placeholder="e.g. 2 years 3 months">
+                                    </div>
+
+                                    <div class="mt-3">
+                                        <div class="form-check">
+                                            <input type="checkbox" id="experienceFeatured" class="form-check-input">
+                                            <label class="form-check-label" for="experienceFeatured">
+                                                Show this record in my Profile Overview card
+                                            </label>
                                         </div>
                                     </div>
                                 </div>
@@ -1149,10 +1162,10 @@
 
                     <div id="nominationInfoMessage"></div>
 
-                    <div class="table-responsive">
+                   <div class="table-responsive">
                         <table class="table erp-table align-middle">
                             <thead>
-                                <tr><th>Nomination For</th><th>Family Member</th><th>Percentage</th><th>Action</th></tr>
+                                <tr><th>Name</th><th>Relationship</th><th>Date of Birth</th><th>Share %</th><th>Minor</th><th>Action</th></tr>
                             </thead>
                             <tbody id="nominationTableBody"></tbody>
                         </table>
@@ -1160,7 +1173,7 @@
                 </section>
 
                 <!-- NOMINATION MODAL -->
-                <div class="modal fade" id="nominationModal" tabindex="-1" aria-hidden="true">
+               <div class="modal fade" id="nominationModal" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content role-modal-content">
                             <div class="modal-header">
@@ -1173,21 +1186,35 @@
                                     <input type="hidden" id="nominationId">
 
                                     <div class="mb-3">
-                                        <label class="form-label">Nomination For <span class="required-star">*</span></label>
-                                        <select id="nominationFor" class="form-select" required>
-                                            <option value="">-- Select --</option>
-                                            <option value="PF">PF</option>
-                                            <option value="Gratuity">Gratuity</option>
-                                            <option value="Insurance">Insurance</option>
-                                        </select>
+                                        <label class="form-label">Nominee Name <span class="required-star">*</span></label>
+                                        <input type="text" id="nominationName" class="form-control" required>
                                     </div>
                                     <div class="mb-3">
-                                        <label class="form-label">Family Member <span class="required-star">*</span></label>
-                                        <input type="text" id="nominationFamilyMember" class="form-control" required>
+                                        <label class="form-label">Relationship <span class="required-star">*</span></label>
+                                        <input type="text" id="nominationRelationship" class="form-control" required>
                                     </div>
-                                    <div class="mb-0">
-                                        <label class="form-label">Percentage <span class="required-star">*</span></label>
+                                    <div class="mb-3">
+                                        <label class="form-label">Date of Birth</label>
+                                        <input type="date" id="nominationDob" class="form-control">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Share Percentage <span class="required-star">*</span></label>
                                         <input type="number" id="nominationPercentage" class="form-control" min="1" max="100" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="form-check">
+                                            <input type="checkbox" id="nominationMinor" class="form-check-input">
+                                            <label class="form-check-label" for="nominationMinor">Minor</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-0">
+                                        <div class="form-check">
+                                            <input type="checkbox" id="nominationFeatured" class="form-check-input">
+                                            <label class="form-check-label" for="nominationFeatured">
+                                                Show this nomination in my Profile Overview card
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="modal-footer">
@@ -1210,10 +1237,31 @@
                     </div>
 
                     <div class="erp-form-card">
-                        <div class="cc-input-group">
-                            <input type="text" id="newSkillInput" class="form-control" placeholder="e.g. Java, React, SQL">
-                            <button type="button" id="addSkillButton" class="btn btn-add-cc">+ Add</button>
+                        <div class="row g-2 align-items-end">
+                            <div class="col-md-5">
+                                <label class="form-label">Skill Name</label>
+                                <input type="text" id="newSkillInput" class="form-control" placeholder="e.g. Java, React, SQL">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Proficiency</label>
+                                <select id="newSkillProficiency" class="form-select">
+                                    <option value="BEGINNER">Beginner</option>
+                                    <option value="INTERMEDIATE">Intermediate</option>
+                                    <option value="ADVANCED">Advanced</option>
+                                    <option value="EXPERT">Expert</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-check mb-2">
+                                    <input type="checkbox" id="newSkillCertified" class="form-check-input">
+                                    <label class="form-check-label" for="newSkillCertified">Certified</label>
+                                </div>
+                            </div>
+                            <div class="col-md-1">
+                                <button type="button" id="addSkillButton" class="btn btn-add-cc w-100">+ Add</button>
+                            </div>
                         </div>
+                        <div id="skillsMessage"></div>
                         <div id="skillsChipsList" class="cc-chips mt-3"></div>
                     </div>
                 </section>
@@ -1282,7 +1330,7 @@
                     <div class="table-responsive">
                         <table class="table erp-table align-middle">
                             <thead>
-                                <tr><th>Name</th><th>Relationship</th><th>Date of Birth</th><th>Phone</th><th>Action</th></tr>
+                                <tr><th>Name</th><th>Relationship</th><th>Date of Birth</th><th>Dependent</th><th>Action</th></tr>
                             </thead>
                             <tbody id="familyMembersTableBody"></tbody>
                         </table>
@@ -1290,7 +1338,7 @@
                 </section>
 
                 <!-- FAMILY MEMBER MODAL (Add aur Edit dono ke liye same modal) -->
-                <div class="modal fade" id="familyMemberModal" tabindex="-1" aria-hidden="true">
+              <div class="modal fade" id="familyMemberModal" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content role-modal-content">
                             <div class="modal-header">
@@ -1314,9 +1362,21 @@
                                         <label class="form-label">Date of Birth</label>
                                         <input type="date" id="familyMemberDob" class="form-control">
                                     </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Dependent</label>
+                                        <select id="familyMemberDependent" class="form-select">
+                                            <option value="false">No</option>
+                                            <option value="true">Yes</option>
+                                        </select>
+                                    </div>
+
                                     <div class="mb-0">
-                                        <label class="form-label">Phone</label>
-                                        <input type="text" id="familyMemberPhone" class="form-control">
+                                        <div class="form-check">
+                                            <input type="checkbox" id="familyMemberFeatured" class="form-check-input">
+                                            <label class="form-check-label" for="familyMemberFeatured">
+                                                Show this member in my Profile Overview card
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="modal-footer">
