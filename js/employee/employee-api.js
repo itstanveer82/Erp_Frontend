@@ -483,3 +483,21 @@ function deleteMyNominee(id) {
 function fetchMyBankInformation() {
     return apiRequest("/api/bank-information/me");
 }
+
+
+// =================================================================================================
+//              USER PROFILE (extended)
+// =================================================================================================
+
+//  GET /api/profiles/me
+function fetchMyExtendedProfile() {
+    return apiRequest("/api/profiles/me");
+}
+
+//  PUT /api/profiles/me
+function updateMyExtendedProfile(payload) {
+    return apiRequest("/api/profiles/me", {
+        method: "PUT",
+        body: JSON.stringify(payload)
+    });
+}

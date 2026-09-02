@@ -1,14 +1,12 @@
 document.addEventListener("DOMContentLoaded", function () {
-    // =========================
-    // AUTH CHECK
-    // =========================
+    // ===============================================================================================
+    //              Auth Check
+    // ===============================================================================================
     const authData = getAuthData();
     if (!authData || !authData.token) {
         window.location.href = "../auth/login.html";
         return;
     }
-
-
 
     // ===============================================================================================
     //   FEATURED RECORD HELPER (per section)
@@ -35,7 +33,10 @@ document.addEventListener("DOMContentLoaded", function () {
         return String(getFeaturedId(sectionKey)) === String(id);
     }
 
-    // Overview card ke liye: featured record milta hai, warna list ka pehla record
+    // ==============================================================================================
+    // Use the featured record for the Overview card
+    // if unavailable, use the first record in the list.
+    // ==============================================================================================
     function getDisplayRecord(sectionKey, list) {
         const featuredId = getFeaturedId(sectionKey);
         if (featuredId) {
@@ -47,22 +48,12 @@ document.addEventListener("DOMContentLoaded", function () {
         return list.length ? list[0] : null;
     }
 
-
-
-
-    // =========================
+    // ===========================================================================================
     // NAVBAR / SIDEBAR USER INFO
     // (demo profile se bharenge; real backend aane par
     //  authData.user se bhi le sakte ho, admin-dashboard.js jaisa)
-    // =========================
-    // const userNameEl = document.getElementById("userName");
-    // const userRoleEl = document.getElementById("userRole");
-    // const sidebarUserNameEl = document.getElementById("sidebarUserName");
-    // const sidebarUserEmailEl = document.getElementById("sidebarUserEmail");
-    // const dashboardWelcomeEl = document.getElementById("dashboardWelcome");
+    // ===========================================================================================
 
-
-    const userInitialsEl = document.getElementById("userInitials");
     const leavePolicyToggle = document.getElementById("leavePolicyToggle");
     const leavePolicyDropdown = document.querySelector(".leave-policy-dropdown");
 
@@ -72,18 +63,18 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // =========================
-    // HTML SECURITY HELPER
-    // =========================
+    // ==============================================================================================
+    //          Html Security Helper
+    // ==============================================================================================
     function escapeHtml(value) {
         const div = document.createElement("div");
         div.textContent = value === null || value === undefined ? "" : String(value);
         return div.innerHTML;
     }
 
-    // =========================
-    // VIEW SWITCHING
-    // =========================
+    // ==============================================================================================
+    //          View Switching
+    // ==============================================================================================
     const viewNames = [
         "dashboard",
         "personal-information", "emergency-information", "bank-information",
@@ -93,8 +84,19 @@ document.addEventListener("DOMContentLoaded", function () {
         "my-attendance", "attendance-calendar", "attendance-corrections",
         "my-leaves", "apply-leave", "leave-balance",
         "my-payroll", "payslips",
-        "profile", "profile-overview"
+        "profile"
     ];
+
+    // ==============================================================================================
+    // These views are part of the “Profile family,
+    //  So the profileHeaderBar stays fixed and visible on all of them
+    // ==============================================================================================
+    const profileFamilyViews = [
+        "profile", "personal-information", "emergency-information", "bank-information",
+        "family-information", "education-information", "experience-information",
+        "joining-details", "work-position", "exit-details", "nomination-information", "skills"
+    ];
+
     const views = {};
     viewNames.forEach(function (name) {
         views[name] = document.getElementById(name + "View");
@@ -123,8 +125,11 @@ document.addEventListener("DOMContentLoaded", function () {
         "payslips": loadPayslips,
         "attendance-corrections": loadCorrections,
         "profile": loadProfile,
-        "profile-overview": loadProfileOverview,
     };
+
+    // ==============================================================================================
+    //              Show View
+    // ==============================================================================================
 
     function showView(viewName) {
         viewNames.forEach(function (name) {
@@ -136,15 +141,28 @@ document.addEventListener("DOMContentLoaded", function () {
         document.querySelectorAll(".sidebar-item[data-view]").forEach(function (btn) {
             btn.classList.toggle("active", btn.dataset.view === viewName);
         });
+        const profileHeaderBar = document.getElementById("profileHeaderBar");
+        if (profileHeaderBar) {
+            if (profileFamilyViews.indexOf(viewName) !== -1) {
+                profileHeaderBar.classList.remove("d-none");
+            } else {
+                profileHeaderBar.classList.add("d-none");
+            }
+            profileHeaderBar.querySelectorAll(".profile-info-btn[data-view]").forEach(function (btn) {
+                btn.classList.toggle("active", btn.dataset.view === viewName);
+            });
+        }
 
         if (viewLoaders[viewName]) {
             viewLoaders[viewName]();
         }
     }
-    // =========================================
-    // EMPLOYEE PROFILE CLICK
-    // EMPLOYEE PROFILE DROPDOWN
-    // =========================================
+
+
+    // ==============================================================================================
+    // Employee Profile Click
+    // Employee Profile DropDown
+    // ==============================================================================================
 
     const employeeProfileButton =
         document.getElementById("employeeProfileButton");
@@ -169,24 +187,30 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const profileDropdownId =
         document.getElementById("profileDropdownId");
-    // Open / close profile dropdown
+
+    // ----------------------------------------------------------------------------------------------
+    //          Open / close profile dropdown
+    // ----------------------------------------------------------------------------------------------
 
     employeeProfileButton.addEventListener("click", function (event) {
         event.stopPropagation();
         employeeProfileDropdown.classList.toggle("show");
     });
-
-    // Outside click
+    // ----------------------------------------------------------------------------------------------
+    //          Outside click
+    // ----------------------------------------------------------------------------------------------
     document.addEventListener("click", function () {
         employeeProfileDropdown.classList.remove("show");
     });
 
-    // Prevent dropdown from closing when clicking inside
+    // ----------------------------------------------------------------------------------------------
+    //  Prevent dropdown from closing when clicking inside
+    // ----------------------------------------------------------------------------------------------
     employeeProfileDropdown.addEventListener("click", function (event) {
         event.stopPropagation();
     });
 
-    // =========================================
+    // ==============================================================================================
     // REAL PROFILE API (demoGetProfile ki jagah)
     // Real endpoint: GET /api/users/me
     // Jo fields backend abhi nahi bhej raha, unke liye
@@ -194,14 +218,14 @@ document.addEventListener("DOMContentLoaded", function () {
     // fields add karega, to yahan sirf fallback values
     // hata dena — baaki poore project me kuch change
     // nahi karna padega.
-    // =========================================
+    // ==============================================================================================
 
     let currentProfileInitials = "";
 
 
-    // ======================================
+    // ==============================================================================================
     //         Employee Profile show
-    // ======================================
+    // ==============================================================================================
 
     function loadHeaderEmployeeProfile() {
         fetchCurrentUserProfile().then(function (res) {
@@ -264,14 +288,13 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    // =============================
+    // ==============================================================================================
     //      DASHBOARD OVERVIEW
-    // =============================
+    // ==============================================================================================
 
     function loadDashboardSummary() {
         fetchCurrentUserProfile().then(function (res) {
             const p = res.data;
-            // const fullName = `${p.firstName} ${p.lastName}`.trim();
 
             const initials =
                 `${p.firstName || ""}${p.lastName || ""}`
@@ -282,8 +305,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     })
                     .join("")
                     .toUpperCase();
-
-            // Dashboard Title show on Welcome Back and Username-----
+            // ----------------------------------------------------------------------------------------------
+            //      Dashboard Title show on Welcome Back and Username-----
+            // ----------------------------------------------------------------------------------------------
 
             safeSetText(
                 "dashboardWelcome",
@@ -312,9 +336,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // =========================
-    //      MY ATTENDANCE
-    // =========================
+    // ==============================================================================================
+    //               MY ATTENDANCE
+    // ==============================================================================================
     let myAttendanceData = [];
 
     function loadMyAttendance() {
@@ -328,9 +352,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // ====================================
-    //         Attendance Stat Cards
-    // ====================================
+    // ==============================================================================================
+    //              Attendance Stat Cards
+    // ==============================================================================================
     function renderAttendanceStats(rows) {
         const counts = { PRESENT: 0, LATE: 0, ABSENT: 0, LEAVE: 0 };
 
@@ -345,9 +369,9 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("attStatAbsent").textContent = counts.ABSENT;
         document.getElementById("attStatLeave").textContent = counts.LEAVE;
     }
-    // ===============================
-    //      Attendance table Show 
-    // ===============================
+    // ==============================================================================================
+    //               Attendance table Show 
+    // ==============================================================================================
 
     function renderAttendanceTable(rows) {
         const tbody = document.getElementById("myAttendanceTableBody");
@@ -369,8 +393,9 @@ document.addEventListener("DOMContentLoaded", function () {
         `;
         }).join("");
     }
-
-    // Status dropdown se client-side filter (demo ke liye)
+    // ----------------------------------------------------------------------------------------------
+    //      Filter by status using the dropdown (client-side demo)
+    // ----------------------------------------------------------------------------------------------
     document.getElementById("attendanceStatusFilter").addEventListener("change", function () {
         const value = this.value;
 
@@ -381,9 +406,9 @@ document.addEventListener("DOMContentLoaded", function () {
         renderAttendanceTable(filtered);
     });
 
-    // ===============================================
+    // ==============================================================================================
     //      ATTENDANCE CALENDAR View data
-    // ===============================================
+    // ==============================================================================================
     function loadAttendanceCalendar() {
         const container = document.getElementById("attendanceCalendar");
         container.innerHTML = `<p class="text-muted">Loading calendar...</p>`;
@@ -409,9 +434,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // ===================================
-    //      MY LEAVES History
-    // ===================================
+    // ==============================================================================================
+    //              My Leaves History
+    // ==============================================================================================
     function loadMyLeaves() {
         const tbody = document.getElementById("myLeavesTableBody");
         tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4">Loading...</td></tr>`;
@@ -439,9 +464,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // =================================
+    // ==============================================================================================
     //      Apply leave type
-    // =================================
+    // ==============================================================================================
     let ccSelectedList = [];
 
     function loadApplyLeaveForm() {
@@ -489,9 +514,9 @@ document.addEventListener("DOMContentLoaded", function () {
         renderCcChips();
     }
 
-    // ======================================
+    // ==============================================================================================
     //      Apply leave from date-month
-    // ======================================
+    // ==============================================================================================
 
     function calculateLeaveDays() {
         const fromVal = document.getElementById("leaveFromDate").value;
@@ -530,9 +555,9 @@ document.addEventListener("DOMContentLoaded", function () {
             balanceField.value = match ? `${match.remainingDays} / ${match.totalDays} days` : "N/A";
         });
     });
-    //============================================
+    // ==============================================================================================
     //      CC To — add / remove chips
-    //============================================
+    // ==============================================================================================
     document.getElementById("addCcButton").addEventListener("click", function () {
         const ccSelect = document.getElementById("ccSelect");
 
@@ -557,9 +582,9 @@ document.addEventListener("DOMContentLoaded", function () {
         ccSelect.value = "";
     });
 
-    // =======================================================
+    // ==============================================================================================
     //     Adds a CC To option in the Apply Leave form.
-    // =======================================================
+    // ==============================================================================================
 
     function renderCcChips() {
         const container = document.getElementById("ccChipsList");
@@ -617,9 +642,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    // ===============================
+    // ==============================================================================================
     //      Leave Balance Cards
-    // ===============================
+    // ==============================================================================================
     function loadLeaveBalance() {
         const container = document.getElementById("leaveBalanceCards");
         container.innerHTML = `<p class="text-muted">Loading...</p>`;
@@ -638,9 +663,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // =============================
+    // ==============================================================================================
     //      Payroll Overview 
-    // =============================
+    // ==============================================================================================
     let myPayrollData = [];
 
     function loadPayroll() {
@@ -719,9 +744,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // ==============================================================
+    // ==============================================================================================
     //      Opens the payslip modal for the selected record.
-    // ==============================================================
+    // ==============================================================================================
 
     function openPayrollSlipModal(p) {
         document.getElementById("payrollSlipModalTitle").textContent =
@@ -743,17 +768,17 @@ document.addEventListener("DOMContentLoaded", function () {
         modal.show();
     }
 
-    // =========================
+    // ==============================================================================================
     //      Payslip List
-    // =========================
+    // ==============================================================================================
     function loadPayslips() {
         const tbody = document.getElementById("payslipsTableBody");
         tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4">Loading...</td></tr>`;
     }
 
-    // ======================================
+    // ==============================================================================================
     //      ATTENDANCE CORRECTIONS
-    // ======================================
+    // ==============================================================================================
     const newCorrectionButton = document.getElementById("newCorrectionButton");
     const correctionForm = document.getElementById("correctionForm");
     const correctionFormMessage = document.getElementById("correctionFormMessage");
@@ -791,9 +816,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    // ====================================================
+    // ==============================================================================================
     //      Displays correction statistics in cards.
-    // ====================================================
+    // ==============================================================================================
 
     function renderCorrectionStats(rows) {
         const counts = { PENDING: 0, APPROVED: 0, REJECTED: 0 };
@@ -811,9 +836,9 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("corrStatTotal").textContent = rows.length;
     }
 
-    // ================================================
+    // ==============================================================================================
     //      Shows attendance correction requests.
-    // ================================================
+    // ==============================================================================================
 
     function loadCorrections() {
         const tbody = document.getElementById("correctionsTableBody");
@@ -851,272 +876,196 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // =========================
-    //      PROFILE
-    // =========================
+    // ==============================================================================================
+    //      PROFILE Icone click Drop down 
+    // ==============================================================================================
     const profileViewButton =
         document.getElementById("profileViewButton");
 
     if (profileViewButton) {
         profileViewButton.addEventListener("click", function () {
             showView("profile");
+            employeeProfileDropdown.classList.remove("show");
         });
     }
 
     // ==============================================================================================
     //               Loads the employee profile section.
     // ==============================================================================================
+    let profileHeaderBuilt = false;
+    let cachedProfileData = null;
+
+    function ensureProfileHeader(callback) {
+        if (profileHeaderBuilt && cachedProfileData) {
+            callback(cachedProfileData);
+            return;
+        }
+
+        fetchCurrentUserProfile().then(function (res) {
+            cachedProfileData = res.data;
+            buildProfileHeader(cachedProfileData);
+            profileHeaderBuilt = true;
+            callback(cachedProfileData);
+        });
+    }
+
+    function buildProfileHeader(p) {
+        const headerBar = document.getElementById("profileHeaderBar");
+        const fullName = `${p.firstName} ${p.lastName}`.trim();
+        const initials = `${p.firstName.charAt(0)}${p.lastName.charAt(0)}`.toUpperCase();
+
+        currentProfileInitials = initials;
+
+        headerBar.innerHTML = `
+        <div class="employee-profile">
+            <div class="profile-header">
+
+                <div class="profile-cover">
+                    <div class="profile-cover-image-wrapper">
+                        <img src="../assets/image/cover-earth-image.jpg" alt="Profile Cover" class="profile-cover-image">
+                    </div>
+                </div>
+
+                <div class="profile-header-content">
+
+                    <div class="profile-avatar" id="profileAvatarClickable">
+                        ${p.profileImage ? `
+                            <div class="profile-avatar-inner">
+                                <img src="${p.profileImage}" alt="Employee Profile" class="profile-avatar-image"
+                                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <span class="profile-avatar-fallback" style="display:none;">${escapeHtml(initials)}</span>
+                            </div>
+                        ` : `
+                            <div class="profile-avatar-inner">
+                                <span class="profile-avatar-fallback">${escapeHtml(initials)}</span>
+                            </div>
+                        `}
+                    </div>
+
+                    <div class="profile-main-info">
+                        <h2>${escapeHtml(fullName)}</h2>
+
+                        <div class="d-flex align-items-center">
+                            <span class="profile-status">${escapeHtml(p.designation)}</span>
+                            <span class="profile-status"><span class="status-dot"></span> Active Employee</span>
+                        </div>
+
+                        <div class="profile-info-buttons">
+                            <button type="button" class="profile-info-btn" data-view="profile">About</button>
+                            <button type="button" class="profile-info-btn" data-view="personal-information">Personal Info</button>
+                            <button type="button" class="profile-info-btn" data-view="emergency-information">Emergency Info</button>
+                            <button type="button" class="profile-info-btn" data-view="bank-information">Bank Info</button>
+                            <button type="button" class="profile-info-btn" data-view="family-information">Family Info</button>
+                            <button type="button" class="profile-info-btn" data-view="education-information">Education Info</button>
+                            <button type="button" class="profile-info-btn" data-view="experience-information">Experience Info</button>
+                            <button type="button" class="profile-info-btn" data-view="joining-details">Joining Details</button>
+                            <button type="button" class="profile-info-btn" data-view="work-position">Work Position</button>
+                            <button type="button" class="profile-info-btn" data-view="exit-details">Exit Details</button>
+                            <button type="button" class="profile-info-btn" data-view="nomination-information">Nomination Info</button>
+                            <button type="button" class="profile-info-btn" data-view="skills">Skills</button>
+                        </div>
+                    </div>
+
+                </div>
+
+              <!--  <button type="button" id="viewFullProfileButton" class="btn btn-outline-primary profile-header-action-btn">
+                    Information
+                </button> -->
+
+            </div>
+        </div>
+    `;
+        headerBar.querySelectorAll("[data-view]").forEach(function (btn) {
+            btn.addEventListener("click", function () {
+                showView(this.dataset.view);
+            });
+        });
+
+        const viewFullProfileButton = document.getElementById("viewFullProfileButton");
+        if (viewFullProfileButton) {
+            viewFullProfileButton.addEventListener("click", toggleProfileExtendedSection);
+        }
+
+        const profileAvatarClickable = document.getElementById("profileAvatarClickable");
+        if (profileAvatarClickable) {
+            profileAvatarClickable.addEventListener("click", function () {
+                openViewPhotoModal(p.profileImage, initials);
+            });
+        }
+    }
+
+    // ==============================================================================================
+    //                  Load Profile 
+    // ==============================================================================================
 
     function loadProfile() {
         const card = document.getElementById("profileCard");
 
-        card.innerHTML = `
-        <div class="profile-loading">
-            Loading profile...
-        </div>
-         `;
+        const extendedSection = document.getElementById("profileExtendedSection");
+        if (extendedSection) extendedSection.classList.add("d-none");
+        profileExtendedLoaded = false;
 
-        fetchCurrentUserProfile().then(function (res) {
-            const p = res.data;
-
+        ensureProfileHeader(function (p) {
             const fullName = `${p.firstName} ${p.lastName}`.trim();
 
-            const initials =
-                `${p.firstName.charAt(0)}${p.lastName.charAt(0)}`
-                    .toUpperCase();
-
             card.innerHTML = `
-            <div class="employee-profile">
-
-             <!-- PROFILE HEADER -->
-                <div class="profile-header">
-
-                <div class="profile-avatar" id="profileAvatarClickable">
-
-
-
-                    ${p.profileImage
-                    ? `<img src="${p.profileImage}"
-                        alt="Employee Profile"
-                        class="profile-avatar-image"
-                        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">`
-                    : "<img src=''>"
-                }
-
-                   <span class="profile-avatar-fallback"
-                        style="${p.profileImage ? 'display:none;' : 'display:flex;'}">
-                    ${escapeHtml(initials)}
-                </span>
-            </div>
-            <div class="profile-main-info">
-                    <h2>${escapeHtml(fullName)}</h2>
-                    <p>${escapeHtml(p.designation)}</p>
-                    <span class="profile-status">
-                    <span class="status-dot"></span>
-                            Active Employee
-                    </span>
-            </div>
-            <button type="button" id="viewFullProfileButton"
-                class="btn btn-outline-primary profile-header-action-btn">
-                        Infomation
-            </button>
-
-        </div>
-
-    </div>
-                <!-- BASIC INFORMATION -->
-                <div class="profile-section">
-
-                    <div class="profile-section-title">
-                        <span class="profile-section-icon">👤</span>
-                        <div>
-                            <h4>Basic Information</h4>
-                            <p>Employee identification details</p>
-                        </div>
-                    </div>
-
-                    <div class="profile-info-grid">
-
-                        <div class="profile-info-item">
-                            <span class="profile-label">
-                                Employee Code
-                            </span>
-                            <strong>
-                                ${escapeHtml(p.employeeCode)}
-                            </strong>
-                        </div>
-
-                        <div class="profile-info-item">
-                            <span class="profile-label">
-                                Full Name
-                            </span>
-                            <strong>
-                                ${escapeHtml(fullName)}
-                            </strong>
-                        </div>
-
-                        <div class="profile-info-item">
-                            <span class="profile-label">
-                                Department
-                            </span>
-                            <strong>
-                                ${escapeHtml(p.departmentName)}
-                            </strong>
-                        </div>
-
-                        <div class="profile-info-item">
-                            <span class="profile-label">
-                                Designation
-                            </span>
-                            <strong>
-                                ${escapeHtml(p.designation)}
-                            </strong>
-                        </div>
-
-                          <div class="profile-info-item">
-                            <span class="profile-label">
-                                Birthday
-                            </span>
-                            <strong>
-                                ${escapeHtml(p.dateOfBirth)}
-                            </strong>
-                        </div>
-
-                        <div class="profile-info-item">
-                            <span class="profile-label">
-                                Gender
-                            </span>
-                            <strong>
-                                ${escapeHtml(p.gender)}
-                            </strong>
-                        </div>
-
-                    </div>
-
+            <div class="profile-section">
+                <div class="profile-section-title">
+                    <span class="profile-section-icon">👤</span>
+                    <div><h2 class="fw-bold">About</h2><p>Employee identification details</p></div>
                 </div>
-
-                <!-- CONTACT INFORMATION -->
-                <div class="profile-section">
-
-                    <div class="profile-section-title">
-                        <span class="profile-section-icon">📞</span>
-                        <div>
-                            <h4>Contact Information</h4>
-                            <p>Your registered contact details</p>
-                        </div>
-                    </div>
-
-                    <div class="profile-info-grid">
-
-                        <div class="profile-info-item">
-                            <span class="profile-label">
-                                Email Address
-                            </span>
-                            <strong>
-                                ${escapeHtml(p.email)}
-                            </strong>
-                        </div>
-
-                        <div class="profile-info-item">
-                            <span class="profile-label">
-                                Phone Number
-                            </span>
-                            <strong>
-                                ${escapeHtml(p.phone)}
-                            </strong>
-                        </div>
-
-                        <div class="profile-info-item profile-password-card">
-                            <span class="profile-label">
-                                Password
-                            </span>
-                            <button type="button" id="resetPasswordToggleButton" class="btn-reset-password">
-                                Reset Password
-                            </button>
-                        </div>
-
-                    </div>
-
+                <div class="profile-info-grid">
+                    <div class="profile-info-item"><span class="profile-label">Employee Code</span><strong>${escapeHtml(p.employeeCode)}</strong></div>
+                    <div class="profile-info-item"><span class="profile-label">Full Name</span><strong>${escapeHtml(fullName)}</strong></div>
+                    <div class="profile-info-item"><span class="profile-label">Department</span><strong>${escapeHtml(p.departmentName)}</strong></div>
+                    <div class="profile-info-item"><span class="profile-label">Designation</span><strong>${escapeHtml(p.designation)}</strong></div>
+                    <div class="profile-info-item"><span class="profile-label">Birthday</span><strong>${escapeHtml(p.dateOfBirth)}</strong></div>
+                    <div class="profile-info-item"><span class="profile-label">Gender</span><strong>${escapeHtml(p.gender)}</strong></div>
                 </div>
+            </div>
 
-                <!-- WORK INFORMATION -->
-                <div class="profile-section">
-
-                    <div class="profile-section-title">
-                        <span class="profile-section-icon">💼</span>
-                        <div>
-                            <h4>Work Information</h4>
-                            <p>Employment and reporting details</p>
-                        </div>
+            <div class="profile-section">
+                <div class="profile-section-title">
+                    <span class="profile-section-icon">📞</span>
+                    <div><h4>Contact Information</h4><p>Your registered contact details</p></div>
+                </div>
+                <div class="profile-info-grid">
+                    <div class="profile-info-item"><span class="profile-label">Email Address</span><strong>${escapeHtml(p.email)}</strong></div>
+                    <div class="profile-info-item"><span class="profile-label">Phone Number</span><strong>${escapeHtml(p.phone)}</strong></div>
+                    <div class="profile-info-item profile-password-card">
+                        <span class="profile-label">Password</span>
+                        <button type="button" id="resetPasswordToggleButton" class="btn-reset-password">Reset Password</button>
                     </div>
+                </div>
+            </div>
 
-                    <div class="profile-info-grid">
-
-                        <div class="profile-info-item">
-                            <span class="profile-label">
-                                Joining Date
-                            </span>
-                            <strong>
-                                ${escapeHtml(p.joiningDate)}
-                            </strong>
-                        </div>
-
-                        <div class="profile-info-item">
-                            <span class="profile-label">
-                                Reporting Manager
-                            </span>
-                            <strong>
-                                ${escapeHtml(p.reportingManager)}
-                            </strong>
-                        </div>
-
-                    </div>
-
+            <div class="profile-section">
+                <div class="profile-section-title">
+                    <span class="profile-section-icon">💼</span>
+                    <div><h4>Work Information</h4><p>Employment and reporting details</p></div>
+                </div>
+                <div class="profile-info-grid">
+                    <div class="profile-info-item"><span class="profile-label">Joining Date</span><strong>${escapeHtml(p.joiningDate)}</strong></div>
+                    <div class="profile-info-item"><span class="profile-label">Reporting Manager</span><strong>${escapeHtml(p.reportingManager)}</strong></div>
                 </div>
             </div>
         `;
 
-            const resetPasswordToggleButton =
-                document.getElementById("resetPasswordToggleButton");
-
-            const resetPasswordMessage =
-                document.getElementById("resetPasswordMessage");
-
+            const resetPasswordToggleButton = document.getElementById("resetPasswordToggleButton");
+            const resetPasswordMessage = document.getElementById("resetPasswordMessage");
             if (resetPasswordToggleButton) {
                 resetPasswordToggleButton.addEventListener("click", function () {
                     resetPasswordMessage.innerHTML = "";
-
-                    const modal = new bootstrap.Modal(
-                        document.getElementById("resetPasswordModal")
-                    );
+                    const modal = new bootstrap.Modal(document.getElementById("resetPasswordModal"));
                     modal.show();
-                });
-            }
-
-            const viewFullProfileButton =
-                document.getElementById("viewFullProfileButton");
-
-            if (viewFullProfileButton) {
-                viewFullProfileButton.addEventListener("click", function () {
-                    showView("profile-overview");
-                });
-            }
-
-            currentProfileInitials = initials;
-
-            const profileAvatarClickable = document.getElementById("profileAvatarClickable");
-            if (profileAvatarClickable) {
-                profileAvatarClickable.addEventListener("click", function () {
-                    openViewPhotoModal(p.profileImage, initials);
                 });
             }
         });
     }
 
-
-    // ============================================================================================
+    // ==============================================================================================
     //             View Phote Model in profile
-    // ============================================================================================
+    // ==============================================================================================
 
     function openViewPhotoModal(imageUrl, initialsText) {
         const img = document.getElementById("viewPhotoImage");
@@ -1136,9 +1085,9 @@ document.addEventListener("DOMContentLoaded", function () {
         modal.show();
     }
 
-    // =========================================================================================
-    //           Uploade Phote Model
-    // =========================================================================================
+    // ==============================================================================================
+    //              Open Uploade Phote Model
+    // ==============================================================================================
 
     let selectedPhotoFile = null;
 
@@ -1236,16 +1185,41 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // =========================================================================================
+    // ==============================================================================================
+    //                   New Function Profile Loaded
+    // ==============================================================================================
+
+    let profileExtendedLoaded = false;
+
+    function toggleProfileExtendedSection() {
+        const section = document.getElementById("profileExtendedSection");
+        const btn = document.getElementById("viewFullProfileButton");
+        const isHidden = section.classList.contains("d-none");
+
+        if (isHidden) {
+            section.classList.remove("d-none");
+            if (btn) btn.textContent = "Hide Information";
+            if (!profileExtendedLoaded) {
+                loadProfileOverview();
+                profileExtendedLoaded = true;
+            }
+        } else {
+            section.classList.add("d-none");
+            if (btn) btn.textContent = "Information";
+        }
+    }
+
+    // ==============================================================================================
     //              Loads and displays the employee profile overview.
-    // =========================================================================================
+    // ==============================================================================================
 
     function loadProfileOverview() {
         const grid = document.getElementById("profileOverviewGrid");
         grid.innerHTML = `<p class="text-muted">Loading...</p>`;
 
         Promise.all([
-            demoGetPersonalInformation(),
+            fetchCurrentUserProfile(),
+            fetchMyExtendedProfile(),
             fetchMyEmergencyContacts(),
             fetchMyFamilyMembers(),
             fetchMyEducationDetails(),
@@ -1258,201 +1232,213 @@ document.addEventListener("DOMContentLoaded", function () {
             fetchMyBankInformation()
         ]).then(function (results) {
 
-            currentPersonalInfo = results[0].data;
-            const emergencyContacts = results[1].data;
-            const familyMembers = results[2].data;
-            const education = results[3].data;
-            const experience = results[4].data;
-            currentJoiningDetails = results[5].data;
-            const workPosition = results[6].data;
-            const exitDetails = results[7].data;
-            const nominations = results[8].data;
-            const skills = results[9].data;
-            const bankInfo = results[10].data;
+            const basicProfile = results[0].data;
+            currentPersonalInfo = results[1].data;
+            const emergencyContacts = results[2].data;
+            const familyMembers = results[3].data;
+            const education = results[4].data;
+            const experience = results[5].data;
+            currentJoiningDetails = results[6].data;
+            const workPosition = results[7].data;
+            const exitDetails = results[8].data;
+            const nominations = results[9].data;
+            const skills = results[10].data;
+            const bankInfo = results[11].data;
 
             const featuredEmergency = getDisplayRecord("emergency", emergencyContacts);
             const featuredFamily = getDisplayRecord("family", familyMembers);
-            const featuredEducation = getDisplayRecord("education", education);
-            const featuredExperience = getDisplayRecord("experience", experience);
-            const featuredNomination = getDisplayRecord("nomination", nominations); 
+            const featuredNomination = getDisplayRecord("nomination", nominations);
 
-            grid.innerHTML = `
-
-                <div class="overview-card">
-                    <div class="overview-card-header">
-                        <h5>Personal Information</h5>
+            // ----------------------------------------------------------------------------------------------
+            //                      About Panel
+            // ----------------------------------------------------------------------------------------------
+            const aboutPanel = `
+            <div class="fb-tab-panel active" data-tab-panel="about">
+                <div class="about-card">
+                    <div class="about-card-header">
+                        <h5>About</h5>
                         <button type="button" class="overview-edit-btn" id="overviewEditPersonalInfo" title="Edit">✎</button>
                     </div>
-                    <div class="overview-card-body overview-kv-grid">
-                        <div class="overview-kv"><span>Height</span><strong>${escapeHtml(currentPersonalInfo.height) || "--"}</strong></div>
-                        <div class="overview-kv"><span>Weight</span><strong>${escapeHtml(currentPersonalInfo.weight) || "--"}</strong></div>
-                        <div class="overview-kv"><span>Blood Group</span><strong>${escapeHtml(currentPersonalInfo.bloodGroup) || "--"}</strong></div>
-                        <div class="overview-kv"><span>Shift</span><strong>${escapeHtml(currentPersonalInfo.shift) || "--"}</strong></div>
+                    <div class="about-grid">
+                        <div class="about-row">
+                            <span class="about-icon">💼</span>
+                            <div class="about-text">
+                                <strong>${escapeHtml(basicProfile.designation) || "--"}</strong>
+                                <span>${escapeHtml(basicProfile.departmentName) || "Department not set"}</span>
+                            </div>
+                        </div>
+                        <div class="about-row">
+                            <span class="about-icon">📅</span>
+                            <div class="about-text">
+                                <strong>Joined ${escapeHtml(currentJoiningDetails.dateOfJoining) || "--"}</strong>
+                                <span>Status: ${escapeHtml(currentJoiningDetails.status) || "--"}</span>
+                            </div>
+                        </div>
+                        <div class="about-row">
+                            <span class="about-icon">📱</span>
+                            <div class="about-text">
+                                <strong>${escapeHtml(basicProfile.phone) || "--"}</strong>
+                                <span>${escapeHtml(basicProfile.email) || "--"}</span>
+                            </div>
+                        </div>
+                        <div class="about-row">
+                            <span class="about-icon">🎂</span>
+                            <div class="about-text">
+                                <strong>${escapeHtml(currentPersonalInfo.dateOfBirth) || "--"}</strong>
+                                <span>${escapeHtml(currentPersonalInfo.gender) || "--"} · ${escapeHtml(currentPersonalInfo.bloodGroup) || "--"}</span>
+                            </div>
+                        </div>
+                        <div class="about-row">
+                            <span class="about-icon">🌍</span>
+                            <div class="about-text">
+                                <strong>${escapeHtml(currentPersonalInfo.nationality) || "--"}</strong>
+                                <span>${escapeHtml(currentPersonalInfo.occupation) || "--"}</span>
+                            </div>
+                        </div>
+                        <div class="about-row">
+                            <span class="about-icon">🏦</span>
+                            <div class="about-text">
+                                <strong>${bankInfo && bankInfo.bankName ? escapeHtml(bankInfo.bankName) : "Not added"}</strong>
+                                <span>${bankInfo && bankInfo.accountNumber ? "A/C ending " + escapeHtml(String(bankInfo.accountNumber).slice(-4)) : "--"}</span>
+                            </div>
+                        </div>
                     </div>
+                    ${currentPersonalInfo.bio ? `<p class="overview-summary-text" style="margin-top:16px;">${escapeHtml(currentPersonalInfo.bio)}</p>` : ""}
                 </div>
-
-               <div class="overview-card">
-                    <div class="overview-card-header">
-                        <h5>Emergency Information</h5>
+            </div>
+        `;
+            // ----------------------------------------------------------------------------------------------
+            //              Family & Contect Panel
+            // ----------------------------------------------------------------------------------------------
+            const familyPanel = `
+            <div class="fb-tab-panel" data-tab-panel="family">
+                <div class="about-card">
+                    <div class="about-card-header">
+                        <h5>Emergency Contact</h5>
                         <button type="button" class="overview-nav-btn" data-goto-view="emergency-information" title="Manage">›</button>
                     </div>
-                    <div class="overview-card-body">
-                        ${featuredEmergency
-                    ? `<div class="overview-kv-grid">
-                                <div class="overview-kv"><span>Name</span><strong>${escapeHtml(featuredEmergency.name)}</strong></div>
-                                <div class="overview-kv"><span>Relationship</span><strong>${escapeHtml(featuredEmergency.relationship)}</strong></div>
-                                <div class="overview-kv"><span>Phone</span><strong>${escapeHtml(featuredEmergency.phone) || "--"}</strong></div>
-                                <div class="overview-kv"><span>Email</span><strong>${escapeHtml(featuredEmergency.email) || "--"}</strong></div>
-                            </div>`
+                    ${featuredEmergency
+                    ? `<div class="about-grid">
+                            <div class="about-row"><span class="about-icon">🆘</span><div class="about-text"><strong>${escapeHtml(featuredEmergency.name)}</strong><span>${escapeHtml(featuredEmergency.relationship)}</span></div></div>
+                            <div class="about-row"><span class="about-icon">📞</span><div class="about-text"><strong>${escapeHtml(featuredEmergency.phone) || "--"}</strong><span>${escapeHtml(featuredEmergency.email) || "--"}</span></div></div>
+                        </div>`
                     : `<p class="overview-summary-text text-muted">${emergencyContacts.length} contact(s) added.</p>`
                 }
-                    </div>
                 </div>
 
-              <div class="overview-card">
-                    <div class="overview-card-header">
-                        <h5>Bank Information</h5>
-                        <button type="button" class="overview-nav-btn" data-goto-view="bank-information" title="Manage">›</button>
-                    </div>
-                    <div class="overview-card-body">
-                        ${bankInfo && bankInfo.bankName
-                    ? `<div class="overview-kv-grid">
-                                <div class="overview-kv"><span>Holder Name</span><strong>${escapeHtml(bankInfo.accountHolderName) || "--"}</strong></div>
-                                <div class="overview-kv"><span>Bank Name</span><strong>${escapeHtml(bankInfo.bankName) || "--"}</strong></div>
-                                <div class="overview-kv"><span>Account No.</span><strong>XXXX XXXX ${escapeHtml((bankInfo.accountNumber || "").slice(-4))}</strong></div>
-                                <div class="overview-kv"><span>IFSC Code</span><strong>${escapeHtml(bankInfo.ifscCode) || "--"}</strong></div>
-                            </div>`
-                    : `<p class="overview-summary-text text-muted">Not added yet.</p>`
-                }
-                    </div>
-                </div>
-
-               <div class="overview-card">
-                    <div class="overview-card-header">
-                        <h5>Family Information</h5>
+                <div class="about-card">
+                    <div class="about-card-header">
+                        <h5>Family</h5>
                         <button type="button" class="overview-nav-btn" data-goto-view="family-information" title="Manage">›</button>
                     </div>
-                    <div class="overview-card-body">
-                        ${featuredFamily
-                    ? `<div class="overview-kv-grid">
-                                <div class="overview-kv"><span>Name</span><strong>${escapeHtml(featuredFamily.name)}</strong></div>
-                                <div class="overview-kv"><span>Relationship</span><strong>${escapeHtml(featuredFamily.relationship)}</strong></div>
-                                <div class="overview-kv"><span>Date of Birth</span><strong>${escapeHtml(featuredFamily.dateOfBirth) || "--"}</strong></div>
-                                <div class="overview-kv"><span>Dependent</span><strong>${featuredFamily.dependent ? "Yes" : "No"}</strong></div>
-                            </div>`
+                    ${featuredFamily
+                    ? `<div class="about-grid">
+                            <div class="about-row"><span class="about-icon">👪</span><div class="about-text"><strong>${escapeHtml(featuredFamily.name)}</strong><span>${escapeHtml(featuredFamily.relationship)}</span></div></div>
+                            <div class="about-row"><span class="about-icon">🎂</span><div class="about-text"><strong>${escapeHtml(featuredFamily.dateOfBirth) || "--"}</strong><span>${featuredFamily.dependent ? "Dependent" : "Not dependent"}</span></div></div>
+                        </div>`
                     : `<p class="overview-summary-text text-muted">${familyMembers.length} member(s) added.</p>`
                 }
-                    </div>
                 </div>
 
-              <div class="overview-card">
-                    <div class="overview-card-header">
-                        <h5>Education Information</h5>
-                        <button type="button" class="overview-nav-btn" data-goto-view="education-information" title="Manage">›</button>
-                    </div>
-                    <div class="overview-card-body">
-                        ${featuredEducation
-                    ? `<div class="overview-kv-grid">
-                                <div class="overview-kv"><span>Degree</span><strong>${escapeHtml(featuredEducation.degree)}</strong></div>
-                                <div class="overview-kv"><span>Institution</span><strong>${escapeHtml(featuredEducation.institution)}</strong></div>
-                                <div class="overview-kv"><span>Year Of Passing</span><strong>${featuredEducation.yearOfPassing || "--"}</strong></div>
-                                <div class="overview-kv"><span>Percentage/Grade</span><strong>${escapeHtml(featuredEducation.percentageOrGrade) || "--"}</strong></div>
-                            </div>`
-                    : `<p class="overview-summary-text text-muted">${education.length} record(s) added.</p>`
-                }
-                    </div>
-                </div>
-
-              <div class="overview-card">
-                    <div class="overview-card-header">
-                        <h5>Experience Information</h5>
-                        <button type="button" class="overview-nav-btn" data-goto-view="experience-information" title="Manage">›</button>
-                    </div>
-                    <div class="overview-card-body">
-                        ${featuredExperience
-                    ? `<div class="overview-kv-grid">
-                                <div class="overview-kv"><span>Company</span><strong>${escapeHtml(featuredExperience.companyName)}</strong></div>
-                                <div class="overview-kv"><span>Designation</span><strong>${escapeHtml(featuredExperience.designation) || "--"}</strong></div>
-                                <div class="overview-kv"><span>From</span><strong>${escapeHtml(featuredExperience.fromDate)}</strong></div>
-                                <div class="overview-kv"><span>Status</span><strong>${featuredExperience.current ? "Current" : "Past"}</strong></div>
-                            </div>`
-                    : `<p class="overview-summary-text text-muted">${experience.length} record(s) added.</p>`
-                }
-                    </div>
-                </div>
-
-                <div class="overview-card">
-                    <div class="overview-card-header">
-                        <h5>Joining Details</h5>
-                        <button type="button" class="overview-edit-btn" id="overviewEditJoiningDetails" title="Edit">✎</button>
-                    </div>
-                    <div class="overview-card-body overview-kv-grid">
-                        <div class="overview-kv"><span>Date of Joining</span><strong>${escapeHtml(currentJoiningDetails.dateOfJoining) || "--"}</strong></div>
-                        <div class="overview-kv"><span>Status</span><strong>${escapeHtml(currentJoiningDetails.status) || "--"}</strong></div>
-                    </div>
-                </div>
-
-                <div class="overview-card">
-                    <div class="overview-card-header">
-                        <h5>Work Position</h5>
-                    </div>
-                    <div class="overview-card-body overview-kv-grid">
-                        <div class="overview-kv"><span>Department</span><strong>${escapeHtml(workPosition.departmentName) || "--"}</strong></div>
-                        <div class="overview-kv"><span>Grade Level</span><strong>${escapeHtml(workPosition.gradeLevel) || "--"}</strong></div>
-                    </div>
-                </div>
-
-                <div class="overview-card">
-                    <div class="overview-card-header">
-                        <h5>Exit Details</h5>
-                    </div>
-                    <div class="overview-card-body overview-kv-grid">
-                        <div class="overview-kv"><span>Separation Mode</span><strong>${escapeHtml(exitDetails.separationMode) || "--"}</strong></div>
-                        <div class="overview-kv"><span>Last Working Date</span><strong>${escapeHtml(exitDetails.lastWorkingDate) || "--"}</strong></div>
-                    </div>
-                </div>
-
-               <div class="overview-card">
-                    <div class="overview-card-header">
-                        <h5>Nomination Information</h5>
+                <div class="about-card">
+                    <div class="about-card-header">
+                        <h5>Nomination</h5>
                         <button type="button" class="overview-nav-btn" data-goto-view="nomination-information" title="Manage">›</button>
                     </div>
-                    <div class="overview-card-body">
-                        ${featuredNomination
-                            ? `<div class="overview-kv-grid">
-                                <div class="overview-kv"><span>Name</span><strong>${escapeHtml(featuredNomination.name)}</strong></div>
-                                <div class="overview-kv"><span>Relationship</span><strong>${escapeHtml(featuredNomination.relationship)}</strong></div>
-                                <div class="overview-kv"><span>Share %</span><strong>${featuredNomination.sharePercentage}%</strong></div>
-                                <div class="overview-kv"><span>Minor</span><strong>${featuredNomination.minor ? "Yes" : "No"}</strong></div>
-                            </div>`
-                            : `<p class="overview-summary-text text-muted">${nominations.length} nomination(s) added.</p>`
-                        }
+                    ${featuredNomination
+                    ? `<div class="about-grid">
+                            <div class="about-row"><span class="about-icon">📝</span><div class="about-text"><strong>${escapeHtml(featuredNomination.name)}</strong><span>${escapeHtml(featuredNomination.relationship)}</span></div></div>
+                            <div class="about-row"><span class="about-icon">📊</span><div class="about-text"><strong>${featuredNomination.sharePercentage}% share</strong><span>${featuredNomination.minor ? "Minor" : "Adult"}</span></div></div>
+                        </div>`
+                    : `<p class="overview-summary-text text-muted">${nominations.length} nomination(s) added.</p>`
+                }
+                </div>
+            </div>
+        `;
+
+            // ----------------------------------------------------------------------------------------------
+            //                   Work & Education Panel
+            // ----------------------------------------------------------------------------------------------
+            const featuredEducation = getDisplayRecord("education", education);
+            const featuredExperience = getDisplayRecord("experience", experience);
+
+            const workPanel = `
+            <div class="fb-tab-panel" data-tab-panel="work">
+                <div class="about-card">
+                    <div class="about-card-header">
+                        <h5>Work Position</h5>
+                    </div>
+                    <div class="about-grid">
+                        <div class="about-row"><span class="about-icon">🏢</span><div class="about-text"><strong>${escapeHtml(workPosition.departmentName) || "--"}</strong><span>Department</span></div></div>
+                        <div class="about-row"><span class="about-icon">📶</span><div class="about-text"><strong>${escapeHtml(workPosition.gradeLevel) || "--"}</strong><span>Grade Level</span></div></div>
                     </div>
                 </div>
 
-              <div class="overview-card">
-                    <div class="overview-card-header">
+                <div class="about-card">
+                    <div class="about-card-header">
+                        <h5>Experience</h5>
+                        <button type="button" class="overview-nav-btn" data-goto-view="experience-information" title="Manage">›</button>
+                    </div>
+                    ${featuredExperience
+                    ? `<div class="about-grid">
+                            <div class="about-row"><span class="about-icon">💼</span><div class="about-text"><strong>${escapeHtml(featuredExperience.companyName)}</strong><span>${escapeHtml(featuredExperience.designation) || "--"}</span></div></div>
+                            <div class="about-row"><span class="about-icon">📅</span><div class="about-text"><strong>${escapeHtml(featuredExperience.fromDate)}</strong><span>${featuredExperience.current ? "Current" : "Past"}</span></div></div>
+                        </div>`
+                    : `<p class="overview-summary-text text-muted">${experience.length} record(s) added.</p>`
+                }
+                </div>
+
+                <div class="about-card">
+                    <div class="about-card-header">
+                        <h5>Education</h5>
+                        <button type="button" class="overview-nav-btn" data-goto-view="education-information" title="Manage">›</button>
+                    </div>
+                    ${featuredEducation
+                    ? `<div class="about-grid">
+                            <div class="about-row"><span class="about-icon">🎓</span><div class="about-text"><strong>${escapeHtml(featuredEducation.degree)}</strong><span>${escapeHtml(featuredEducation.institution)}</span></div></div>
+                            <div class="about-row"><span class="about-icon">📈</span><div class="about-text"><strong>${featuredEducation.yearOfPassing || "--"}</strong><span>${escapeHtml(featuredEducation.percentageOrGrade) || "--"}</span></div></div>
+                        </div>`
+                    : `<p class="overview-summary-text text-muted">${education.length} record(s) added.</p>`
+                }
+                </div>
+
+                <div class="about-card">
+                    <div class="about-card-header">
+                        <h5>Exit Details</h5>
+                    </div>
+                    <div class="about-grid">
+                        <div class="about-row"><span class="about-icon">🚪</span><div class="about-text"><strong>${escapeHtml(exitDetails.separationMode) || "--"}</strong><span>Separation Mode</span></div></div>
+                        <div class="about-row"><span class="about-icon">📅</span><div class="about-text"><strong>${escapeHtml(exitDetails.lastWorkingDate) || "--"}</strong><span>Last Working Date</span></div></div>
+                    </div>
+                </div>
+            </div>
+        `;
+            // ----------------------------------------------------------------------------------------------
+            //              Skill Panel
+            // ----------------------------------------------------------------------------------------------
+            const skillsPanel = `
+            <div class="fb-tab-panel" data-tab-panel="skills">
+                <div class="about-card">
+                    <div class="about-card-header">
                         <h5>Skills</h5>
                         <button type="button" class="overview-nav-btn" data-goto-view="skills" title="Manage">›</button>
                     </div>
-                    <div class="overview-card-body">
-                        ${skills.length
-                    ? `<div class="cc-chips">${skills.map(function (s) { return `<span class="cc-chip">${escapeHtml(s.skillName)}</span>`; }).join("")}</div>`
+                    ${skills.length
+                    ? `<div class="cc-chips">${skills.map(function (s) { return `<span class="cc-chip">${escapeHtml(s.skillName)}${s.certified ? " ✔" : ""}</span>`; }).join("")}</div>`
                     : `<p class="overview-summary-text text-muted">No skills added yet.</p>`
                 }
-                    </div>
                 </div>
+            </div>
+        `;
 
-            `;
+            grid.innerHTML = aboutPanel + familyPanel + workPanel + skillsPanel;
 
+            // ----------------------------------------------------------------------------------------------
+            //                     Bind edit/nav buttons
+            // ----------------------------------------------------------------------------------------------
             const overviewEditPersonalInfo = document.getElementById("overviewEditPersonalInfo");
             if (overviewEditPersonalInfo) {
                 overviewEditPersonalInfo.addEventListener("click", openPersonalInfoModal);
-            }
-
-            const overviewEditJoiningDetails = document.getElementById("overviewEditJoiningDetails");
-            if (overviewEditJoiningDetails) {
-                overviewEditJoiningDetails.addEventListener("click", openJoiningDetailsModal);
             }
 
             grid.querySelectorAll("[data-goto-view]").forEach(function (btn) {
@@ -1460,14 +1446,33 @@ document.addEventListener("DOMContentLoaded", function () {
                     showView(this.dataset.gotoView);
                 });
             });
+        });
+    }
+    // ----------------------------------------------------------------------------------------------
+    //                  Tab Switching
+    // ----------------------------------------------------------------------------------------------
+    const fbProfileTabs = document.getElementById("fbProfileTabs");
+    if (fbProfileTabs) {
+        fbProfileTabs.addEventListener("click", function (e) {
+            const btn = e.target.closest(".fb-tab");
+            if (!btn) return;
 
+            fbProfileTabs.querySelectorAll(".fb-tab").forEach(function (t) {
+                t.classList.remove("active");
+            });
+            btn.classList.add("active");
+
+            const tabName = btn.dataset.tab;
+            document.querySelectorAll(".fb-tab-panel").forEach(function (panel) {
+                panel.classList.toggle("active", panel.dataset.tabPanel === tabName);
+            });
         });
     }
 
-    // ============================================================================================
+    // ==============================================================================================
     //              RESET PASSWORD (from Profile)
-    //              RESET PASSWORD — SUBMIT (modal se)
-    // ============================================================================================
+    //              RESET PASSWORD — SUBMIT (modal)
+    // ==============================================================================================
     const resetPasswordForm =
         document.getElementById("resetPasswordForm");
 
@@ -1528,9 +1533,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // ==========================================================================================
+    // ==============================================================================================
     //              Validates the password confirmation in real time.
-    // ==========================================================================================
+    // ==============================================================================================
 
     function checkPasswordMatchLive() {
         const newPasswordField = document.getElementById("newPasswordField");
@@ -1565,33 +1570,41 @@ document.addEventListener("DOMContentLoaded", function () {
         confirmPasswordFieldForLiveCheck.addEventListener("input", checkPasswordMatchLive);
     }
 
-    // ============================================================================================
+    // ==============================================================================================
     //                  INITIAL VIEW
-    // ============================================================================================
+    // ==============================================================================================
     showView("dashboard");
 
-    // ============================================================================================
-    //                  Mobile View Responsive 
-    // ============================================================================================
-    const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+    // ==============================================================================================
+    //                Brand Logo Dropdown And  Mobile View Responsive — Logo dropdown
+    // ==============================================================================================
+    const brandLogoToggle = document.getElementById("brandLogoToggle");
     const dashboardSidebarEl = document.getElementById("dashboardSidebar");
 
-    if (mobileMenuBtn && dashboardSidebarEl) {
-        mobileMenuBtn.addEventListener("click", function (e) {
-            e.stopPropagation();
-            dashboardSidebarEl.classList.toggle("mobile-open");
+    if (brandLogoToggle && dashboardSidebarEl) {
+        brandLogoToggle.addEventListener("click", function (e) {
+            if (window.innerWidth < 768) {
+                e.stopPropagation();
+                dashboardSidebarEl.classList.toggle("mobile-open");
+            }
         });
 
+        // ----------------------------------------------------------------------------------------------
+        //      Outside click pe close
+        // ----------------------------------------------------------------------------------------------
         document.addEventListener("click", function (e) {
             if (
                 dashboardSidebarEl.classList.contains("mobile-open") &&
                 !dashboardSidebarEl.contains(e.target) &&
-                e.target !== mobileMenuBtn
+                !brandLogoToggle.contains(e.target)
             ) {
                 dashboardSidebarEl.classList.remove("mobile-open");
             }
         });
 
+        // ----------------------------------------------------------------------------------------------
+        //          Clicking any nav item closes the menu.
+        // ----------------------------------------------------------------------------------------------
         dashboardSidebarEl.querySelectorAll("[data-view]").forEach(function (btn) {
             btn.addEventListener("click", function () {
                 if (window.innerWidth < 768) {
@@ -1601,9 +1614,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // ===========================================================================================
+    // ==============================================================================================
     //           Updates the sidebar avatar after the profile photo changes.
-    // ===========================================================================================
+    // ==============================================================================================
     function refreshSidebarProfileImage() {
         const sidebarImage = document.getElementById("sidebarProfileImage");
         const sidebarInitials = document.getElementById("sidebarInitials");
@@ -1617,10 +1630,9 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-
-    // ============================================================================================
+    // ==============================================================================================
     //              Opens the employee joining details modal.
-    // ============================================================================================
+    // ==============================================================================================
 
     let currentJoiningDetails = null;
 
@@ -1650,9 +1662,9 @@ document.addEventListener("DOMContentLoaded", function () {
             `;
         });
     }
-    // ==========================================================================================
+    // ==============================================================================================
     //                  Open Joining Model
-    // ==========================================================================================
+    // ==============================================================================================
 
     function openJoiningDetailsModal() {
         if (!currentJoiningDetails) return;
@@ -1697,10 +1709,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // =============================================================================================
+    // ==============================================================================================
     //                  View work position only section
-    // =============================================================================================
-
+    // ==============================================================================================
     function loadWorkPosition() {
         const card = document.getElementById("workPositionCard");
         card.innerHTML = `<p class="text-muted">Loading...</p>`;
@@ -1728,10 +1739,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // ============================================================================================
+    // ==============================================================================================
     //               Exit details View only Section
-    // ============================================================================================
-
+    // ==============================================================================================
     function loadExitDetails() {
         const card = document.getElementById("exitDetailsCard");
         card.innerHTML = `<p class="text-muted">Loading...</p>`;
@@ -1754,55 +1764,77 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-
-    // ==================================================================================================
+    // ==============================================================================================
     //      Renders the nomination table and opens the nomination modal for a selected record.
-    // ==================================================================================================
+    // ==============================================================================================
 
     let nominationData = [];
-
     function loadNominationInformation() {
-        const tbody = document.getElementById("nominationTableBody");
-        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4">Loading...</td></tr>`;
+        const container = document.getElementById("nominationCardsList");
+        container.innerHTML = `<p class="text-muted">Loading...</p>`;
 
         fetchMyNominees().then(function (res) {
             nominationData = res.data;
             renderNominationTable();
         }).catch(function (error) {
-            tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-danger">${escapeHtml(error.message || "Failed to load nominations.")}</td></tr>`;
+            container.innerHTML = `<p class="text-danger">${escapeHtml(error.message || "Failed to load nominations.")}</p>`;
         });
     }
+
+    // ==============================================================================================
+    //          Show on Nomination Card details
+    // ==============================================================================================
     function renderNominationTable() {
-        const tbody = document.getElementById("nominationTableBody");
+        const container = document.getElementById("nominationCardsList");
 
         if (nominationData.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted">No nominations added yet.</td></tr>`;
+            container.innerHTML = `<p class="text-muted">No nominations added yet.</p>`;
             return;
         }
 
-        tbody.innerHTML = nominationData.map(function (n) {
+        container.innerHTML = nominationData.map(function (n) {
             return `
-            <tr>
-                <td>${escapeHtml(n.name)}</td>
-                <td>${escapeHtml(n.relationship)}</td>
-                <td>${escapeHtml(n.dateOfBirth) || "--"}</td>
-                <td>${n.sharePercentage}%</td>
-                <td>${n.minor ? "Yes" : "No"}</td>
-                <td>
-                    <button type="button" class="btn btn-sm btn-outline-primary" data-edit-nomination="${n.id}">Edit</button>
-                    <button type="button" class="btn btn-sm btn-outline-danger" data-delete-nomination="${n.id}">Delete</button>
-                </td>
-            </tr>
+            <div class="education-card">
+
+                <div class="education-card-actions">
+                    <button type="button" class="education-edit-btn" data-edit-nomination="${n.id}" title="Edit">✎</button>
+                    <button type="button" class="education-delete-btn" data-delete-nomination="${n.id}" title="Delete">🗑</button>
+                </div>
+
+                <div class="education-card-header">
+                    <div class="education-card-icon">📝</div>
+                    <div class="education-card-title">
+                        <h5>${escapeHtml(n.name)}</h5>
+                        <p>${escapeHtml(n.relationship)}</p>
+                    </div>
+                </div>
+
+                <div class="education-card-details">
+                    <div class="education-detail-item">
+                        <span>Date of Birth</span>
+                        <strong>${escapeHtml(n.dateOfBirth) || "--"}</strong>
+                    </div>
+                    <div class="education-detail-item">
+                        <span>Share %</span>
+                        <strong>${n.sharePercentage}%</strong>
+                    </div>
+                    <div class="education-detail-item">
+                        <span>Minor</span>
+                        <strong>${n.minor ? "Yes" : "No"}</strong>
+                    </div>
+                </div>
+
+            </div>
         `;
         }).join("");
 
-        tbody.querySelectorAll("[data-edit-nomination]").forEach(function (btn) {
+        container.querySelectorAll("[data-edit-nomination]").forEach(function (btn) {
             btn.addEventListener("click", function () {
                 openNominationModal(this.dataset.editNomination);
             });
         });
 
-        tbody.querySelectorAll("[data-delete-nomination]").forEach(function (btn) {
+        container.querySelectorAll("[data-delete-nomination]").forEach(function (btn) {
             btn.addEventListener("click", function () {
                 const id = this.dataset.deleteNomination;
 
@@ -1833,6 +1865,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    // ==============================================================================================
+    //              Open Nomination Model Box
+    // ==============================================================================================
     function openNominationModal(id) {
         const modalTitle = document.getElementById("nominationModalTitle");
         document.getElementById("nominationFormMessage").innerHTML = "";
@@ -1916,9 +1951,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // ============================================================================================
+    // ==============================================================================================
     //               Displays skills as chips and saves the updated skills.
-    // ============================================================================================
+    // ==============================================================================================
     let skillsList = [];
 
     function loadSkills() {
@@ -2002,9 +2037,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // =============================================================================================
+    // ==============================================================================================
     //               Opens the personal information modal.
-    // =============================================================================================
+    // ==============================================================================================
 
     let currentPersonalInfo = null;
 
@@ -2012,68 +2047,60 @@ document.addEventListener("DOMContentLoaded", function () {
         const card = document.getElementById("personalInfoCard");
         card.innerHTML = `<p class="text-muted">Loading...</p>`;
 
-        demoGetPersonalInformation().then(function (res) {
+        fetchMyExtendedProfile().then(function (res) {
             currentPersonalInfo = res.data;
             const d = currentPersonalInfo;
 
             card.innerHTML = `
-                <div class="profile-info-grid">
-                    <div class="profile-info-item">
-                        <span class="profile-label">Height</span>
-                        <strong>${escapeHtml(d.height) || "--"}</strong>
-                    </div>
-                    <div class="profile-info-item">
-                        <span class="profile-label">Weight</span>
-                        <strong>${escapeHtml(d.weight) || "--"}</strong>
-                    </div>
-                    <div class="profile-info-item">
-                        <span class="profile-label">Passport No</span>
-                        <strong>${escapeHtml(d.passportNo) || "--"}</strong>
-                    </div>
-                    <div class="profile-info-item">
-                        <span class="profile-label">PAN No</span>
-                        <strong>${escapeHtml(d.panNo) || "--"}</strong>
-                    </div>
-                    <div class="profile-info-item">
-                        <span class="profile-label">Aadhar No</span>
-                        <strong>${escapeHtml(d.aadharNo) || "--"}</strong>
-                    </div>
-                    <div class="profile-info-item">
-                        <span class="profile-label">Religion</span>
-                        <strong>${escapeHtml(d.religion) || "--"}</strong>
-                    </div>
-                    <div class="profile-info-item">
-                        <span class="profile-label">Marital Status</span>
-                        <strong>${escapeHtml(d.maritalStatus) || "--"}</strong>
-                    </div>
-                    <div class="profile-info-item">
-                        <span class="profile-label">Employee Blood Group</span>
-                        <strong>${escapeHtml(d.bloodGroup) || "--"}</strong>
-                    </div>
-                    <div class="profile-info-item">
-                        <span class="profile-label">Shift</span>
-                        <strong>${escapeHtml(d.shift) || "--"}</strong>
-                    </div>
+            <div class="profile-info-grid">
+                <div class="profile-info-item">
+                    <span class="profile-label">Date of Birth</span>
+                    <strong>${escapeHtml(d.dateOfBirth) || "--"}</strong>
                 </div>
-            `;
+                <div class="profile-info-item">
+                    <span class="profile-label">Gender</span>
+                    <strong>${escapeHtml(d.gender) || "--"}</strong>
+                </div>
+                <div class="profile-info-item">
+                    <span class="profile-label">Marital Status</span>
+                    <strong>${escapeHtml(d.maritalStatus) || "--"}</strong>
+                </div>
+                <div class="profile-info-item">
+                    <span class="profile-label">Blood Group</span>
+                    <strong>${escapeHtml(d.bloodGroup) || "--"}</strong>
+                </div>
+                <div class="profile-info-item">
+                    <span class="profile-label">Occupation</span>
+                    <strong>${escapeHtml(d.occupation) || "--"}</strong>
+                </div>
+                <div class="profile-info-item">
+                    <span class="profile-label">Nationality</span>
+                    <strong>${escapeHtml(d.nationality) || "--"}</strong>
+                </div>
+                <div class="profile-info-item" style="grid-column: 1 / -1;">
+                    <span class="profile-label">Bio</span>
+                    <strong>${escapeHtml(d.bio) || "--"}</strong>
+                </div>
+            </div>
+        `;
+        }).catch(function (error) {
+            card.innerHTML = `<div class="custom-alert error">${escapeHtml(error.message || "Failed to load profile.")}</div>`;
         });
     }
-    // =============================================================================================
+    // ==============================================================================================
     //                  Profile Infomation model Open
-    // =============================================================================================
+    // ==============================================================================================
 
     function openPersonalInfoModal() {
         if (!currentPersonalInfo) return;
 
-        document.getElementById("heightField").value = currentPersonalInfo.height || "";
-        document.getElementById("weightField").value = currentPersonalInfo.weight || "";
-        document.getElementById("passportNoField").value = currentPersonalInfo.passportNo || "";
-        document.getElementById("panNoField").value = currentPersonalInfo.panNo || "";
-        document.getElementById("aadharNoField").value = currentPersonalInfo.aadharNo || "";
-        document.getElementById("religionField").value = currentPersonalInfo.religion || "";
-        document.getElementById("maritalStatusField").value = currentPersonalInfo.maritalStatus || "Single";
+        document.getElementById("dobField").value = currentPersonalInfo.dateOfBirth || "";
+        document.getElementById("genderField").value = currentPersonalInfo.gender || "MALE";
+        document.getElementById("maritalStatusField").value = currentPersonalInfo.maritalStatus || "SINGLE";
         document.getElementById("bloodGroupField").value = currentPersonalInfo.bloodGroup || "O+";
-        document.getElementById("shiftField").value = currentPersonalInfo.shift || "Day";
+        document.getElementById("occupationField").value = currentPersonalInfo.occupation || "";
+        document.getElementById("nationalityField").value = currentPersonalInfo.nationality || "";
+        document.getElementById("bioField").value = currentPersonalInfo.bio || "";
         document.getElementById("personalInfoFormMessage").innerHTML = "";
 
         const modal = new bootstrap.Modal(document.getElementById("personalInfoModal"));
@@ -2090,43 +2117,44 @@ document.addEventListener("DOMContentLoaded", function () {
         personalInfoForm.addEventListener("submit", function (e) {
             e.preventDefault();
 
+            const messageBox = document.getElementById("personalInfoFormMessage");
+            messageBox.innerHTML = "";
+
             const payload = {
-                height: document.getElementById("heightField").value.trim(),
-                weight: document.getElementById("weightField").value.trim(),
-                passportNo: document.getElementById("passportNoField").value.trim(),
-                panNo: document.getElementById("panNoField").value.trim(),
-                aadharNo: document.getElementById("aadharNoField").value.trim(),
-                religion: document.getElementById("religionField").value.trim(),
+                dateOfBirth: document.getElementById("dobField").value || null,
+                gender: document.getElementById("genderField").value,
                 maritalStatus: document.getElementById("maritalStatusField").value,
                 bloodGroup: document.getElementById("bloodGroupField").value,
-                shift: document.getElementById("shiftField").value
+                occupation: document.getElementById("occupationField").value.trim(),
+                nationality: document.getElementById("nationalityField").value.trim(),
+                bio: document.getElementById("bioField").value.trim()
             };
 
-            demoUpdatePersonalInformation(payload).then(function (res) {
+            updateMyExtendedProfile(payload).then(function (res) {
                 const modal = bootstrap.Modal.getInstance(document.getElementById("personalInfoModal"));
                 if (modal) modal.hide();
 
                 Swal.fire({
                     icon: "success",
-                    title: res.data.message,
+                    title: res.message || "Profile updated successfully.",
                     confirmButtonColor: "#17a2b8"
                 });
 
                 loadPersonalInformation();
+            }).catch(function (error) {
+                messageBox.innerHTML = `<div class="custom-alert error">${escapeHtml(error.message || "Something went wrong.")}</div>`;
             });
         });
     }
 
-
-    // ===========================================================================================
-    //              EMERGENCY INFORMATION
-    // ===========================================================================================
-
+    // ==============================================================================================
+    //             Load Emergency Information
+    // ==============================================================================================
     let emergencyContactsData = [];
 
     function loadEmergencyInformation() {
-        const tbody = document.getElementById("emergencyContactsTableBody");
-        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4">Loading...</td></tr>`;
+        const container = document.getElementById("emergencyContactsCardsList");
+        container.innerHTML = `<p class="text-muted">Loading...</p>`;
 
         fetchMyEmergencyContacts().then(function (res) {
             emergencyContactsData = res.data;
@@ -2134,42 +2162,64 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // ============================================================================================
-    //              Emergency Contect Table Body
-    // ============================================================================================
-
+    // ==============================================================================================
+    //              Show on Emergency Card details
+    // ==============================================================================================
     function renderEmergencyContactsTable() {
-        const tbody = document.getElementById("emergencyContactsTableBody");
+        const container = document.getElementById("emergencyContactsCardsList");
 
         if (emergencyContactsData.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-muted">No emergency contacts added yet.</td></tr>`;
+            container.innerHTML = `<p class="text-muted">No emergency contacts added yet.</p>`;
             return;
         }
 
-        tbody.innerHTML = emergencyContactsData.map(function (c) {
+        container.innerHTML = emergencyContactsData.map(function (c) {
             return `
-                <tr>
-                    <td>${escapeHtml(c.name)}</td>
-                    <td>${escapeHtml(c.relationship)}</td>
-                    <td>${escapeHtml(c.phone)}</td>
-                    <td>${escapeHtml(c.email)}</td>
-                    <td>${escapeHtml(c.address)}</td>
-                    <td>${escapeHtml(c.email)}</td>
-                    <td>
-                        <button type="button" class="btn btn-sm btn-outline-primary" data-edit-emergency="${c.id}">Edit</button>
-                        <button type="button" class="btn btn-sm btn-outline-danger" data-delete-emergency="${c.id}">Delete</button>
-                    </td>
-                </tr>
-            `;
+            <div class="education-card">
+
+                <div class="education-card-actions">
+                    <button type="button" class="education-edit-btn" data-edit-emergency="${c.id}" title="Edit">✎</button>
+                    <button type="button" class="education-delete-btn" data-delete-emergency="${c.id}" title="Delete">🗑</button>
+                </div>
+
+                <div class="education-card-header">
+                    <div class="education-card-icon">🆘</div>
+                    <div class="education-card-title">
+                        <h5>${escapeHtml(c.name)}</h5>
+                        <p>${escapeHtml(c.relationship)}</p>
+                    </div>
+                </div>
+
+                <div class="education-card-details">
+                    <div class="education-detail-item">
+                        <span>Phone</span>
+                        <strong>${escapeHtml(c.phone) || "--"}</strong>
+                    </div>
+                    <div class="education-detail-item">
+                        <span>Email</span>
+                        <strong>${escapeHtml(c.email) || "--"}</strong>
+                    </div>
+                    <div class="education-detail-item">
+                        <span>Address</span>
+                        <strong>${escapeHtml(c.address) || "--"}</strong>
+                    </div>
+                    <div class="education-detail-item">
+                        <span>Priority</span>
+                        <strong>${c.priority || "--"}</strong>
+                    </div>
+                </div>
+
+            </div>
+        `;
         }).join("");
 
-        tbody.querySelectorAll("[data-edit-emergency]").forEach(function (btn) {
+        container.querySelectorAll("[data-edit-emergency]").forEach(function (btn) {
             btn.addEventListener("click", function () {
                 openEmergencyContactModal(this.dataset.editEmergency);
             });
         });
 
-        tbody.querySelectorAll("[data-delete-emergency]").forEach(function (btn) {
+        container.querySelectorAll("[data-delete-emergency]").forEach(function (btn) {
             btn.addEventListener("click", function () {
                 const id = this.dataset.deleteEmergency;
 
@@ -2181,57 +2231,28 @@ document.addEventListener("DOMContentLoaded", function () {
                     confirmButtonColor: "#b3261e"
                 }).then(function (result) {
                     if (result.isConfirmed) {
-                        demoDeleteEmergencyContact(id).then(function () {
+                        deleteMyEmergencyContact(id).then(function () {
                             emergencyContactsData = emergencyContactsData.filter(function (c) {
                                 return String(c.id) !== String(id);
                             });
                             renderEmergencyContactsTable();
+                        }).catch(function (error) {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Could not remove contact",
+                                text: error.message,
+                                confirmButtonColor: "#17a2b8"
+                            });
                         });
                     }
-                });
-            });
-            tbody.querySelectorAll("[data-delete-emergency]").forEach(function (btn) {
-                btn.addEventListener("click", function () {
-                    const id = this.dataset.deleteEmergency;
-
-                    Swal.fire({
-                        icon: "warning",
-                        title: "Remove this contact?",
-                        showCancelButton: true,
-                        confirmButtonText: "Yes, remove",
-                        confirmButtonColor: "#b3261e"
-                    }).then(function (result) {
-                        if (result.isConfirmed) {
-                            deleteMyEmergencyContact(id).then(function () {
-                                emergencyContactsData = emergencyContactsData.filter(function (c) {
-                                    return String(c.id) !== String(id);
-                                });
-                                renderEmergencyContactsTable();
-                            }).catch(function (error) {
-                                Swal.fire({
-                                    icon: "error",
-                                    title: "Could not remove contact",
-                                    text: error.message,
-                                    confirmButtonColor: "#17a2b8"
-                                });
-                            });
-                        }
-                    });
-                });
-            });
-            tbody.querySelectorAll(".feature-checkbox").forEach(function (cb) {
-                cb.addEventListener("change", function () {
-                    setFeaturedId("emergency", this.checked ? this.dataset.id : null);
-                    renderEmergencyContactsTable();
                 });
             });
         });
     }
 
-    // ========================================================================================
-    //          Emergency Cotect Model
-    // ========================================================================================
-
+    // ==============================================================================================
+    //         Open Emergency Cotect Model
+    // ==============================================================================================
     function openEmergencyContactModal(id) {
         const modalTitle = document.getElementById("emergencyContactModalTitle");
         document.getElementById("emergencyContactFormMessage").innerHTML = "";
@@ -2261,9 +2282,9 @@ document.addEventListener("DOMContentLoaded", function () {
         modal.show();
     }
 
-    // =============================================================================================
+    // ==============================================================================================
     //              Emergency Contect Button
-    // =========================================================================================== 
+    // ==============================================================================================
     const addEmergencyContactButton = document.getElementById("addEmergencyContactButton");
     if (addEmergencyContactButton) {
         addEmergencyContactButton.addEventListener("click", function () {
@@ -2296,13 +2317,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 const modal = bootstrap.Modal.getInstance(document.getElementById("emergencyContactModal"));
                 if (modal) modal.hide();
 
-                // Featured checkbox handle karo
                 const savedId = id || (res.data && res.data.id);
 
                 if (wantsFeatured && savedId) {
                     setFeaturedId("emergency", savedId);
                 } else if (!wantsFeatured && isFeatured("emergency", savedId)) {
-                    // agar isi record ko unfeature kiya gaya, toh clear kar do
                     setFeaturedId("emergency", null);
                 }
 
@@ -2321,9 +2340,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    // ===========================================================================================
+    // ==============================================================================================
     //               Displays education details and opens the education modal.
-    // ===========================================================================================
+    // ==============================================================================================
 
     let educationData = [];
     function loadEducationInformation() {
@@ -2338,84 +2357,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // function renderEducationCards() {
-    //     const container = document.getElementById("educationCardsList");
-
-    //     if (educationData.length === 0) {
-    //         container.innerHTML = `<p class="text-muted">No education records added yet.</p>`;
-    //         return;
-    //     }
-
-    //     container.innerHTML = educationData.map(function (e) {
-    //         return `
-    //             <div class="education-card">
-
-    //                 <div class="education-card-actions">
-    //                     <button type="button" class="education-edit-btn" data-edit-education="${e.id}" title="Edit">✎</button>
-    //                     <button type="button" class="education-delete-btn" data-delete-education="${e.id}" title="Delete">🗑</button>
-    //                 </div>
-
-    //                 <div class="education-card-header">
-    //                     <div class="education-card-icon">🎓</div>
-    //                     <div class="education-card-title">
-    //                         <h5>${escapeHtml(e.qualification)}</h5>
-    //                         <p>${escapeHtml(e.institution)}</p>
-    //                     </div>
-    //                 </div>
-
-    //                 <div class="education-card-details">
-    //                     <div class="education-detail-item">
-    //                         <span>Roll Number</span>
-    //                         <strong>${escapeHtml(e.rollNumber) || "--"}</strong>
-    //                     </div>
-    //                     <div class="education-detail-item">
-    //                         <span>Year Of Passing</span>
-    //                         <strong>${escapeHtml(e.year) || "--"}</strong>
-    //                     </div>
-    //                     <div class="education-detail-item">
-    //                         <span>Subjects/Specialization</span>
-    //                         <strong>${escapeHtml(e.subjects) || "--"}</strong>
-    //                     </div>
-    //                     <div class="education-detail-item">
-    //                         <span>Percentage</span>
-    //                         <strong>${escapeHtml(e.percentage) || "--"}</strong>
-    //                     </div>
-    //                 </div>
-
-    //             </div>
-    //         `;
-    //     }).join("");
-
-    //     container.querySelectorAll("[data-edit-education]").forEach(function (btn) {
-    //         btn.addEventListener("click", function () {
-    //             openEducationModal(this.dataset.editEducation);
-    //         });
-    //     });
-
-    //     container.querySelectorAll("[data-delete-education]").forEach(function (btn) {
-    //         btn.addEventListener("click", function () {
-    //             const id = this.dataset.deleteEducation;
-
-    //             Swal.fire({
-    //                 icon: "warning",
-    //                 title: "Remove this education record?",
-    //                 showCancelButton: true,
-    //                 confirmButtonText: "Yes, remove",
-    //                 confirmButtonColor: "#b3261e"
-    //             }).then(function (result) {
-    //                 if (result.isConfirmed) {
-    //                     demoDeleteEducation(id).then(function () {
-    //                         educationData = educationData.filter(function (e) {
-    //                             return String(e.id) !== String(id);
-    //                         });
-    //                         renderEducationCards();
-    //                     });
-    //                 }
-    //             });
-    //         });
-    //     });
-    // }
-
+    // ==============================================================================================
+    //          Show on Education Card Details
+    // ==============================================================================================
     function renderEducationCards() {
         const container = document.getElementById("educationCardsList");
 
@@ -2501,33 +2445,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-
-    // function openEducationModal(id) {
-    //     const modalTitle = document.getElementById("educationModalTitle");
-    //     document.getElementById("educationFormMessage").innerHTML = "";
-
-    //     if (id) {
-    //         const record = educationData.find(function (e) {
-    //             return String(e.id) === String(id);
-    //         });
-
-    //         modalTitle.textContent = "Edit Education";
-    //         document.getElementById("educationId").value = record.id;
-    //         document.getElementById("educationQualification").value = record.qualification;
-    //         document.getElementById("educationInstitution").value = record.institution;
-    //         document.getElementById("educationRollNumber").value = record.rollNumber;
-    //         document.getElementById("educationSubjects").value = record.subjects;
-    //         document.getElementById("educationYear").value = record.year;
-    //         document.getElementById("educationPercentage").value = record.percentage;
-    //     } else {
-    //         modalTitle.textContent = "Add Education";
-    //         document.getElementById("educationForm").reset();
-    //         document.getElementById("educationId").value = "";
-    //     }
-
-    //     const modal = new bootstrap.Modal(document.getElementById("educationModal"));
-    //     modal.show();
-    // }
+    // ==============================================================================================
+    //              Open Education Model Box
+    // ==============================================================================================
 
     function openEducationModal(id) {
         const modalTitle = document.getElementById("educationModalTitle");
@@ -2573,9 +2493,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const id = document.getElementById("educationId").value;
             const messageBox = document.getElementById("educationFormMessage");
             messageBox.innerHTML = "";
-
             const wantsFeatured = document.getElementById("educationFeatured").checked;
-
             const payload = {
                 degree: document.getElementById("educationQualification").value.trim(),
                 institution: document.getElementById("educationInstitution").value.trim(),
@@ -2614,56 +2532,77 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-
-    // ============================================================================================
+    // ==============================================================================================
     //             Displays work experience and opens the experience modal.
-    // ============================================================================================
+    // ==============================================================================================
 
     let experienceData = [];
-
     function loadExperienceInformation() {
-        const tbody = document.getElementById("experienceTableBody");
-        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4">Loading...</td></tr>`;
+        const container = document.getElementById("experienceCardsList");
+        container.innerHTML = `<p class="text-muted">Loading...</p>`;
 
         fetchMyExperienceDetails().then(function (res) {
             experienceData = res.data;
             renderExperienceTable();
         }).catch(function (error) {
-            tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-danger">${escapeHtml(error.message || "Failed to load experience details.")}</td></tr>`;
+            container.innerHTML = `<p class="text-danger">${escapeHtml(error.message || "Failed to load experience details.")}</p>`;
         });
     }
 
+    // ==============================================================================================
+    //          Show on Experience Card details
+    // ==============================================================================================
     function renderExperienceTable() {
-        const tbody = document.getElementById("experienceTableBody");
+        const container = document.getElementById("experienceCardsList");
 
         if (experienceData.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted">No experience records added yet.</td></tr>`;
+            container.innerHTML = `<p class="text-muted">No experience records added yet.</p>`;
             return;
         }
 
-        tbody.innerHTML = experienceData.map(function (x) {
+        container.innerHTML = experienceData.map(function (x) {
             return `
-            <tr>
-                <td>${escapeHtml(x.fromDate)}</td>
-                <td>${x.current ? "--" : escapeHtml(x.toDate || "--")}</td>
-                <td>${escapeHtml(x.companyName)}</td>
-                <td>${escapeHtml(x.designation)}</td>
-                <td>${x.current ? `<span class="badge text-bg-success">Current</span>` : `<span class="badge text-bg-secondary">Past</span>`}</td>
-                <td>
-                    <button type="button" class="btn btn-sm btn-outline-primary" data-edit-experience="${x.id}">Edit</button>
-                    <button type="button" class="btn btn-sm btn-outline-danger" data-delete-experience="${x.id}">Delete</button>
-                </td>
-            </tr>
+            <div class="education-card">
+
+                <div class="education-card-actions">
+                    <button type="button" class="education-edit-btn" data-edit-experience="${x.id}" title="Edit">✎</button>
+                    <button type="button" class="education-delete-btn" data-delete-experience="${x.id}" title="Delete">🗑</button>
+                </div>
+
+                <div class="education-card-header">
+                    <div class="education-card-icon">💼</div>
+                    <div class="education-card-title">
+                        <h5>${escapeHtml(x.companyName)}</h5>
+                        <p>${escapeHtml(x.designation) || "--"}</p>
+                    </div>
+                </div>
+
+                <div class="education-card-details">
+                    <div class="education-detail-item">
+                        <span>From Date</span>
+                        <strong>${escapeHtml(x.fromDate)}</strong>
+                    </div>
+                    <div class="education-detail-item">
+                        <span>To Date</span>
+                        <strong>${x.current ? "--" : (escapeHtml(x.toDate) || "--")}</strong>
+                    </div>
+                    <div class="education-detail-item">
+                        <span>Status</span>
+                        <strong>${x.current ? "Current" : "Past"}</strong>
+                    </div>
+                </div>
+
+            </div>
         `;
         }).join("");
 
-        tbody.querySelectorAll("[data-edit-experience]").forEach(function (btn) {
+        container.querySelectorAll("[data-edit-experience]").forEach(function (btn) {
             btn.addEventListener("click", function () {
                 openExperienceModal(this.dataset.editExperience);
             });
         });
 
-        tbody.querySelectorAll("[data-delete-experience]").forEach(function (btn) {
+        container.querySelectorAll("[data-delete-experience]").forEach(function (btn) {
             btn.addEventListener("click", function () {
                 const id = this.dataset.deleteExperience;
 
@@ -2694,6 +2633,10 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    // ==============================================================================================
+    //          Open Experience Model Box
+    // ==============================================================================================
+
     function openExperienceModal(id) {
         const modalTitle = document.getElementById("experienceModalTitle");
         document.getElementById("experienceFormMessage").innerHTML = "";
@@ -2721,7 +2664,6 @@ document.addEventListener("DOMContentLoaded", function () {
         const modal = new bootstrap.Modal(document.getElementById("experienceModal"));
         modal.show();
     }
-
 
     const experienceForm = document.getElementById("experienceForm");
     if (experienceForm) {
@@ -2772,61 +2714,72 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-
-
-
-
-    // ===========================================================================================
+    // ==============================================================================================
     //               Displays the employee family details.
-    // ===========================================================================================
+    // ==============================================================================================
 
     let familyMembersData = [];
-
     function loadFamilyInformation() {
-        const tbody = document.getElementById("familyMembersTableBody");
-        tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4">Loading...</td></tr>`;
+        const container = document.getElementById("familyMembersCardsList");
+        container.innerHTML = `<p class="text-muted">Loading...</p>`;
 
         fetchMyFamilyMembers().then(function (res) {
             familyMembersData = res.data;
             renderFamilyTable();
         }).catch(function (error) {
-            tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-danger">${escapeHtml(error.message || "Failed to load family members.")}</td></tr>`;
+            container.innerHTML = `<p class="text-danger">${escapeHtml(error.message || "Failed to load family members.")}</p>`;
         });
     }
 
-    // ============================================================================================
+    // ==============================================================================================
     //               Open Family Model form
-    // ============================================================================================
+    // ==============================================================================================
     function renderFamilyTable() {
-        const tbody = document.getElementById("familyMembersTableBody");
+        const container = document.getElementById("familyMembersCardsList");
 
         if (familyMembersData.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-muted">No family members added yet.</td></tr>`;
+            container.innerHTML = `<p class="text-muted">No family members added yet.</p>`;
             return;
         }
-
-        tbody.innerHTML = familyMembersData.map(function (m) {
+        container.innerHTML = familyMembersData.map(function (m) {
             return `
-            <tr>
-                <td>${escapeHtml(m.name)}</td>
-                <td>${escapeHtml(m.relationship)}</td>
-                <td>${escapeHtml(m.dateOfBirth)}</td>
-                <td>${m.dependent ? "Yes" : "No"}</td>
-                <td>
-                    <button type="button" class="btn btn-sm btn-outline-primary" data-edit-family="${m.id}">Edit</button>
-                    <button type="button" class="btn btn-sm btn-outline-danger" data-delete-family="${m.id}">Delete</button>
-                </td>
-            </tr>
+            <div class="education-card">
+
+                <div class="education-card-actions">
+                    <button type="button" class="education-edit-btn" data-edit-family="${m.id}" title="Edit">✎</button>
+                    <button type="button" class="education-delete-btn" data-delete-family="${m.id}" title="Delete">🗑</button>
+                </div>
+
+                <div class="education-card-header">
+                    <div class="education-card-icon">👪</div>
+                    <div class="education-card-title">
+                        <h5>${escapeHtml(m.name)}</h5>
+                        <p>${escapeHtml(m.relationship)}</p>
+                    </div>
+                </div>
+
+                <div class="education-card-details">
+                    <div class="education-detail-item">
+                        <span>Date of Birth</span>
+                        <strong>${escapeHtml(m.dateOfBirth) || "--"}</strong>
+                    </div>
+                    <div class="education-detail-item">
+                        <span>Dependent</span>
+                        <strong>${m.dependent ? "Yes" : "No"}</strong>
+                    </div>
+                </div>
+
+            </div>
         `;
         }).join("");
 
-        tbody.querySelectorAll("[data-edit-family]").forEach(function (btn) {
+        container.querySelectorAll("[data-edit-family]").forEach(function (btn) {
             btn.addEventListener("click", function () {
                 openFamilyMemberModal(this.dataset.editFamily);
             });
         });
 
-        tbody.querySelectorAll("[data-delete-family]").forEach(function (btn) {
+        container.querySelectorAll("[data-delete-family]").forEach(function (btn) {
             btn.addEventListener("click", function () {
                 const id = this.dataset.deleteFamily;
 
@@ -2856,9 +2809,11 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         });
     }
-    // ============================================================================================
+
+
+    // ==============================================================================================
     //                      Family member open model box
-    // ============================================================================================
+    // ==============================================================================================
 
     function openFamilyMemberModal(id) {
         const modalTitle = document.getElementById("familyMemberModalTitle");
@@ -2893,9 +2848,9 @@ document.addEventListener("DOMContentLoaded", function () {
             openFamilyMemberModal(null);
         });
     }
-    // ===============================================================================================
+    // ==============================================================================================
     //                  Family Member Details Get
-    // ===============================================================================================
+    // ==============================================================================================
     const familyMemberForm = document.getElementById("familyMemberForm");
     if (familyMemberForm) {
         familyMemberForm.addEventListener("submit", function (e) {
@@ -2943,9 +2898,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // ===================================================================================================
+    // ==============================================================================================
     //                     Get Bank Detail
-    // ===================================================================================================
+    // ==============================================================================================
     function loadBankInformation() {
         const card = document.getElementById("bankInfoCard");
         const messageBox = document.getElementById("bankInfoMessage");
@@ -2960,8 +2915,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 card.innerHTML = `<p class="text-muted">No bank information added yet.</p>`;
                 return;
             }
-
-            // Account number ko masked dikhana behtar hai (last 4 digits visible)
+            // ----------------------------------------------------------------------------------------------
+            //      Mask the account number and show only the last 4 digits.
+            // ----------------------------------------------------------------------------------------------
             const maskedAccount = d.accountNumber;
 
 
@@ -2990,47 +2946,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-
-
-    // =============================================================================================
-    //      Identifies device and browser details from the user agent. -------- Upcomming
-    // =============================================================================================
-    function parseDeviceInfo(ua) {
-        if (!ua) return "Unknown device";
-
-        let browser = "Unknown browser";
-        if (ua.includes("Chrome")) {
-            const match = ua.match(/Chrome\/(\d+)/);
-            browser = "Chrome" + (match ? " " + match[1] : "");
-        } else if (ua.includes("Firefox")) {
-            browser = "Firefox";
-        } else if (ua.includes("Safari") && !ua.includes("Chrome")) {
-            browser = "Safari";
-        } else if (ua.includes("Edg")) {
-            browser = "Edge";
-        }
-
-        let os = "Unknown OS";
-        if (ua.includes("Windows")) {
-            os = "Windows";
-        } else if (ua.includes("Android")) {
-            os = "Android";
-        } else if (ua.includes("Mac OS")) {
-            os = "macOS";
-        } else if (ua.includes("Linux")) {
-            os = "Linux";
-        } else if (ua.includes("iPhone") || ua.includes("iPad")) {
-            os = "iOS";
-        }
-
-        const isMobile = ua.includes("Mobile");
-
-        return `${browser} on ${os}${isMobile ? " (Mobile)" : ""}`;
-    }
-
-    // ===========================================================================================
+    // ==============================================================================================
     //               Formats session dates for display
-    // ===========================================================================================
+    // ==============================================================================================
     function formatSessionDate(isoString) {
         if (!isoString) return "--";
 
@@ -3044,14 +2962,13 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // ============================================================================================
+    // ==============================================================================================
     //               Loads and displays the active session list
-    // ============================================================================================
+    // ==============================================================================================
     function loadSessions() {
         const body = document.getElementById("sessionsModalBody");
         body.innerHTML = `<p class="text-muted text-center py-4">Loading sessions...</p>`;
 
-        // apiRequest("/api/sessions").then(function (res) {
         getEmployeeSessions().then(function (res) {
             const sessions = res.data || [];
 
@@ -3142,13 +3059,16 @@ document.addEventListener("DOMContentLoaded", function () {
             body.innerHTML = `<div class="custom-alert error">${escapeHtml(error.message || "Failed to load sessions.")}</div>`;
         });
     }
-
+    // ----------------------------------------------------------------------------------------------
+    //          Session show drop
+    // ----------------------------------------------------------------------------------------------
     const sessionsButton = document.getElementById("sessionsButton");
     if (sessionsButton) {
         sessionsButton.addEventListener("click", function () {
             const modal = new bootstrap.Modal(document.getElementById("sessionsModal"));
             modal.show();
             loadSessions();
+            employeeProfileDropdown.classList.remove("show");
         });
     }
 });
@@ -3157,13 +3077,17 @@ const logoutPanel = document.getElementById("logoutPanel");
 
 if (logoutPanel) {
     logoutPanel.addEventListener("click", function () {
+        // ----------------------------------------------------------------------------------------------
+        //       Use the logout function from auth.js, if available.
+        // ----------------------------------------------------------------------------------------------
 
-        // Agar tumhare auth.js me logout function hai
         if (typeof logout === "function") {
             logout();
             return;
         }
-        // Fallback
+        // ----------------------------------------------------------------------------------------------
+        //          Fallback
+        // ----------------------------------------------------------------------------------------------
         if (typeof deleteCookie === "function") {
             deleteCookie("authData");
         }

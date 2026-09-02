@@ -200,9 +200,6 @@
             <!-- Main Content -->
             <main class="dashboard-main">
 
-                 <!-- FIXED PROFILE HEADER — sabhi profile tabs ke upar hamesha dikhega -->
-                 <div id="profileHeaderBar" class="d-none"></div>
-
                 <!-- DASHBOARD OVERVIEW -->
                 <section id="dashboardView" class="content-view">
                     <div class="dashboard-welcome">
@@ -658,21 +655,10 @@
                 <!-- PROFILE -->
                 <section id="profileView" class="content-view d-none">
                     <div class="section-heading">
-                        <!-- <div><h1>Profile</h1></div> -->
+                        <div><h1>Profile</h1></div>
                     </div>
                     <div id="profileMessage"></div>
                     <div id="profileCard" class="erp-form-card"></div>
-
-                    <!-- EXTENDED INFORMATION — collapsible, "Information" button se neeche open hoga -->
-                    <div id="profileExtendedSection" class="fb-extended-section d-none">
-                        <div class="fb-tabs" id="fbProfileTabs">
-                            <button type="button" class="fb-tab active" data-tab="about">About</button>
-                            <button type="button" class="fb-tab" data-tab="family">Family &amp; Contacts</button>
-                            <button type="button" class="fb-tab" data-tab="work">Work &amp; Education</button>
-                            <button type="button" class="fb-tab" data-tab="skills">Skills</button>
-                        </div>
-                        <div id="profileOverviewGrid"></div>
-                    </div>
 
                     <div class="modal fade" id="resetPasswordModal"
                         tabindex="-1"
@@ -748,39 +734,6 @@
                     </div>
                 </section>
 
-                <!-- <section id="profile-overviewView" class="content-view d-none">
-                    <div class="section-heading">
-                        <button type="button" class="back-to-profile-btn" data-view="profile-overview">← Back</button>
-                    </div>
-
-                    <div class="fb-profile-card">
-                        <div class="fb-cover" id="fbCoverPhoto"></div>
-
-                        <div class="fb-profile-row">
-                            <div class="fb-avatar-wrap">
-                                <img id="fbOverviewAvatar" src="" alt="Profile" class="fb-avatar-img d-none">
-                                <span id="fbOverviewAvatarFallback" class="fb-avatar-fallback"></span>
-                            </div>
-                            <div class="fb-profile-meta">
-                                <h2 id="fbOverviewName">--</h2>
-                                <p id="fbOverviewDesignation">--</p>
-                            </div>
-                        </div>
-
-                        <div class="fb-tabs" id="fbProfileTabs">
-                            <button type="button" class="fb-tab active" data-tab="about">About</button>
-                            <button type="button" class="fb-tab" data-tab="family">Family &amp; Contacts</button>
-                            <button type="button" class="fb-tab" data-tab="work">Work &amp; Education</button>
-                            <button type="button" class="fb-tab" data-tab="skills">Skills</button>
-                        </div>
-                    </div>
-
-                    <div id="profileOverviewGrid"></div>
-                </section> -->
-
-
-
-
                 <!-- VIEW PHOTO MODAL -->
                 <div class="modal fade" id="viewPhotoModal" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered modal-sm">
@@ -830,10 +783,9 @@
                     </div>
                 </div>
                 <!-- PROFILE OVERVIEW (all sections on one page) -->
-
-                 <section id="profile-overviewView" class="content-view d-none">
+                <section id="profile-overviewView" class="content-view d-none">
                     <div class="section-heading">
-                         <!-- <button type="button" class="back-to-profile-btn" data-view="profile-overview">← Back</button> -->
+                         <button type="button" class="back-to-profile-btn" data-view="profile-overview">← Back</button>
                         <div><h3>My Profile — Full Overview</h3><p>All your profile information at a glance.</p></div>
                     </div>
                     <div id="profileOverviewGrid" class="overview-cards-grid"></div>
@@ -843,7 +795,7 @@
                 <section id="personal-informationView" class="content-view d-none">
                     <div class="section-heading">
                         <div class="section-heading-left">
-                            <!-- <button type="button" class="back-to-profile-btn" data-view="profile">← Back</button> -->
+                            <button type="button" class="back-to-profile-btn" data-view="profile-overview">← Back</button>
                             <h3>Personal Information</h3>
                         </div>
                         <button type="button" id="editPersonalInfoButton" class="btn btn-outline-primary">Edit</button>
@@ -925,23 +877,22 @@
                <section id="emergency-informationView" class="content-view d-none">
                     <div class="section-heading">
                         <div class="section-heading-left">
-                            <!-- <button type="button" class="back-to-profile-btn" data-view="profile">← Back</button> -->
+                            <button type="button" class="back-to-profile-btn" data-view="profile-overview">← Back</button>
                             <h3>Emergency Information</h3>
                         </div>
                         <button type="button" id="addEmergencyContactButton" class="btn btn-primary">+ Add Contact</button>
                     </div>
 
                     <div id="emergencyInfoMessage"></div>
-                    <div id="emergencyContactsCardsList" class="education-cards-grid"></div>
 
-                    <!-- <div class="table-responsive">
+                    <div class="table-responsive">
                         <table class="table erp-table align-middle">
                             <thead>
                                 <tr><th>Name</th><th>Relationship</th><th>Phone</th><th>Email</th><th>Address</th><th>Priority</th><th>Action</th></tr>
                             </thead>
                             <tbody id="emergencyContactsTableBody"></tbody>
                         </table>
-                    </div> -->
+                    </div>
                 </section>
 
                 <!-- EMERGENCY CONTACT MODAL -->
@@ -1003,7 +954,7 @@
                 <section id="bank-informationView" class="content-view d-none">
                     <div class="section-heading">
                         <div class="section-heading-left">
-                            <!-- <button type="button" class="back-to-profile-btn" data-view="profile">← Back</button> -->
+                            <button type="button" class="back-to-profile-btn" data-view="profile-overview">← Back</button>
                             <h3>Bank Information</h3>
                         </div>
                     </div>
@@ -1015,7 +966,7 @@
                <section id="education-informationView" class="content-view d-none">
                     <div class="section-heading">
                         <div class="section-heading-left">
-                            <!-- <button type="button" class="back-to-profile-btn" data-view="profile">← Back</button> -->
+                            <button type="button" class="back-to-profile-btn" data-view="profile-overview">← Back</button>
                             <h3>Education Information</h3>
                             <p>Your academic qualifications.</p>
                         </div>
@@ -1088,17 +1039,15 @@
                <section id="experience-informationView" class="content-view d-none">
                     <div class="section-heading">
                         <div class="section-heading-left">
-                            <!-- <button type="button" class="back-to-profile-btn" data-view="profile">← Back</button> -->
+                            <button type="button" class="back-to-profile-btn" data-view="profile-overview">← Back</button>
                             <h3>Experience Information</h3>
                         </div>
                         <button type="button" id="addExperienceButton" class="btn btn-primary">+ Add Experience</button>
                     </div>
 
                     <div id="experienceInfoMessage"></div>
-                    
-                    <div id="experienceCardsList" class="education-cards-grid"></div>
 
-                        <!-- <div class="table-responsive">
+                        <div class="table-responsive">
                             <table class="table erp-table align-middle">
                                 <thead>
                                     <tr>
@@ -1108,7 +1057,7 @@
                                 </thead>
                                 <tbody id="experienceTableBody"></tbody>
                             </table>
-                        </div> -->
+                        </div>
                 </section>
 
                 <!-- EXPERIENCE MODAL -->
@@ -1170,7 +1119,7 @@
                 <section id="work-positionView" class="content-view d-none">
                     <div class="section-heading">
                         <div class="section-heading-left">
-                            <!-- <button type="button" class="back-to-profile-btn" data-view="profile">← Back</button> -->
+                            <button type="button" class="back-to-profile-btn" data-view="profile-overview">← Back</button>
                             <h3>Work Position</h3>
                         </div>
                     </div>
@@ -1182,7 +1131,7 @@
                 <section id="exit-detailsView" class="content-view d-none">
                     <div class="section-heading">
                         <div class="section-heading-left">
-                            <!-- <button type="button" class="back-to-profile-btn" data-view="profile">← Back</button> -->
+                            <button type="button" class="back-to-profile-btn" data-view="profile-overview">← Back</button>
                             <h3>Exit Details</h3>
                         </div>
                     </div>
@@ -1194,7 +1143,7 @@
                 <section id="nomination-informationView" class="content-view d-none">
                     <div class="section-heading">
                         <div class="section-heading-left">
-                            <!-- <button type="button" class="back-to-profile-btn" data-view="profile">← Back</button> -->
+                            <button type="button" class="back-to-profile-btn" data-view="profile-overview">← Back</button>
                             <h3>Nomination Information</h3>
                         </div>
                         <button type="button" id="addNominationButton" class="btn btn-primary">+ Add Nomination</button>
@@ -1202,16 +1151,14 @@
 
                     <div id="nominationInfoMessage"></div>
 
-                    <div id="nominationCardsList" class="education-cards-grid"></div>
-
-                   <!-- <div class="table-responsive">
+                   <div class="table-responsive">
                         <table class="table erp-table align-middle">
                             <thead>
                                 <tr><th>Name</th><th>Relationship</th><th>Date of Birth</th><th>Share %</th><th>Minor</th><th>Action</th></tr>
                             </thead>
                             <tbody id="nominationTableBody"></tbody>
                         </table>
-                    </div> -->
+                    </div>
                 </section>
 
                 <!-- NOMINATION MODAL -->
@@ -1264,6 +1211,7 @@
                                     <button type="submit" class="btn-primary-erp">Save</button>
                                 </div>
                             </form>
+
                         </div>
                     </div>
                 </div>
@@ -1273,7 +1221,7 @@
                 <section id="skillsView" class="content-view d-none">
                     <div class="section-heading">
                         <div class="section-heading-left">
-                            <!-- <button type="button" class="back-to-profile-btn" data-view="profile">← Back</button> -->
+                            <button type="button" class="back-to-profile-btn" data-view="profile-overview">← Back</button>
                             <h3>Skills</h3>
                         </div>
                     </div>
@@ -1311,7 +1259,7 @@
                 <section id="joining-detailsView" class="content-view d-none">
                     <div class="section-heading">
                         <div class="section-heading-left">
-                            <!-- <button type="button" class="back-to-profile-btn" data-view="profile">← Back</button> -->
+                            <button type="button" class="back-to-profile-btn" data-view="profile-overview">← Back</button>
                             <h3>Joining Details</h3>
                         </div>
                         <button type="button" id="editJoiningDetailsButton" class="btn btn-outline-primary">Edit</button>
@@ -1361,7 +1309,7 @@
                <section id="family-informationView" class="content-view d-none">
                     <div class="section-heading">
                         <div class="section-heading-left">
-                            <!-- <button type="button" class="back-to-profile-btn" data-view="profile">← Back</button> -->
+                            <button type="button" class="back-to-profile-btn" data-view="profile-overview">← Back</button>
                             <h3>Family Information</h3>
                         </div>
                         <button type="button" id="addFamilyMemberButton" class="btn btn-primary">+ Add Member</button>
@@ -1369,16 +1317,14 @@
 
                     <div id="familyInfoMessage"></div>
 
-                    <div id="familyMembersCardsList" class="education-cards-grid"></div>
-
-                    <!-- <div class="table-responsive">
+                    <div class="table-responsive">
                         <table class="table erp-table align-middle">
                             <thead>
                                 <tr><th>Name</th><th>Relationship</th><th>Date of Birth</th><th>Dependent</th><th>Action</th></tr>
                             </thead>
                             <tbody id="familyMembersTableBody"></tbody>
                         </table>
-                    </div> -->
+                    </div>
                 </section>
 
                 <!-- FAMILY MEMBER MODAL (Add aur Edit dono ke liye same modal) -->

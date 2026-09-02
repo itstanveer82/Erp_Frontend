@@ -38,10 +38,10 @@ function demoGetProfile() {
 // Suggested real endpoint: GET /api/employee/me/dashboard-summary
 function demoGetDashboardSummary() {
     return demoDelay({
-        attendancePercent: 92,
-        leaveBalanceDays: 8,
-        pendingCorrections: 1,
-        lastPayslipMonth: "July 2026"
+        attendancePercent: 112,
+        leaveBalanceDays: 88,
+        pendingCorrections: 57,
+        lastPayslipMonth: "July 2050"
     });
 }
 

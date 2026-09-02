@@ -38,6 +38,15 @@
     background: rgba(0, 0, 0, 0.08);
 }
 
+/* =============02/09/2026 Change date============================================================ */
+#profileHeaderBar:not(.d-none) {
+    margin-bottom: 20px;
+}
+.content-view:not(.d-none) {
+    min-height: 420px;
+}
+
+
 /* DASHBOARD LAYOUT */
 
 .dashboard-layout {
@@ -393,9 +402,208 @@
 }
 
 
-/* =========================
+/*=====================================================================
+            Employee New Profile Style  
+ ======================================================================*/
+
+/* ===== FACEBOOK-STYLE PROFILE CARD ===== */
+
+.fb-profile-card {
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+    margin-bottom: 20px;
+}
+
+.fb-cover {
+    height: 160px;
+    background: linear-gradient(120deg, #17a2b8, #7c3aed);
+    position: relative;
+}
+
+.fb-profile-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 16px;
+    padding: 0 28px;
+    margin-top: -48px;
+}
+
+.fb-avatar-wrap {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 4px solid #fff;
+    overflow: hidden;
+    background: #17a2b8;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+    flex-shrink: 0;
+}
+
+.fb-avatar-img,
+.fb-avatar-fallback {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.fb-avatar-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 30px;
+    font-weight: 700;
+}
+
+.fb-profile-meta {
+    padding-bottom: 14px;
+}
+
+.fb-profile-meta h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: #1c2126;
+}
+
+.fb-profile-meta p {
+    margin: 2px 0 0;
+    font-size: 13px;
+    color: #6c757d;
+}
+
+.fb-tabs {
+    display: flex;
+    gap: 4px;
+    padding: 16px 28px 0;
+    border-top: 1px solid #eef0f3;
+    margin-top: 14px;
+    overflow-x: auto;
+}
+
+.fb-tab {
+    border: none;
+    background: transparent;
+    padding: 12px 16px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #6c757d;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.fb-tab:hover {
+    color: #17a2b8;
+}
+
+.fb-tab.active {
+    color: #17a2b8;
+    border-bottom-color: #17a2b8;
+}
+
+/* ===== ABOUT-STYLE ROWS ===== */
+
+.fb-tab-panel {
+    display: none;
+}
+
+.fb-tab-panel.active {
+    display: block;
+}
+
+.about-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 22px 26px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    margin-bottom: 16px;
+}
+
+.about-card h5 {
+    margin: 0 0 16px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #1c2126;
+}
+
+.about-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px 24px;
+}
+
+.about-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.about-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #eef2ff;
+    color: #3949ab;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+}
+
+.about-text strong {
+    display: block;
+    font-size: 13.5px;
+    color: #1c2126;
+    font-weight: 600;
+}
+
+.about-text span {
+    display: block;
+    font-size: 12px;
+    color: #9aa1ab;
+    margin-top: 1px;
+}
+
+.about-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.about-card-header .overview-nav-btn,
+.about-card-header .overview-edit-btn {
+    margin: 0;
+}
+
+@media (max-width: 767.98px) {
+    .about-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .fb-profile-row {
+        padding: 0 16px;
+    }
+
+    .fb-tabs {
+        padding: 14px 16px 0;
+    }
+
+    .about-card {
+        padding: 18px;
+    }
+}
+
+
+
+
+/* =====================================================================
    EMPLOYEE PROFILE BUTTON
-   ========================= */
+   ===================================================================== */
 
 #employeeProfileButton {
     cursor: pointer;
@@ -414,9 +622,9 @@
     white-space: nowrap;
 }
 
-/* =========================================
+/* =========================================================
    EMPLOYEE PROFILE
-   ========================================= */
+   ========================================================= */
 
 .employee-profile {
     background: #ffffff;
@@ -427,89 +635,256 @@
 }
 
 
-/* =========================================
+/* =========================================================
    PROFILE HEADER
-   ========================================= */
+   ========================================================= */
 
 .profile-header {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 20px;
-
-    padding: 28px 30px;
-
-    background: linear-gradient(135deg,
-            #f1f8fa 0%,
-            #ffffff 100%);
-
-    border-bottom: 1px solid #e8ebef;
+    position: relative;
+    width: 100%;
+    min-height: 333px;
+    padding: 0 0 15px;
+    background: #ffffff;
+    overflow: hidden;
 }
+
+
+/* =========================================================
+   PROFILE COVER
+   Background / Back Layer
+   ========================================================= */
+
+.profile-cover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* background: linear-gradient(145deg, #063285,#2f6bdb); */
+    background-color: #F4F6FA;
+    overflow: hidden;
+    z-index: 0;
+}
+
+.profile-cover::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 82%;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 1;
+    pointer-events: none;
+}
+
+.profile-cover-image-wrapper {
+    position: relative;
+    width: 100%;
+    height: 82%;
+    overflow: hidden;
+    z-index: 0;
+}
+
+
+/* Cover Image */
+
+.profile-cover-image {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover;
+    display: block;
+}
+
+
+/* =========================================================
+   PROFILE HEADER CONTENT
+   Above Cover Image
+   Bottom = 15px
+   ========================================================= */
+
+.profile-header-content {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 15px;
+    display: flex;
+    align-items: flex-end;
+    gap: 16px;
+    padding: 0 30px;
+
+    z-index: 10;
+}
+
+
+/* =========================================================
+   PROFILE AVATAR
+   ========================================================= */
 
 .profile-avatar {
-    width: 90px;
-    height: 90px;
-
-    flex-shrink: 0;
-
     position: relative;
-    overflow: hidden;
+    width: 120px;
+    height: 120px;
+    flex: 0 0 120px;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
+    border: 4px solid #fff;
     border-radius: 50%;
-
+    overflow: hidden;
     background: #17a2b8;
-    color: #fff;
-
-    font-size: 26px;
-    font-weight: 700;
-
-    border: 4px solid #ffffff;
-
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+    z-index: 20;
 }
+
+
+/* Avatar Inner */
+
+.profile-avatar-inner {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+
+/* Employee Profile Image */
 
 .profile-avatar-image {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    object-fit: cover;
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
+    object-fit: cover !important;
     object-position: center;
+
+    border-radius: 50%;
 }
+
+/* =========================================================
+   AVATAR FALLBACK
+   ========================================================= */
 
 .profile-avatar-fallback {
     width: 100%;
     height: 100%;
-
+    display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: 50%;
+    background: #17a2b8;
+    color: #fff;
+    font-size: 30px;
+    font-weight: 700;
 }
 
+/* =========================================================
+   EMPLOYEE MAIN INFORMATION
+   ========================================================= */
+
 .profile-main-info {
+    position: relative;
+    z-index: 20;
+    padding: 0;
     min-width: 0;
 }
 
 .profile-main-info h2 {
-    margin: 0 0 5px;
-    overflow-wrap: break-word;
-
-    font-size: 24px;
-    font-weight: 700;
-    color: #252a31;
+    color: white    ;
+    font-size: 30px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    padding: 0;
+    margin: 0 0 0 8px;
 }
 
-.profile-main-info p {
-    margin: 0 0 10px;
+/* =========================================================
+   ACTIVE STATUS
+   ========================================================= */
+.profile-status {
+    
+    display: inline-flex;
+    align-items: center;
+    border-radius: 20px;
+    background: transparent;
+    color: white;
+    font-size: 12px;
+    padding-bottom: 0px;
+}
 
-    color: #6c757d;
-    font-size: 14px;
+
+.status-dot {
+    
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #28a745;
+    flex-shrink: 0;
+    margin: 0;
+    padding: 0;
+}
+
+
+/* =========================================================
+   All button BUTTON
+   ========================================================= */
+.profile-info-buttons {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    padding: 0;
+    margin-top: 20px !important;
+}
+
+.profile-info-buttons::-webkit-scrollbar {
+    display: none;
+}
+
+.profile-info-btn {
+    flex: 0 0 auto;
+
+    padding: 6px 12px;
+
+    border: 1px solid rgba(20, 19, 19, 0.055);
+    border-radius: 6px;
+
+    background: rgba(61, 60, 60, 0.068);
+
+    color: #241f1f;
+
+    font-size: 11px;
+    font-weight: 600;
+
+    white-space: nowrap;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.profile-info-btn:hover {
+    transform: scale(1.04);
+    background: rgba(61, 60, 60, 0.11);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+}
+.profile-info-btn.active {
+    background: #33313138;
+
+    color: #1F4EA8;
+
+    border-color: #444141;
+}
+
+
+.profile-header-action-btn:hover {
+    background: #ffffff;
 }
 
 /* Reset Button */
-
 .profile-password-card {
     display: flex;
     flex-direction: column;
@@ -888,38 +1263,6 @@
 
 
 /* Mobile */
-
-
-
-
-/* =========================================
-   ACTIVE STATUS
-   ========================================= */
-
-.profile-status {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-
-    padding: 5px 11px;
-
-    border-radius: 20px;
-
-    background: #e8f7ef;
-    color: #21864b;
-
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.status-dot {
-    width: 7px;
-    height: 7px;
-
-    border-radius: 50%;
-    background: #28a745;
-}
-
 
 /* =========================================
    PROFILE SECTION
@@ -1700,10 +2043,118 @@
 }
 
 
+/*==============================================
+             New Profile Viewer
+  ==============================================  */
+
+
+
+.fb-extended-section {
+    margin-top: 20px;
+    animation: fbExpandDown 0.25s ease;
+}
+
+@keyframes fbExpandDown {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fb-extended-section .fb-tabs {
+    background: #fff;
+    border-radius: 14px 14px 0 0;
+    padding: 14px 20px 0;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid #eef0f3;
+}
 
 /* =========================================
                  RESPONSIVE
    ========================================= */
+
+@media (max-width: 767.98px) {
+
+    /* Cover image completely hide */
+    .profile-cover {
+        display: none !important;
+    }
+
+    /* Header */
+    .profile-header {
+        min-height: auto !important;
+        height: auto !important;
+        padding: 25px 15px 20px !important;
+        text-align: center;
+        overflow: visible !important;
+    }
+
+    /* Avatar + info vertical center */
+    .profile-header-content {
+        position: relative !important;
+
+        top: auto !important;
+        left: auto !important;
+        right: auto !important;
+        bottom: auto !important;
+
+        margin: 0 !important;
+        padding: 0 !important;
+
+        display: flex !important;
+        flex-direction: column !important;
+
+        align-items: center !important;
+        justify-content: center !important;
+
+        gap: 8px !important;
+
+        width: 100%;
+        text-align: center;
+    }
+
+    /* Avatar exactly center */
+    .profile-avatar {
+        width: 110px !important;
+        height: 110px !important;
+
+        flex: 0 0 110px !important;
+
+        margin: 0 auto 5px !important;
+
+        border-radius: 50%;
+    }
+
+    
+    /* Active Employee */
+    .profile-status {
+        display: inline-flex !important;
+
+        align-items: center;
+        justify-content: center;
+        /* gap: 3rem; */
+        text-align: center;
+    }
+
+    /* Information button */
+    .profile-header-action-btn {
+        position: relative !important;
+
+        top: auto !important;
+        right: auto !important;
+
+        display: block !important;
+
+        margin: 15px auto 0 !important;
+
+        z-index: 10;
+    }
+}
 
 @media (max-width: 767.98px) {
 
@@ -1772,14 +2223,91 @@
     }
 }
 
+/* User Profile Mobile View Style */
+
 @media (max-width: 767.98px) {
     .dashboard-sidebar {
-        transform: translateX(-100%);
-        transition: transform 0.3s ease;
+        position: static;
+        width: 100%;
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        transform: translateY(-8px);
+        transition: max-height 0.35s ease, opacity 0.25s ease, transform 0.25s ease;
+
+        border-radius: 0 0 16px 16px;
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+        background: #fff;
     }
 
     .dashboard-sidebar.mobile-open {
-        transform: translateX(0);
+        max-height: 75vh;
+        opacity: 1;
+        transform: translateY(0);
+        overflow-y: auto;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .profile-header {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        position: relative;
+        padding: 40px 20px 60px;
+        overflow: hidden;
+        border-bottom: none;
+        background: linear-gradient(135deg, #1F4EA8, #EC4899);
+        border-radius: 0 0 40% 40% / 0 0 30px 30px;
+    }
+
+    .profile-avatar {
+        width: 90px;
+        height: 90px;
+        border: 4px solid #fff;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+        z-index: 2;
+    }
+
+    .profile-main-info h2 {
+        color: #fff;
+        margin-top: 8px;
+    }
+
+    .profile-main-info p {
+        color: rgba(255, 255, 255, 0.85);
+    }
+
+    .profile-status {
+        background: rgba(255, 255, 255, 0.25);
+        color: #fff;
+    }
+
+    .profile-header-action-btn {
+        margin: 12px auto 0;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .profile-section-title {
+        margin-bottom: 14px;
+    }
+
+    .profile-info-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .profile-info-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-radius: 12px;
+        padding: 14px 16px;
+    }
+
+    .profile-info-item strong {
+        text-align: right;
     }
 }
 
@@ -1841,6 +2369,9 @@
     }
 }
 
+
+
+
 @media (max-width: 420px) {
 
     .brand-text {
@@ -1901,4 +2432,120 @@
     .form-submit-row .btn-primary-erp {
         width: 100%;
     }
+}
+
+
+
+
+
+/* =========================================================
+   MOBILE VIEW PROFILE
+   ========================================================= */
+
+@media (max-width: 767.98px) {
+
+    .profile-header {
+        min-height: 230px;
+
+        padding: 0 0 15px;
+    }
+
+
+    .profile-header-content {
+        bottom: 15px;
+
+        padding: 0 20px;
+
+        gap: 12px;
+    }
+
+
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
+
+        flex: 0 0 100px;
+
+        border-width: 4px;
+    }
+
+
+    .profile-avatar-fallback {
+        font-size: 25px;
+    }
+
+
+    .profile-main-info h2 {
+        font-size: 18px;
+    }
+
+
+    .profile-main-info p {
+        font-size: 12px;
+
+        margin-bottom: 6px;
+    }
+
+
+    .profile-status {
+        font-size: 11px;
+
+        padding: 4px 9px;
+    }
+
+
+    .profile-header-action-btn {
+        top: 12px;
+        right: 15px;
+
+        font-size: 12px;
+
+        padding: 5px 10px;
+    }
+
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 480px) {
+
+    .profile-header {
+        min-height: 220px;
+    }
+
+
+    .profile-header-content {
+        padding: 0 15px;
+
+        gap: 10px;
+    }
+
+
+    .profile-avatar {
+        width: 85px;
+        height: 85px;
+
+        flex-basis: 85px;
+    }
+
+
+    .profile-main-info h2 {
+        font-size: 16px;
+    }
+
+
+    .profile-main-info p {
+        font-size: 11px;
+    }
+
+
+    .profile-status {
+        font-size: 10px;
+
+        padding: 4px 8px;
+    }
+
 }
