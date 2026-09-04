@@ -1,0 +1,507 @@
+:root {
+    --ink: #161B29;
+    --paper: #EEF0F4;
+    --paper-2: #E4E7ED;
+    --card: #FFFFFF;
+    --line: #D3D7E0;
+    --amber: #C8912E;
+    --amber-deep: #9C6E1E;
+    --teal: #2C6A5E;
+    --teal-deep: #1E4B42;
+    --muted: #5B6274;
+}
+
+body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans', sans-serif;
+}
+
+h1,
+h2,
+h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+.mono {
+    font-family: 'IBM Plex Mono', monospace;
+}
+
+.text-muted-custom {
+    color: var(--muted);
+}
+
+/* ---------- NAVBAR (fixed) ---------- */
+
+.brand-logo {
+    height: 50px;
+    width: auto;
+    object-fit: contain;
+}
+
+.navbar {
+    border-bottom: 1px solid var(--line);
+    background: var(--card) !important;
+    padding: 5px 0;
+}
+
+.brand-mark {
+    width: 26px;
+    /* pehle 32px tha */
+    height: 26px;
+    border-radius: 4px;
+    background: var(--ink);
+    color: var(--paper);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.brand-name {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 18px;
+    color: var(--ink);
+}
+
+.brand-sub {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    /* pehle 10px tha */
+    color: var(--muted);
+    letter-spacing: .04em;
+}
+
+.nav-link-custom {
+    color: var(--ink) !important;
+    font-size: 14.5px;
+    font-weight: 500;
+}
+
+.nav-link-custom:hover {
+    color: var(--amber-deep) !important;
+}
+
+/* Custom button — explicit colors, high specificity so nothing overrides it */
+.btn-brand-dark {
+    background-color: var(--ink) !important;
+    color: var(--paper) !important;
+    border: 1px solid var(--ink) !important;
+    border-radius: 2px;
+    font-size: 13.5px;
+    font-weight: 500;
+    padding: 0.5rem 2.2rem;
+    /* pehle 9px 20px tha */
+}
+
+.btn-brand-dark:hover {
+    background-color: var(--amber-deep) !important;
+    border-color: var(--amber-deep) !important;
+    color: #fff !important;
+}
+
+.btn-brand-ghost {
+    background: transparent !important;
+    color: var(--ink) !important;
+    border: 1px solid var(--ink) !important;
+    border-radius: 2px;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 9px 20px;
+}
+
+.btn-brand-ghost:hover {
+    background: var(--ink) !important;
+    color: var(--paper) !important;
+}
+
+.btn-brand-amber {
+    background-color: var(--amber) !important;
+    color: #2A1D06 !important;
+    border: 1px solid var(--amber) !important;
+    border-radius: 2px;
+    font-weight: 500;
+}
+
+.btn-brand-amber:hover {
+    background-color: var(--amber-deep) !important;
+    border-color: var(--amber-deep) !important;
+    color: #fff !important;
+}
+
+/* ---------- HERO ---------- */
+.hero {
+    padding: 90px 0 70px;
+}
+
+.eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--amber-deep);
+    margin-bottom: 16px;
+}
+
+.hero h1 {
+    font-size: 44px;
+    line-height: 1.15;
+    max-width: 12ch;
+}
+
+.hero p.lede {
+    font-size: 17px;
+    color: var(--muted);
+    max-width: 44ch;
+    margin: 22px 0 30px;
+}
+
+.ts-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    box-shadow: 0 20px 45px -22px rgba(22, 27, 41, .35);
+    padding: 26px;
+    position: relative;
+}
+
+.ts-tag {
+    position: absolute;
+    top: -14px;
+    right: 22px;
+    background: var(--amber);
+    color: #2A1D06;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    padding: 6px 12px;
+    border-radius: 2px;
+    box-shadow: 0 8px 18px -8px rgba(200, 145, 46, .7);
+}
+
+.ts-head {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px dashed var(--line);
+    padding-bottom: 16px;
+    margin-bottom: 16px;
+}
+
+.ts-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    padding: 6px 0;
+}
+
+.ts-row span:first-child {
+    color: var(--muted);
+}
+
+.ts-row span:last-child {
+    font-family: 'IBM Plex Mono', monospace;
+}
+
+.status-chip {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    background: #E7F1EC;
+    color: var(--teal-deep);
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid #BFDAD0;
+    height: fit-content;
+}
+
+.ts-clock {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 14px 16px;
+    margin-top: 10px;
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--amber);
+    flex-shrink: 0;
+}
+
+/* ---------- SECTIONS ---------- */
+.section {
+    padding: 3rem 0;
+}
+
+.section-alt {
+    background: var(--card);
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+}
+
+.section-head h2 {
+    font-size: 30px;
+}
+
+.section-head p {
+    color: var(--muted);
+    max-width: 38ch;
+    font-size: 15px;
+    margin: 0;
+}
+
+.ledger {
+    border-top: 1px solid var(--ink);
+}
+
+.ledger-row {
+    padding: 24px 0;
+    border-bottom: 1px solid var(--line);
+}
+
+.ledger-row .idx {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.ledger-row h3 {
+    font-size: 19px;
+    margin: 4px 0 6px;
+}
+
+.ledger-row p {
+    color: var(--muted);
+    font-size: 14.5px;
+    margin: 0;
+}
+
+.tl-time {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    color: var(--amber-deep);
+}
+
+.tl-line {
+    width: 1px;
+    flex: 1;
+    background: var(--line);
+    margin: 0 auto;
+}
+
+.aud-cell {
+    /* background: var(--paper-2); */
+    padding: 28px 24px;
+    /* border: 1px solid var(--line); */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+}
+
+.aud-mono {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 14px;
+}
+
+.accordion-button {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 500;
+    background: var(--card);
+    color: var(--ink);
+}
+
+.accordion-button:not(.collapsed) {
+    background: var(--card);
+    color: var(--ink);
+    box-shadow: none;
+}
+
+.accordion-button::after {
+    filter: none;
+}
+
+.accordion-item {
+    border-color: var(--line);
+}
+
+.accordion-body {
+    color: var(--muted);
+    font-size: 14.5px;
+}
+
+.cta-band {
+    background: linear-gradient(120deg,
+            #0b1f4d,
+            #2f80ed,
+            #0b1f4d,
+            #0b1f4d,
+            #2f80ed,
+            #0b1f4d);
+    color: #F2EFE6;
+}
+
+.cta-band h2 {
+    color: #fff;
+    font-size: 28px;
+}
+
+footer {
+    padding: 50px 0 30px;
+}
+
+footer h4 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--muted);
+}
+
+footer a {
+    color: var(--ink);
+    text-decoration: none;
+    font-size: 14px;
+}
+
+footer a:hover {
+    color: var(--amber-deep);
+}
+
+.foot-bottom {
+    border-top: 1px solid var(--line);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    color: var(--muted);
+}
+
+.eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 25px;
+    /* ye chhota hi rahega - "Welcome to the" aur "!!!" ke liye */
+    color: var(--amber-deep);
+    margin-bottom: 18px;
+    line-height: 1.6;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+/* Card Box  */
+
+.card-box {
+    position: relative;
+    /* zaroori hai taaki icon isi ke andar se position ho */
+    transition: transform 0.5s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.card-box:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+    transition: transform 0.5s ease
+}
+
+.tl-icon-wrap {
+    position: absolute;
+    top: 15px;
+    left: 25px;
+}
+
+.tl-node {
+    color: #0D2B52;
+}
+
+/* Image Card */
+.image-card {
+    padding: 1rem;
+}
+
+.image-scale {
+    transition: transform 0.25s ease;
+}
+
+.image-scale:hover {
+    transform: scale(1.06);
+}
+
+.bg-transparent {
+    background: transparent !important;
+}
+
+.accordion-item {
+    background-color: transparent !important;
+    /* background-color: rgba(255, 255, 255, 0.18) !important; */
+    border-color: rgba(0, 0, 0, 0.00) !important;
+    padding: 0.5rem 0;
+}
+
+.accordion-button {
+    background-color: transparent !important;
+    color: var(--ink);
+    box-shadow: none !important;
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: transparent !important;
+    color: var(--ink);
+    box-shadow: none !important;
+}
+
+.accordion-body {
+    background-color: transparent !important;
+    color: var(--muted);
+}
+
+.accordion-button::after {
+    filter: none;
+}
+
+.accordion-collapse {
+    background-color: transparent !important;
+}
+
+/* .list-unstyled li a {
+    color: #555;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+.list-unstyled li a:hover {
+    color: #1e3a8a;
+} */
+/* Hero Content  */
+.highlight-text {
+    font-size: 25px;
+    /* sirf "Barrownz ERP" bada */
+    line-height: 1.2;
+    font-weight: 600;
+    background: linear-gradient(90deg, #0D2B52, #3B82F6, #93C5FD, #EC4899, #0D2B52);
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shine 4s linear infinite;
+}
+
+@keyframes shine {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    100% {
+        background-position: 300% 50%;
+    }
+}

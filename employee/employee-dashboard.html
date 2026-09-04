@@ -1,20 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
-
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
         <title>Employee Dashboard - Attendance & Payroll ERP</title>
         <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
         <link rel="stylesheet" href="../css/admin-dashboard.css">
         <link rel="stylesheet" href="../css/employee/employee-dashboard.css">
-
     </head>
-
     <body>
-
+<!--================================================================================================-->
         <!-- Top Navbar -->
+<!--================================================================================================-->
         <nav class="navbar admin-navbar">
             <div class="container-fluid">
 
@@ -105,10 +102,10 @@
             </div>
         </nav>
 
-        <!--    ==================== 
-                    Session Model 
-                SESSION MANAGEMENT MODAL
-                 ====================       -->
+<!--================================================================================================-->
+                    <!-- Session Model  -->
+                <!-- SESSION MANAGEMENT MODAL -->
+<!--================================================================================================-->
         <div class="modal fade" id="sessionsModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-xl">
                 <div class="modal-content role-modal-content">
@@ -124,7 +121,9 @@
             </div>
         </div>
         <div class="dashboard-layout">
-            <!-- Sidebar -->
+<!--================================================================================================-->
+                <!-- Sidebar -->
+<!--================================================================================================-->
             <aside class="dashboard-sidebar" id="dashboardSidebar">
                 <div class="sidebar-header">
                     <span>EMPLOYEE PANEL</span>
@@ -134,8 +133,9 @@
                         data-view="dashboard">
                         <span class="menu-icon">▦</span> Home
                     </button>
-
+<!--================================================================================================-->
                     <!-- ATTENDANCE GROUP -->
+<!--================================================================================================-->
                     <button class="sidebar-item sidebar-group-toggle"
                         type="button"
                         data-bs-toggle="collapse"
@@ -158,7 +158,9 @@
                             Attendance Corrections
                         </button>
                     </div>
+<!--================================================================================================-->
                     <!-- LEAVES GROUP -->
+<!--================================================================================================-->
                     <button class="sidebar-item sidebar-group-toggle"
                         type="button"
                         data-bs-toggle="collapse" data-bs-target="#leavesGroup"
@@ -180,7 +182,9 @@
                             Leave Balance
                         </button>
                     </div>
+<!--================================================================================================-->
                     <!-- PAYROLL GROUP -->
+<!--================================================================================================-->
                     <button class="sidebar-item sidebar-group-toggle"
                         type="button"
                         data-bs-toggle="collapse" data-bs-target="#payrollGroup"
@@ -196,14 +200,17 @@
                     </div>
                 </div>
             </aside>
-
+<!--================================================================================================-->
             <!-- Main Content -->
+<!--================================================================================================-->
             <main class="dashboard-main">
-
-                 <!-- FIXED PROFILE HEADER — sabhi profile tabs ke upar hamesha dikhega -->
-                 <div id="profileHeaderBar" class="d-none"></div>
-
+<!--================================================================================================-->
+                <!-- FIXED PROFILE HEADER — Always visible above all profile tabs -->
+<!--================================================================================================-->
+                <div id="profileHeaderBar" class="d-none"></div>
+<!--================================================================================================-->
                 <!-- DASHBOARD OVERVIEW -->
+<!--================================================================================================-->
                 <section id="dashboardView" class="content-view">
                     <div class="dashboard-welcome">
                         <div>
@@ -245,8 +252,9 @@
                         </div>
                     </div>
                 </section>
-
+<!--================================================================================================-->
                 <!-- MY ATTENDANCE -->
+<!--================================================================================================-->
                 <section id="my-attendanceView" class="content-view d-none">
                     <div class="section-heading">
                         <div><h3>My Attendance</h3><p>Apki check-in / check-out
@@ -312,8 +320,9 @@
                         </div>
                     </div>
                 </section>
-
+<!--================================================================================================-->
                 <!-- ATTENDANCE CALENDAR -->
+<!--================================================================================================-->
                 <section id="attendance-calendarView"
                     class="content-view d-none">
                     <div class="section-heading">
@@ -322,8 +331,9 @@
                     </div>
                     <div id="attendanceCalendar" class="calendar-grid"></div>
                 </section>
-
+<!--================================================================================================-->
                 <!-- MY LEAVES -->
+<!--================================================================================================-->
                 <section id="my-leavesView" class="content-view d-none">
                     <div class="section-heading">
                         <div><h3>My Leaves</h3><p>Leave applications
@@ -340,15 +350,17 @@
                         </table>
                     </div>
                 </section>
-
+<!--================================================================================================-->
                 <!-- APPLY LEAVE -->
+<!--================================================================================================-->
                 <section id="apply-leaveView" class="content-view d-none">
                     <div class="section-heading">
                         <div><h3>Apply Leave</h3><p>Naya leave request submit
                                 karein.</p></div>
                     </div>
-
+<!--================================================================================================-->
                     <!-- LEAVE POLICY DROPDOWN -->
+<!--================================================================================================-->
                     <div class="leave-policy-dropdown">
                         <button type="button"
                             class="leave-policy-toggle"
@@ -487,8 +499,9 @@
 
                     </form>
                 </section>
-
+<!--================================================================================================-->
                 <!-- LEAVE BALANCE -->
+<!--================================================================================================-->
                 <section id="leave-balanceView" class="content-view d-none">
                     <div class="section-heading">
                         <div><h3>Leave Balance</h3><p>View your remaining leave
@@ -496,8 +509,9 @@
                     </div>
                     <div id="leaveBalanceCards" class="row g-3"></div>
                 </section>
-
+<!--================================================================================================-->
                 <!-- MY PAYROLL -->
+<!--================================================================================================-->
                 <section id="my-payrollView" class="content-view d-none">
                     <div class="section-heading">
                         <div><h3>My Payroll</h3><p>View your salary breakdown by
@@ -514,8 +528,9 @@
                         </table>
                     </div>
                 </section>
-
+<!--================================================================================================-->
                 <!-- PAYROLL SLIP MODAL -->
+<!--================================================================================================-->
                 <div class="modal fade" id="payrollSlipModal" tabindex="-1"
                     aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
@@ -541,8 +556,9 @@
                         </div>
                     </div>
                 </div>
-
+<!--================================================================================================-->
                 <!-- PAYSLIPS -->
+<!--================================================================================================-->
                 <section id="payslipsView" class="content-view d-none">
                     <div class="section-heading">
                         <div><h3>Payslips</h3><p>View or download your previous
@@ -558,8 +574,9 @@
                         </table>
                     </div>
                 </section>
-
+<!--================================================================================================-->
                 <!-- ATTENDANCE CORRECTIONS -->
+<!--================================================================================================-->
                <section id="attendance-correctionsView"
                     class="content-view d-none">
                     <div class="section-heading">
@@ -609,8 +626,9 @@
                         </div>
                     </div>
                 </section>
-
+<!--================================================================================================-->
                 <!-- ATTENDANCE CORRECTION MODAL -->
+<!--================================================================================================-->
                 <div class="modal fade" id="correctionModal" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content role-modal-content">
@@ -654,27 +672,13 @@
                         </div>
                     </div>
                 </div>
-
+<!--================================================================================================-->
                 <!-- PROFILE -->
+<!--================================================================================================-->
                 <section id="profileView" class="content-view d-none">
-                    <div class="section-heading">
-                        <!-- <div><h1>Profile</h1></div> -->
-                    </div>
-                    <div id="profileMessage"></div>
                     <div id="profileCard" class="erp-form-card"></div>
-
-                    <!-- EXTENDED INFORMATION — collapsible, "Information" button se neeche open hoga -->
-                    <div id="profileExtendedSection" class="fb-extended-section d-none">
-                        <div class="fb-tabs" id="fbProfileTabs">
-                            <button type="button" class="fb-tab active" data-tab="about">About</button>
-                            <button type="button" class="fb-tab" data-tab="family">Family &amp; Contacts</button>
-                            <button type="button" class="fb-tab" data-tab="work">Work &amp; Education</button>
-                            <button type="button" class="fb-tab" data-tab="skills">Skills</button>
-                        </div>
-                        <div id="profileOverviewGrid"></div>
-                    </div>
-
                     <div class="modal fade" id="resetPasswordModal"
+
                         tabindex="-1"
                         aria-labelledby="resetPasswordModalLabel"
                         aria-hidden="true">
@@ -747,41 +751,9 @@
                         </div>
                     </div>
                 </section>
-
-                <!-- <section id="profile-overviewView" class="content-view d-none">
-                    <div class="section-heading">
-                        <button type="button" class="back-to-profile-btn" data-view="profile-overview">← Back</button>
-                    </div>
-
-                    <div class="fb-profile-card">
-                        <div class="fb-cover" id="fbCoverPhoto"></div>
-
-                        <div class="fb-profile-row">
-                            <div class="fb-avatar-wrap">
-                                <img id="fbOverviewAvatar" src="" alt="Profile" class="fb-avatar-img d-none">
-                                <span id="fbOverviewAvatarFallback" class="fb-avatar-fallback"></span>
-                            </div>
-                            <div class="fb-profile-meta">
-                                <h2 id="fbOverviewName">--</h2>
-                                <p id="fbOverviewDesignation">--</p>
-                            </div>
-                        </div>
-
-                        <div class="fb-tabs" id="fbProfileTabs">
-                            <button type="button" class="fb-tab active" data-tab="about">About</button>
-                            <button type="button" class="fb-tab" data-tab="family">Family &amp; Contacts</button>
-                            <button type="button" class="fb-tab" data-tab="work">Work &amp; Education</button>
-                            <button type="button" class="fb-tab" data-tab="skills">Skills</button>
-                        </div>
-                    </div>
-
-                    <div id="profileOverviewGrid"></div>
-                </section> -->
-
-
-
-
+<!--================================================================================================-->
                 <!-- VIEW PHOTO MODAL -->
+<!--================================================================================================-->
                 <div class="modal fade" id="viewPhotoModal" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered modal-sm">
                         <div class="modal-content role-modal-content">
@@ -799,8 +771,9 @@
                         </div>
                     </div>
                 </div>
-
+<!--================================================================================================-->
                 <!-- UPLOAD PHOTO MODAL -->
+<!--================================================================================================-->
                 <div class="modal fade" id="uploadPhotoModal" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content role-modal-content">
@@ -829,103 +802,163 @@
                         </div>
                     </div>
                 </div>
-                <!-- PROFILE OVERVIEW (all sections on one page) -->
-
-                 <section id="profile-overviewView" class="content-view d-none">
-                    <div class="section-heading">
-                         <!-- <button type="button" class="back-to-profile-btn" data-view="profile-overview">← Back</button> -->
-                        <div><h3>My Profile — Full Overview</h3><p>All your profile information at a glance.</p></div>
-                    </div>
-                    <div id="profileOverviewGrid" class="overview-cards-grid"></div>
-                </section>
-
-               <!-- PERSONAL INFORMATION -->
-                <section id="personal-informationView" class="content-view d-none">
-                    <div class="section-heading">
-                        <div class="section-heading-left">
-                            <!-- <button type="button" class="back-to-profile-btn" data-view="profile">← Back</button> -->
-                            <h3>Personal Information</h3>
-                        </div>
-                        <button type="button" id="editPersonalInfoButton" class="btn btn-outline-primary">Edit</button>
-                    </div>
-                    <div id="personalInfoCard" class="erp-form-card"></div>
-                </section>
-
-                <!-- PERSONAL INFO EDIT MODAL -->
-                <div class="modal fade" id="personalInfoModal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content role-modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Edit Personal Information</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <form id="personalInfoForm">
+<!--================================================================================================-->
+                <!-- UPLOAD COVER PHOTO MODAL -->
+<!--================================================================================================-->
+                <div class="modal fade" id="uploadCoverModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content role-modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Update Cover Photo</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
                             <div class="modal-body">
-                                <div id="personalInfoFormMessage"></div>
+                                <div id="uploadCoverMessage"></div>
 
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label">Date of Birth</label>
-                                        <input type="date" id="dobField" class="form-control">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Gender</label>
-                                        <select id="genderField" class="form-select">
-                                            <option value="MALE">Male</option>
-                                            <option value="FEMALE">Female</option>
-                                            <option value="OTHER">Other</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Marital Status</label>
-                                        <select id="maritalStatusField" class="form-select">
-                                            <option value="SINGLE">Single</option>
-                                            <option value="MARRIED">Married</option>
-                                            <option value="OTHER">Other</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Blood Group</label>
-                                        <select id="bloodGroupField" class="form-select">
-                                            <option value="A+">A+</option>
-                                            <option value="A-">A-</option>
-                                            <option value="B+">B+</option>
-                                            <option value="B-">B-</option>
-                                            <option value="AB+">AB+</option>
-                                            <option value="AB-">AB-</option>
-                                            <option value="O+">O+</option>
-                                            <option value="O-">O-</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Occupation</label>
-                                        <input type="text" id="occupationField" class="form-control">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Nationality</label>
-                                        <input type="text" id="nationalityField" class="form-control">
-                                    </div>
-                                    <div class="col-12">
-                                        <label class="form-label">Bio</label>
-                                        <textarea id="bioField" class="form-control" rows="3"></textarea>
-                                    </div>
+                                <div class="upload-cover-preview-wrapper">
+                                    <img id="uploadCoverPreview" src="" alt="Cover Preview"
+                                        style="width:100%; height:150px; object-fit:cover; border-radius:10px; display:none;">
+                                </div>
+
+                                <div class="mb-0 mt-3">
+                                    <label class="form-label">Choose Image</label>
+                                    <input type="file" id="uploadCoverInput" class="form-control" accept="image/*">
+                                    <small class="text-muted">JPG or PNG, max 2MB recommended.</small>
                                 </div>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="secondary-action-btn" data-bs-dismiss="modal">Cancel</button>
-                                <button type="submit" class="btn-primary-erp">Save Changes</button>
+                                <button type="button" id="saveCoverButton" class="btn-primary-erp" disabled>Save Cover</button>
                             </div>
-                        </form>
+                        </div>
                     </div>
                 </div>
-            </div>
+<!--================================================================================================-->
+                <!-- PROFILE OVERVIEW (all sections on one page) -->
+<!--================================================================================================-->
+                 <section id="profile-overviewView" class="content-view d-none">
+                    <div class="section-heading">
+                        <div><h3>My Profile — Full Overview</h3><p>All your profile information at a glance.</p></div>
+                    </div>
+                    <div id="profileOverviewGrid" class="overview-cards-grid"></div>
+                </section>
+<!--================================================================================================-->
+               <!-- PERSONAL INFORMATION -->
+<!--================================================================================================-->
+                <section id="personal-informationView" class="content-view d-none">
+<!--================================================================================================-->
+                      <!-- ADDRESS -->
+<!--================================================================================================-->
+                    <div class="erp-form-card" style="margin-top:16px;">
+                        <div class="profile-section-title d-flex justify-content-between" style="margin-bottom:16px;">
+                            <div><h3 class="fw-light">Infomation</h3><p>Your registered address details</p></div>
+                            <button type="button" id="editPersonalInfoButton" class="btn btn-outline-primary">Edit</button>
+                        </div>
+                        <div id="addressInfoCard"></div>
+                        <div id="personalInfoCard" class="erp-form-card"></div>
+                    </div>                 
+                </section>
+<!--================================================================================================-->
+                <!-- PERSONAL INFO EDIT MODAL -->
+<!--================================================================================================-->
+                <div class="modal fade" id="personalInfoModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content role-modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Edit Personal Information</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <form id="personalInfoForm">
+                                <div class="modal-body">
+                                    <div id="personalInfoFormMessage"></div>
 
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Date of Birth</label>
+                                            <input type="date" id="dobField" class="form-control">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Gender</label>
+                                            <select id="genderField" class="form-select">
+                                                <option value="MALE">Male</option>
+                                                <option value="FEMALE">Female</option>
+                                                <option value="OTHER">Other</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Marital Status</label>
+                                            <select id="maritalStatusField" class="form-select">
+                                                <option value="SINGLE">Single</option>
+                                                <option value="MARRIED">Married</option>
+                                                <option value="OTHER">Other</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Blood Group</label>
+                                            <select id="bloodGroupField" class="form-select">
+                                                <option value="A+">A+</option>
+                                                <option value="A-">A-</option>
+                                                <option value="B+">B+</option>
+                                                <option value="B-">B-</option>
+                                                <option value="AB+">AB+</option>
+                                                <option value="AB-">AB-</option>
+                                                <option value="O+">O+</option>
+                                                <option value="O-">O-</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Occupation</label>
+                                            <input type="text" id="occupationField" class="form-control">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Nationality</label>
+                                            <input type="text" id="nationalityField" class="form-control">
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label">Bio</label>
+                                            <textarea id="bioField" class="form-control" rows="3"></textarea>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Address 1</label>
+                                            <input type="text" id="addressLine1Field" class="form-control">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Address 2</label>
+                                            <input type="text" id="addressLine2Field" class="form-control">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">City</label>
+                                            <input type="text" id="addressCityField" class="form-control">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">State</label>
+                                            <input type="text" id="addressStateField" class="form-control">
+                                        </div>
 
+                                        <div class="col-md-6">
+                                            <label class="form-label">Country</label>
+                                            <input type="text" id="addressCountryField" class="form-control">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Postal Code</label>
+                                            <input type="text" id="addressPostalCodeField" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="secondary-action-btn" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn-primary-erp">Save Changes</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+<!--================================================================================================-->
                 <!-- EMERGENCY INFORMATION -->
+<!--================================================================================================-->
                <section id="emergency-informationView" class="content-view d-none">
                     <div class="section-heading">
                         <div class="section-heading-left">
-                            <!-- <button type="button" class="back-to-profile-btn" data-view="profile">← Back</button> -->
                             <h3>Emergency Information</h3>
                         </div>
                         <button type="button" id="addEmergencyContactButton" class="btn btn-primary">+ Add Contact</button>
@@ -933,18 +966,10 @@
 
                     <div id="emergencyInfoMessage"></div>
                     <div id="emergencyContactsCardsList" class="education-cards-grid"></div>
-
-                    <!-- <div class="table-responsive">
-                        <table class="table erp-table align-middle">
-                            <thead>
-                                <tr><th>Name</th><th>Relationship</th><th>Phone</th><th>Email</th><th>Address</th><th>Priority</th><th>Action</th></tr>
-                            </thead>
-                            <tbody id="emergencyContactsTableBody"></tbody>
-                        </table>
-                    </div> -->
                 </section>
-
+<!--================================================================================================-->
                 <!-- EMERGENCY CONTACT MODAL -->
+<!--================================================================================================-->
                 <div class="modal fade" id="emergencyContactModal" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content role-modal-content">
@@ -982,14 +1007,6 @@
                                         <input type="number" id="emergencyContactPriority" class="form-control" min="1">
                                     </div>
 
-                                    <div class="mb-0">
-                                        <div class="form-check">
-                                            <input type="checkbox" id="emergencyContactFeatured" class="form-check-input">
-                                            <label class="form-check-label" for="emergencyContactFeatured">
-                                                Show this contact in my Profile Overview card
-                                            </label>
-                                        </div>
-                                    </div>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="secondary-action-btn" data-bs-dismiss="modal">Cancel</button>
@@ -1003,19 +1020,18 @@
                 <section id="bank-informationView" class="content-view d-none">
                     <div class="section-heading">
                         <div class="section-heading-left">
-                            <!-- <button type="button" class="back-to-profile-btn" data-view="profile">← Back</button> -->
                             <h3>Bank Information</h3>
                         </div>
                     </div>
                     <div id="bankInfoMessage"></div>
                     <div id="bankInfoCard" class="erp-form-card"></div>
                 </section>
-
+<!--================================================================================================-->
                 <!-- EDUCATION INFORMATION -->
+<!--================================================================================================-->
                <section id="education-informationView" class="content-view d-none">
                     <div class="section-heading">
                         <div class="section-heading-left">
-                            <!-- <button type="button" class="back-to-profile-btn" data-view="profile">← Back</button> -->
                             <h3>Education Information</h3>
                             <p>Your academic qualifications.</p>
                         </div>
@@ -1026,8 +1042,9 @@
 
                     <div id="educationCardsList" class="education-cards-grid"></div>
                 </section>
-
+<!--================================================================================================-->
                 <!-- EDUCATION MODAL -->
+<!--================================================================================================-->
               <div class="modal fade" id="educationModal" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content role-modal-content">
@@ -1065,14 +1082,6 @@
                                         <input type="text" id="educationPercentage" class="form-control" placeholder="e.g. A or 78%">
                                     </div>
 
-                                    <div class="mb-0">
-                                        <div class="form-check">
-                                            <input type="checkbox" id="educationFeatured" class="form-check-input">
-                                            <label class="form-check-label" for="educationFeatured">
-                                                Show this record in my Profile Overview card
-                                            </label>
-                                        </div>
-                                    </div>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="secondary-action-btn" data-bs-dismiss="modal">Cancel</button>
@@ -1082,36 +1091,22 @@
                         </div>
                     </div>
                 </div>
-
-
+<!--================================================================================================-->
                 <!-- EXPERIENCE INFORMATION -->
+<!--================================================================================================-->
                <section id="experience-informationView" class="content-view d-none">
                     <div class="section-heading">
                         <div class="section-heading-left">
-                            <!-- <button type="button" class="back-to-profile-btn" data-view="profile">← Back</button> -->
                             <h3>Experience Information</h3>
                         </div>
                         <button type="button" id="addExperienceButton" class="btn btn-primary">+ Add Experience</button>
                     </div>
-
                     <div id="experienceInfoMessage"></div>
-                    
                     <div id="experienceCardsList" class="education-cards-grid"></div>
-
-                        <!-- <div class="table-responsive">
-                            <table class="table erp-table align-middle">
-                                <thead>
-                                    <tr>
-                                        <th>From Date</th><th>To Date</th><th>Company</th><th>Designation</th>
-                                        <th>Current</th><th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="experienceTableBody"></tbody>
-                            </table>
-                        </div> -->
                 </section>
-
+<!--================================================================================================-->
                 <!-- EXPERIENCE MODAL -->
+<!--================================================================================================-->
               <div class="modal fade" id="experienceModal" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered modal-lg">
                         <div class="modal-content role-modal-content">
@@ -1149,14 +1144,6 @@
                                         </div>
                                     </div>
 
-                                    <div class="mt-3">
-                                        <div class="form-check">
-                                            <input type="checkbox" id="experienceFeatured" class="form-check-input">
-                                            <label class="form-check-label" for="experienceFeatured">
-                                                Show this record in my Profile Overview card
-                                            </label>
-                                        </div>
-                                    </div>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="secondary-action-btn" data-bs-dismiss="modal">Cancel</button>
@@ -1166,55 +1153,46 @@
                         </div>
                     </div>
                 </div>
+<!--================================================================================================-->
                <!-- WORK POSITION (view-only, HR/Admin controlled) -->
+<!--================================================================================================-->
                 <section id="work-positionView" class="content-view d-none">
                     <div class="section-heading">
                         <div class="section-heading-left">
-                            <!-- <button type="button" class="back-to-profile-btn" data-view="profile">← Back</button> -->
                             <h3>Work Position</h3>
                         </div>
                     </div>
                     <div id="workPositionCard" class="erp-form-card"></div>
                 </section>
 
-
+<!--================================================================================================-->
                 <!-- EXIT DETAILS (view-only, HR/Admin controlled) -->
+<!--================================================================================================-->
                 <section id="exit-detailsView" class="content-view d-none">
                     <div class="section-heading">
                         <div class="section-heading-left">
-                            <!-- <button type="button" class="back-to-profile-btn" data-view="profile">← Back</button> -->
                             <h3>Exit Details</h3>
                         </div>
                     </div>
                     <div id="exitDetailsCard" class="erp-form-card"></div>
                 </section>
 
-
+<!--================================================================================================-->
                 <!-- NOMINATION INFORMATION -->
+<!--================================================================================================-->
                 <section id="nomination-informationView" class="content-view d-none">
                     <div class="section-heading">
                         <div class="section-heading-left">
-                            <!-- <button type="button" class="back-to-profile-btn" data-view="profile">← Back</button> -->
                             <h3>Nomination Information</h3>
                         </div>
                         <button type="button" id="addNominationButton" class="btn btn-primary">+ Add Nomination</button>
                     </div>
-
                     <div id="nominationInfoMessage"></div>
-
                     <div id="nominationCardsList" class="education-cards-grid"></div>
-
-                   <!-- <div class="table-responsive">
-                        <table class="table erp-table align-middle">
-                            <thead>
-                                <tr><th>Name</th><th>Relationship</th><th>Date of Birth</th><th>Share %</th><th>Minor</th><th>Action</th></tr>
-                            </thead>
-                            <tbody id="nominationTableBody"></tbody>
-                        </table>
-                    </div> -->
                 </section>
-
+<!--================================================================================================-->
                 <!-- NOMINATION MODAL -->
+<!--================================================================================================-->
                <div class="modal fade" id="nominationModal" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content role-modal-content">
@@ -1250,14 +1228,6 @@
                                         </div>
                                     </div>
 
-                                    <div class="mb-0">
-                                        <div class="form-check">
-                                            <input type="checkbox" id="nominationFeatured" class="form-check-input">
-                                            <label class="form-check-label" for="nominationFeatured">
-                                                Show this nomination in my Profile Overview card
-                                            </label>
-                                        </div>
-                                    </div>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="secondary-action-btn" data-bs-dismiss="modal">Cancel</button>
@@ -1268,17 +1238,15 @@
                     </div>
                 </div>
 
-
-                <!-- SKILLS -->
-                <section id="skillsView" class="content-view d-none">
+               <section id="skillsView" class="content-view d-none">
                     <div class="section-heading">
                         <div class="section-heading-left">
-                            <!-- <button type="button" class="back-to-profile-btn" data-view="profile">← Back</button> -->
                             <h3>Skills</h3>
                         </div>
+                        <button type="button" id="addSkillMobileButton" class="btn btn-primary skills-mobile-add-btn">+ Add Skill</button>
                     </div>
 
-                    <div class="erp-form-card">
+                    <div class="erp-form-card skills-add-form-card skills-desktop-form">
                         <div class="row g-2 align-items-end">
                             <div class="col-md-5">
                                 <label class="form-label">Skill Name</label>
@@ -1304,64 +1272,62 @@
                             </div>
                         </div>
                         <div id="skillsMessage"></div>
-                        <div id="skillsChipsList" class="cc-chips mt-3"></div>
                     </div>
-                </section>
 
-                <section id="joining-detailsView" class="content-view d-none">
-                    <div class="section-heading">
-                        <div class="section-heading-left">
-                            <!-- <button type="button" class="back-to-profile-btn" data-view="profile">← Back</button> -->
-                            <h3>Joining Details</h3>
-                        </div>
-                        <button type="button" id="editJoiningDetailsButton" class="btn btn-outline-primary">Edit</button>
-                    </div>
-                    <div id="joiningDetailsCard" class="erp-form-card"></div>
+                    <div id="skillsChipsList" class="skills-grid"></div>
                 </section>
-
-                <!-- JOINING DETAILS EDIT MODAL -->
-                <div class="modal fade" id="joiningDetailsModal" tabindex="-1" aria-hidden="true">
+<!--================================================================================================-->
+                <!-- ADD SKILL MODAL (mobile) -->
+<!--================================================================================================-->
+                <div class="modal fade" id="addSkillModal" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content role-modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title">Edit Joining Details</h5>
+                                <h5 class="modal-title">Add Skill</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
-                            <form id="joiningDetailsForm">
-                                <div class="modal-body">
-                                    <div id="joiningDetailsFormMessage"></div>
-                                    <div class="mb-3">
-                                        <label class="form-label">Date of Joining</label>
-                                        <input type="date" id="dateOfJoiningField" class="form-control" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">Confirmation Date</label>
-                                        <input type="date" id="confirmationDateField" class="form-control">
-                                    </div>
-                                    <div class="mb-0">
-                                        <label class="form-label">Status</label>
-                                        <select id="joiningStatusField" class="form-select">
-                                            <option value="Active">Active</option>
-                                            <option value="Probation">Probation</option>
-                                            <option value="Confirmed">Confirmed</option>
-                                            <option value="Terminated">Terminated</option>
-                                        </select>
+                            <div class="modal-body">
+                                <div id="addSkillModalMessage"></div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Skill Name <span class="required-star">*</span></label>
+                                    <input type="text" id="modalSkillInput" class="form-control" placeholder="e.g. Java, React, SQL">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Proficiency</label>
+                                    <select id="modalSkillProficiency" class="form-select">
+                                        <option value="BEGINNER">Beginner</option>
+                                        <option value="INTERMEDIATE">Intermediate</option>
+                                        <option value="ADVANCED">Advanced</option>
+                                        <option value="EXPERT">Expert</option>
+                                    </select>
+                                </div>
+                                <div class="mb-0">
+                                    <div class="form-check">
+                                        <input type="checkbox" id="modalSkillCertified" class="form-check-input">
+                                        <label class="form-check-label" for="modalSkillCertified">Certified</label>
                                     </div>
                                 </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="secondary-action-btn" data-bs-dismiss="modal">Cancel</button>
-                                    <button type="submit" class="btn-primary-erp">Save Changes</button>
-                                </div>
-                            </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="secondary-action-btn" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" id="modalAddSkillButton" class="btn-primary-erp">Add Skill</button>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-
+                <section id="joining-detailsView" class="content-view d-none">
+                    <div class="section-heading">
+                        <div class="section-heading-left">
+                            <h3>Joining Details</h3>
+                        </div>
+                    </div>
+                    <div id="joiningDetailsCard" class="erp-form-card"></div>
+                </section>
                <section id="family-informationView" class="content-view d-none">
                     <div class="section-heading">
                         <div class="section-heading-left">
-                            <!-- <button type="button" class="back-to-profile-btn" data-view="profile">← Back</button> -->
                             <h3>Family Information</h3>
                         </div>
                         <button type="button" id="addFamilyMemberButton" class="btn btn-primary">+ Add Member</button>
@@ -1370,19 +1336,11 @@
                     <div id="familyInfoMessage"></div>
 
                     <div id="familyMembersCardsList" class="education-cards-grid"></div>
-
-                    <!-- <div class="table-responsive">
-                        <table class="table erp-table align-middle">
-                            <thead>
-                                <tr><th>Name</th><th>Relationship</th><th>Date of Birth</th><th>Dependent</th><th>Action</th></tr>
-                            </thead>
-                            <tbody id="familyMembersTableBody"></tbody>
-                        </table>
-                    </div> -->
                 </section>
-
-                <!-- FAMILY MEMBER MODAL (Add aur Edit dono ke liye same modal) -->
-              <div class="modal fade" id="familyMemberModal" tabindex="-1" aria-hidden="true">
+<!--================================================================================================-->
+                <!-- FAMILY MEMBER MODAL (Same modal for both Add and Edit) -->
+<!--================================================================================================-->
+                <div class="modal fade" id="familyMemberModal" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content role-modal-content">
                             <div class="modal-header">
@@ -1414,14 +1372,6 @@
                                         </select>
                                     </div>
 
-                                    <div class="mb-0">
-                                        <div class="form-check">
-                                            <input type="checkbox" id="familyMemberFeatured" class="form-check-input">
-                                            <label class="form-check-label" for="familyMemberFeatured">
-                                                Show this member in my Profile Overview card
-                                            </label>
-                                        </div>
-                                    </div>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="secondary-action-btn" data-bs-dismiss="modal">Cancel</button>

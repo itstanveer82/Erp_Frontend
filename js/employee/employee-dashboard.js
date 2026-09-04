@@ -221,6 +221,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // ==============================================================================================
 
     let currentProfileInitials = "";
+    let currentCoverImage = null;
 
 
     // ==============================================================================================
@@ -730,7 +731,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     Swal.fire({
                         icon: "success",
-                        title: "Chal BSDK.....",
+                        title: "Wait for Download.....",
                         confirmButtonColor: "#17a2b8",
                         timer: 2000,
                         timerProgressBar: true,
@@ -920,10 +921,16 @@ document.addEventListener("DOMContentLoaded", function () {
         <div class="employee-profile">
             <div class="profile-header">
 
-                <div class="profile-cover">
+               <!--- <div class="profile-cover">
                     <div class="profile-cover-image-wrapper">
                         <img src="../assets/image/cover-earth-image.jpg" alt="Profile Cover" class="profile-cover-image">
                     </div>
+                </div> -->
+                <div class="profile-cover">
+                    <div class="profile-cover-image-wrapper">
+                        <img src="${currentCoverImage || '../assets/image/cover-earth-image.jpg'}" alt="Profile Cover" class="profile-cover-image">
+                    </div>
+                    <button type="button" id="coverEditButton" class="cover-edit-btn" title="Change Cover Photo">📷</button>
                 </div>
 
                 <div class="profile-header-content">
@@ -992,6 +999,97 @@ document.addEventListener("DOMContentLoaded", function () {
                 openViewPhotoModal(p.profileImage, initials);
             });
         }
+
+        const coverEditButton = document.getElementById("coverEditButton");
+
+        if (coverEditButton) {
+            coverEditButton.addEventListener("click", function () {
+                openUploadCoverModal();
+            });
+        }
+    }
+
+    // =========================================================================================
+    //           Upload Cover Photo Model (DEMO — real API aane par yahan replace karna hai)
+    // =========================================================================================
+
+    let selectedCoverFile = null;
+
+    function openUploadCoverModal() {
+        selectedCoverFile = null;
+
+        document.getElementById("uploadCoverInput").value = "";
+        document.getElementById("uploadCoverMessage").innerHTML = "";
+        document.getElementById("saveCoverButton").disabled = true;
+
+        const preview = document.getElementById("uploadCoverPreview");
+        preview.src = currentCoverImage || "../assets/image/cover-earth-image.jpg";
+        preview.style.display = "block";
+
+        const modal = new bootstrap.Modal(document.getElementById("uploadCoverModal"));
+        modal.show();
+    }
+
+    const uploadCoverInput = document.getElementById("uploadCoverInput");
+    if (uploadCoverInput) {
+        uploadCoverInput.addEventListener("change", function () {
+            const file = this.files[0];
+            if (!file) return;
+
+            selectedCoverFile = file;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const preview = document.getElementById("uploadCoverPreview");
+                preview.src = e.target.result;
+                preview.style.display = "block";
+
+                document.getElementById("saveCoverButton").disabled = false;
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    const saveCoverButton = document.getElementById("saveCoverButton");
+    if (saveCoverButton) {
+        saveCoverButton.addEventListener("click", function () {
+            if (!selectedCoverFile) return;
+
+            const messageBox = document.getElementById("uploadCoverMessage");
+            messageBox.innerHTML = "";
+            saveCoverButton.disabled = true;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+
+                // -----------------------------------------------------------------------------------------
+                // TODO: Once the real API is available, call uploadCoverPhoto(selectedCoverFile) here,
+                // and after success, set the URL returned by the server as currentCoverImage.
+                // For now, we are saving the local preview for demo purposes.
+                // -----------------------------------------------------------------------------------------
+                currentCoverImage = e.target.result;
+
+                const modal = bootstrap.Modal.getInstance(document.getElementById("uploadCoverModal"));
+                if (modal) modal.hide();
+
+                Swal.fire({
+                    icon: "success",
+                    title: "Cover photo updated",
+                    confirmButtonColor: "#17a2b8",
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+                // -----------------------------------------------------------------------------------
+                //          Header dobara build karo taaki naya cover turant dikhe
+                // -----------------------------------------------------------------------------------
+                if (cachedProfileData) {
+                    buildProfileHeader(cachedProfileData);
+                }
+
+                saveCoverButton.disabled = false;
+            };
+            reader.readAsDataURL(selectedCoverFile);
+        });
     }
 
     // ==============================================================================================
@@ -1012,7 +1110,8 @@ document.addEventListener("DOMContentLoaded", function () {
             <div class="profile-section">
                 <div class="profile-section-title">
                     <span class="profile-section-icon">👤</span>
-                    <div><h2 class="fw-bold">About</h2><p>Employee identification details</p></div>
+                    <!--<div><h4>About</h4><p>Your registered contact details</p></div>-->
+                    <div><h3 class="fw-light">About</h3></div>
                 </div>
                 <div class="profile-info-grid">
                     <div class="profile-info-item"><span class="profile-label">Employee Code</span><strong>${escapeHtml(p.employeeCode)}</strong></div>
@@ -1021,6 +1120,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     <div class="profile-info-item"><span class="profile-label">Designation</span><strong>${escapeHtml(p.designation)}</strong></div>
                     <div class="profile-info-item"><span class="profile-label">Birthday</span><strong>${escapeHtml(p.dateOfBirth)}</strong></div>
                     <div class="profile-info-item"><span class="profile-label">Gender</span><strong>${escapeHtml(p.gender)}</strong></div>
+                    
                 </div>
             </div>
 
@@ -1047,6 +1147,28 @@ document.addEventListener("DOMContentLoaded", function () {
                 <div class="profile-info-grid">
                     <div class="profile-info-item"><span class="profile-label">Joining Date</span><strong>${escapeHtml(p.joiningDate)}</strong></div>
                     <div class="profile-info-item"><span class="profile-label">Reporting Manager</span><strong>${escapeHtml(p.reportingManager)}</strong></div>
+                    <div class="profile-info-item role-info-item " style="grid-column: 1 / -1;">
+                        <span class="profile-label">Role</span>
+                        <div class="permission-chips role-chips ">
+                            ${(p.roles && p.roles.length)
+                    ? p.roles.map(function (perm) {
+                        return `<span class="permission-chip">${escapeHtml(perm)}</span>`;
+                    }).join("")
+                    : `<span class="text-muted" style="font-size:0.85rem;">--</span>`
+                }
+                        </div>
+                    </div>
+                   <div class="profile-info-item permission-info-item" style="grid-column: 1 / -1;">
+                        <span class="profile-label">Permission</span>
+                        <div class="permission-chips">
+                            ${(p.permissions && p.permissions.length)
+                    ? p.permissions.map(function (perm) {
+                        return `<span class="permission-chip">${escapeHtml(perm)}</span>`;
+                    }).join("")
+                    : `<span class="text-muted" style="font-size:0.85rem;">--</span>`
+                }
+                        </div>
+                    </div>
                 </div>
             </div>
         `;
@@ -1571,49 +1693,84 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // ==============================================================================================
-    //                  INITIAL VIEW
+    //                  Initial View Method calll
     // ==============================================================================================
     showView("dashboard");
 
     // ==============================================================================================
     //                Brand Logo Dropdown And  Mobile View Responsive — Logo dropdown
     // ==============================================================================================
+
     const brandLogoToggle = document.getElementById("brandLogoToggle");
     const dashboardSidebarEl = document.getElementById("dashboardSidebar");
 
     if (brandLogoToggle && dashboardSidebarEl) {
+
+        // -------------------------------------------------------------------------------------------
+        //      Transition always inline — CSS specificity conflicts no longer matter.
+        // --------------------------------------------------------------------------------------------
+        dashboardSidebarEl.style.setProperty("transition", "transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)", "important");
+
+        function openMobileSidebar() {
+            dashboardSidebarEl.classList.add("mobile-open");
+            dashboardSidebarEl.style.setProperty("display", "flex", "important");
+            dashboardSidebarEl.style.setProperty("transform", "translateX(-100%)", "important");
+
+            void dashboardSidebarEl.offsetHeight;
+
+            requestAnimationFrame(function () {
+                dashboardSidebarEl.style.setProperty("transform", "translateX(0)", "important");
+            });
+        }
+
+        function closeMobileSidebar() {
+            dashboardSidebarEl.style.setProperty("transform", "translateX(-100%)", "important");
+
+            setTimeout(function () {
+                dashboardSidebarEl.classList.remove("mobile-open");
+                dashboardSidebarEl.style.setProperty("display", "none", "important");
+            }, 500);
+        }
+
         brandLogoToggle.addEventListener("click", function (e) {
             if (window.innerWidth < 768) {
                 e.stopPropagation();
-                dashboardSidebarEl.classList.toggle("mobile-open");
+                const isOpen = dashboardSidebarEl.classList.contains("mobile-open");
+
+                if (isOpen) {
+                    closeMobileSidebar();
+                } else {
+                    openMobileSidebar();
+                }
             }
         });
 
-        // ----------------------------------------------------------------------------------------------
-        //      Outside click pe close
-        // ----------------------------------------------------------------------------------------------
+        //  ----------------------------------------------------------------------------------------------
+        //        Outside click pe close
+        //  ----------------------------------------------------------------------------------------------
+
         document.addEventListener("click", function (e) {
             if (
                 dashboardSidebarEl.classList.contains("mobile-open") &&
                 !dashboardSidebarEl.contains(e.target) &&
                 !brandLogoToggle.contains(e.target)
             ) {
-                dashboardSidebarEl.classList.remove("mobile-open");
+                closeMobileSidebar();
             }
         });
 
-        // ----------------------------------------------------------------------------------------------
+        //  ----------------------------------------------------------------------------------------------
         //          Clicking any nav item closes the menu.
-        // ----------------------------------------------------------------------------------------------
+        //  ----------------------------------------------------------------------------------------------
+
         dashboardSidebarEl.querySelectorAll("[data-view]").forEach(function (btn) {
             btn.addEventListener("click", function () {
                 if (window.innerWidth < 768) {
-                    dashboardSidebarEl.classList.remove("mobile-open");
+                    closeMobileSidebar();
                 }
             });
         });
     }
-
     // ==============================================================================================
     //           Updates the sidebar avatar after the profile photo changes.
     // ==============================================================================================
@@ -1660,52 +1817,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     </div>
                 </div>
             `;
-        });
-    }
-    // ==============================================================================================
-    //                  Open Joining Model
-    // ==============================================================================================
-
-    function openJoiningDetailsModal() {
-        if (!currentJoiningDetails) return;
-
-        document.getElementById("dateOfJoiningField").value = currentJoiningDetails.dateOfJoining || "";
-        document.getElementById("confirmationDateField").value = currentJoiningDetails.confirmationDate || "";
-        document.getElementById("joiningStatusField").value = currentJoiningDetails.status || "Active";
-        document.getElementById("joiningDetailsFormMessage").innerHTML = "";
-
-        const modal = new bootstrap.Modal(document.getElementById("joiningDetailsModal"));
-        modal.show();
-    }
-
-    const editJoiningDetailsButton = document.getElementById("editJoiningDetailsButton");
-    if (editJoiningDetailsButton) {
-        editJoiningDetailsButton.addEventListener("click", openJoiningDetailsModal);
-    }
-
-    const joiningDetailsForm = document.getElementById("joiningDetailsForm");
-    if (joiningDetailsForm) {
-        joiningDetailsForm.addEventListener("submit", function (e) {
-            e.preventDefault();
-
-            const payload = {
-                dateOfJoining: document.getElementById("dateOfJoiningField").value,
-                confirmationDate: document.getElementById("confirmationDateField").value,
-                status: document.getElementById("joiningStatusField").value
-            };
-
-            demoUpdateJoiningDetails(payload).then(function (res) {
-                const modal = bootstrap.Modal.getInstance(document.getElementById("joiningDetailsModal"));
-                if (modal) modal.hide();
-
-                Swal.fire({
-                    icon: "success",
-                    title: res.data.message,
-                    confirmButtonColor: "#17a2b8"
-                });
-
-                loadJoiningDetails();
-            });
         });
     }
 
@@ -1884,12 +1995,10 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("nominationDob").value = record.dateOfBirth || "";
             document.getElementById("nominationPercentage").value = record.sharePercentage;
             document.getElementById("nominationMinor").checked = !!record.minor;
-            document.getElementById("nominationFeatured").checked = isFeatured("nomination", record.id);
         } else {
             modalTitle.textContent = "Add Nomination";
             document.getElementById("nominationForm").reset();
             document.getElementById("nominationId").value = "";
-            document.getElementById("nominationFeatured").checked = false;
         }
 
         const modal = new bootstrap.Modal(document.getElementById("nominationModal"));
@@ -1911,7 +2020,6 @@ document.addEventListener("DOMContentLoaded", function () {
             const messageBox = document.getElementById("nominationFormMessage");
             messageBox.innerHTML = "";
 
-            const wantsFeatured = document.getElementById("nominationFeatured").checked;
 
             const payload = {
                 name: document.getElementById("nominationName").value.trim(),
@@ -1928,14 +2036,6 @@ document.addEventListener("DOMContentLoaded", function () {
             apiCall.then(function (res) {
                 const modal = bootstrap.Modal.getInstance(document.getElementById("nominationModal"));
                 if (modal) modal.hide();
-
-                const savedId = id || (res.data && res.data.id);
-
-                if (wantsFeatured && savedId) {
-                    setFeaturedId("nomination", savedId);
-                } else if (!wantsFeatured && isFeatured("nomination", savedId)) {
-                    setFeaturedId("nomination", null);
-                }
 
                 Swal.fire({
                     icon: "success",
@@ -1972,17 +2072,39 @@ document.addEventListener("DOMContentLoaded", function () {
         const container = document.getElementById("skillsChipsList");
 
         if (skillsList.length === 0) {
-            container.innerHTML = `<p class="text-muted">No skills added yet.</p>`;
+            container.innerHTML = `<p class="skills-empty-text">No skills added yet. Add your first skill above.</p>`;
             return;
         }
 
+        const proficiencyLabels = {
+            BEGINNER: "Beginner",
+            INTERMEDIATE: "Intermediate",
+            ADVANCED: "Advanced",
+            EXPERT: "Expert"
+        };
+
         container.innerHTML = skillsList.map(function (skill) {
-            const certifiedTag = skill.certified ? " ✔" : "";
+            const levelClass = "level-" + (skill.proficiency || "beginner").toLowerCase();
+            const proficiencyText = proficiencyLabels[skill.proficiency] || skill.proficiency || "--";
+
             return `
-            <span class="cc-chip">
-                ${escapeHtml(skill.skillName)} — ${escapeHtml(skill.proficiency)}${certifiedTag}
-                <button type="button" data-remove-skill="${skill.id}">&times;</button>
-            </span>
+            <div class="skill-card">
+                <div class="skill-card-header">
+                    <span class="skill-card-name">
+                        ${escapeHtml(skill.skillName)}
+                        ${skill.certified ? `<span class="skill-certified-badge" title="Certified">✔</span>` : ""}
+                    </span>
+                    <button type="button" class="skill-remove-btn" data-remove-skill="${skill.id}" title="Remove">&times;</button>
+                </div>
+
+                <div class="skill-proficiency-label">
+                    <span>Proficiency</span>
+                    <span>${escapeHtml(proficiencyText)}</span>
+                </div>
+                <div class="skill-proficiency-track">
+                    <div class="skill-proficiency-fill ${levelClass}"></div>
+                </div>
+            </div>
         `;
         }).join("");
 
@@ -2037,19 +2159,90 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
+    // =========================================================================================
+    //              ADD SKILL — Mobile Modal
+    // =========================================================================================
+    const addSkillMobileButton = document.getElementById("addSkillMobileButton");
+    if (addSkillMobileButton) {
+        addSkillMobileButton.addEventListener("click", function () {
+            document.getElementById("modalSkillInput").value = "";
+            document.getElementById("modalSkillProficiency").value = "BEGINNER";
+            document.getElementById("modalSkillCertified").checked = false;
+            document.getElementById("addSkillModalMessage").innerHTML = "";
+
+            const modal = new bootstrap.Modal(document.getElementById("addSkillModal"));
+            modal.show();
+        });
+    }
+
+    const modalAddSkillButton = document.getElementById("modalAddSkillButton");
+    if (modalAddSkillButton) {
+        modalAddSkillButton.addEventListener("click", function () {
+            const nameInput = document.getElementById("modalSkillInput");
+            const proficiencySelect = document.getElementById("modalSkillProficiency");
+            const certifiedCheckbox = document.getElementById("modalSkillCertified");
+            const messageBox = document.getElementById("addSkillModalMessage");
+
+            const skillName = nameInput.value.trim();
+            messageBox.innerHTML = "";
+
+            if (!skillName) {
+                messageBox.innerHTML = `<div class="custom-alert error">Please enter a skill name.</div>`;
+                return;
+            }
+
+            const payload = {
+                skillName: skillName,
+                proficiency: proficiencySelect.value,
+                certified: certifiedCheckbox.checked
+            };
+
+            addMySkill(payload).then(function () {
+                const modal = bootstrap.Modal.getInstance(document.getElementById("addSkillModal"));
+                if (modal) modal.hide();
+
+                Swal.fire({
+                    icon: "success",
+                    title: "Skill added successfully.",
+                    confirmButtonColor: "#17a2b8",
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+
+                loadSkills();
+            }).catch(function (error) {
+                messageBox.innerHTML = `<div class="custom-alert error">${escapeHtml(error.message || "Failed to add skill.")}</div>`;
+            });
+        });
+    }
+
+
     // ==============================================================================================
     //               Opens the personal information modal.
     // ==============================================================================================
 
     let currentPersonalInfo = null;
+    let currentAddressInfo = null;
 
     function loadPersonalInformation() {
         const card = document.getElementById("personalInfoCard");
+        const addressCard = document.getElementById("addressInfoCard");
+
         card.innerHTML = `<p class="text-muted">Loading...</p>`;
 
-        fetchMyExtendedProfile().then(function (res) {
-            currentPersonalInfo = res.data;
+        Promise.all([
+            fetchMyExtendedProfile(),
+            fetchMyAddress()
+        ]).then(function (results) {
+            currentPersonalInfo = results[0].data || {};
+
+            // The API returns an array — find the primary address, otherwise use the first one.
+            const addressList = Array.isArray(results[1].data) ? results[1].data : [];
+            currentAddressInfo = addressList.find(function (a) { return a.primary; }) || addressList[0] || null;
+
+
             const d = currentPersonalInfo;
+            const a = currentAddressInfo;
 
             card.innerHTML = `
             <div class="profile-info-grid">
@@ -2077,16 +2270,44 @@ document.addEventListener("DOMContentLoaded", function () {
                     <span class="profile-label">Nationality</span>
                     <strong>${escapeHtml(d.nationality) || "--"}</strong>
                 </div>
-                <div class="profile-info-item" style="grid-column: 1 / -1;">
+                 <div class="profile-info-item">
                     <span class="profile-label">Bio</span>
                     <strong>${escapeHtml(d.bio) || "--"}</strong>
                 </div>
+                <div class="profile-info-item">
+                    <span class="profile-label">Address 1</span>
+                    <strong>${escapeHtml(a.line1) || "--"}</strong>
+                </div>
+                <div class="profile-info-item">
+                    <span class="profile-label">Address 2</span>
+                    <strong>${escapeHtml(a.line2) || "--"}</strong>
+                </div>
+                <div class="profile-info-item">
+                    <span class="profile-label">City</span>
+                    <strong>${escapeHtml(a.city) || "--"}</strong>
+                </div>
+                <div class="profile-info-item">
+                    <span class="profile-label">State</span>
+                    <strong>${escapeHtml(a.state) || "--"}</strong>
+                </div>
+                <div class="profile-info-item">
+                    <span class="profile-label">Country</span>
+                    <strong>${escapeHtml(a.country) || "--"}</strong>
+                </div>
+                <div class="profile-info-item">
+                    <span class="profile-label">Postal Code</span>
+                    <strong>${escapeHtml(a.postalCode) || "--"}</strong>
+                </div>                
+                
             </div>
         `;
+
         }).catch(function (error) {
             card.innerHTML = `<div class="custom-alert error">${escapeHtml(error.message || "Failed to load profile.")}</div>`;
+            addressCard.innerHTML = "";
         });
     }
+
     // ==============================================================================================
     //                  Profile Infomation model Open
     // ==============================================================================================
@@ -2101,6 +2322,15 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("occupationField").value = currentPersonalInfo.occupation || "";
         document.getElementById("nationalityField").value = currentPersonalInfo.nationality || "";
         document.getElementById("bioField").value = currentPersonalInfo.bio || "";
+
+        const a = currentAddressInfo || {};
+        document.getElementById("addressLine1Field").value = a.line1 || "";
+        document.getElementById("addressLine2Field").value = a.line2 || "";
+        document.getElementById("addressCityField").value = a.city || "";
+        document.getElementById("addressStateField").value = a.state || "";
+        document.getElementById("addressCountryField").value = a.country || "";
+        document.getElementById("addressPostalCodeField").value = a.postalCode || "";
+
         document.getElementById("personalInfoFormMessage").innerHTML = "";
 
         const modal = new bootstrap.Modal(document.getElementById("personalInfoModal"));
@@ -2120,7 +2350,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const messageBox = document.getElementById("personalInfoFormMessage");
             messageBox.innerHTML = "";
 
-            const payload = {
+            const profilePayload = {
                 dateOfBirth: document.getElementById("dobField").value || null,
                 gender: document.getElementById("genderField").value,
                 maritalStatus: document.getElementById("maritalStatusField").value,
@@ -2130,13 +2360,31 @@ document.addEventListener("DOMContentLoaded", function () {
                 bio: document.getElementById("bioField").value.trim()
             };
 
-            updateMyExtendedProfile(payload).then(function (res) {
+            const addressPayload = {
+                type: (currentAddressInfo && currentAddressInfo.type) || "HOME",
+                line1: document.getElementById("addressLine1Field").value.trim(),
+                line2: document.getElementById("addressLine2Field").value.trim(),
+                city: document.getElementById("addressCityField").value.trim(),
+                state: document.getElementById("addressStateField").value.trim(),
+                country: document.getElementById("addressCountryField").value.trim(),
+                postalCode: document.getElementById("addressPostalCodeField").value.trim(),
+                primary: true
+            };
+
+            const addressApiCall = (currentAddressInfo && currentAddressInfo.id)
+                ? updateMyAddress(currentAddressInfo.id, addressPayload)
+                : addMyAddress(addressPayload);
+
+            Promise.all([
+                updateMyExtendedProfile(profilePayload),
+                addressApiCall
+            ]).then(function (res) {
                 const modal = bootstrap.Modal.getInstance(document.getElementById("personalInfoModal"));
                 if (modal) modal.hide();
 
                 Swal.fire({
                     icon: "success",
-                    title: res.message || "Profile updated successfully.",
+                    title: "Profile updated successfully.",
                     confirmButtonColor: "#17a2b8"
                 });
 
@@ -2270,12 +2518,10 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("emergencyContactEmail").value = contact.email || "";
             document.getElementById("emergencyContactAddress").value = contact.address || "";
             document.getElementById("emergencyContactPriority").value = contact.priority || "";
-            document.getElementById("emergencyContactFeatured").checked = isFeatured("emergency", contact.id);
         } else {
             modalTitle.textContent = "Add Emergency Contact";
             document.getElementById("emergencyContactForm").reset();
             document.getElementById("emergencyContactId").value = "";
-            document.getElementById("emergencyContactFeatured").checked = false;
         }
 
         const modal = new bootstrap.Modal(document.getElementById("emergencyContactModal"));
@@ -2298,7 +2544,6 @@ document.addEventListener("DOMContentLoaded", function () {
             e.preventDefault();
 
             const id = document.getElementById("emergencyContactId").value;
-            const wantsFeatured = document.getElementById("emergencyContactFeatured").checked;
 
             const payload = {
                 name: document.getElementById("emergencyContactName").value.trim(),
@@ -2316,14 +2561,6 @@ document.addEventListener("DOMContentLoaded", function () {
             apiCall.then(function (res) {
                 const modal = bootstrap.Modal.getInstance(document.getElementById("emergencyContactModal"));
                 if (modal) modal.hide();
-
-                const savedId = id || (res.data && res.data.id);
-
-                if (wantsFeatured && savedId) {
-                    setFeaturedId("emergency", savedId);
-                } else if (!wantsFeatured && isFeatured("emergency", savedId)) {
-                    setFeaturedId("emergency", null);
-                }
 
                 Swal.fire({
                     icon: "success",
@@ -2466,12 +2703,10 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("educationSubjects").value = record.specialization || "";
             document.getElementById("educationYear").value = record.yearOfPassing || "";
             document.getElementById("educationPercentage").value = record.percentageOrGrade || "";
-            document.getElementById("educationFeatured").checked = isFeatured("education", record.id);
         } else {
             modalTitle.textContent = "Add Education";
             document.getElementById("educationForm").reset();
             document.getElementById("educationId").value = "";
-            document.getElementById("educationFeatured").checked = false;
         }
 
         const modal = new bootstrap.Modal(document.getElementById("educationModal"));
@@ -2493,7 +2728,6 @@ document.addEventListener("DOMContentLoaded", function () {
             const id = document.getElementById("educationId").value;
             const messageBox = document.getElementById("educationFormMessage");
             messageBox.innerHTML = "";
-            const wantsFeatured = document.getElementById("educationFeatured").checked;
             const payload = {
                 degree: document.getElementById("educationQualification").value.trim(),
                 institution: document.getElementById("educationInstitution").value.trim(),
@@ -2510,15 +2744,6 @@ document.addEventListener("DOMContentLoaded", function () {
             apiCall.then(function (res) {
                 const modal = bootstrap.Modal.getInstance(document.getElementById("educationModal"));
                 if (modal) modal.hide();
-
-                const savedId = id || (res.data && res.data.id);
-
-                if (wantsFeatured && savedId) {
-                    setFeaturedId("education", savedId);
-                } else if (!wantsFeatured && isFeatured("education", savedId)) {
-                    setFeaturedId("education", null);
-                }
-
                 Swal.fire({
                     icon: "success",
                     title: res.message || "Education record saved.",
@@ -2653,16 +2878,21 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("experienceFromDate").value = record.fromDate;
             document.getElementById("experienceToDate").value = record.toDate || "";
             document.getElementById("experienceCurrent").checked = !!record.current;
-            document.getElementById("experienceFeatured").checked = isFeatured("experience", record.id);
         } else {
             modalTitle.textContent = "Add Experience";
             document.getElementById("experienceForm").reset();
             document.getElementById("experienceId").value = "";
-            document.getElementById("experienceFeatured").checked = false;
         }
 
         const modal = new bootstrap.Modal(document.getElementById("experienceModal"));
         modal.show();
+    }
+
+    const addExperienceButton = document.getElementById("addExperienceButton");
+    if (addExperienceButton) {
+        addExperienceButton.addEventListener("click", function () {
+            openExperienceModal(null);
+        });
     }
 
     const experienceForm = document.getElementById("experienceForm");
@@ -2675,7 +2905,6 @@ document.addEventListener("DOMContentLoaded", function () {
             messageBox.innerHTML = "";
 
             const isCurrent = document.getElementById("experienceCurrent").checked;
-            const wantsFeatured = document.getElementById("experienceFeatured").checked;
 
             const payload = {
                 companyName: document.getElementById("experienceOrganization").value.trim(),
@@ -2693,13 +2922,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 const modal = bootstrap.Modal.getInstance(document.getElementById("experienceModal"));
                 if (modal) modal.hide();
 
-                const savedId = id || (res.data && res.data.id);
-
-                if (wantsFeatured && savedId) {
-                    setFeaturedId("experience", savedId);
-                } else if (!wantsFeatured && isFeatured("experience", savedId)) {
-                    setFeaturedId("experience", null);
-                }
+                // const savedId = id || (res.data && res.data.id);
 
                 Swal.fire({
                     icon: "success",
@@ -2830,12 +3053,10 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("familyMemberRelationship").value = member.relationship;
             document.getElementById("familyMemberDob").value = member.dateOfBirth || "";
             document.getElementById("familyMemberDependent").value = String(member.dependent);
-            document.getElementById("familyMemberFeatured").checked = isFeatured("family", member.id);
         } else {
             modalTitle.textContent = "Add Family Member";
             document.getElementById("familyMemberForm").reset();
             document.getElementById("familyMemberId").value = "";
-            document.getElementById("familyMemberFeatured").checked = false;
         }
 
         const modal = new bootstrap.Modal(document.getElementById("familyMemberModal"));
@@ -2860,7 +3081,6 @@ document.addEventListener("DOMContentLoaded", function () {
             const messageBox = document.getElementById("familyMemberFormMessage");
             messageBox.innerHTML = "";
 
-            const wantsFeatured = document.getElementById("familyMemberFeatured").checked;
 
             const payload = {
                 name: document.getElementById("familyMemberName").value.trim(),
@@ -2876,14 +3096,6 @@ document.addEventListener("DOMContentLoaded", function () {
             apiCall.then(function (res) {
                 const modal = bootstrap.Modal.getInstance(document.getElementById("familyMemberModal"));
                 if (modal) modal.hide();
-
-                const savedId = id || (res.data && res.data.id);
-
-                if (wantsFeatured && savedId) {
-                    setFeaturedId("family", savedId);
-                } else if (!wantsFeatured && isFeatured("family", savedId)) {
-                    setFeaturedId("family", null);
-                }
 
                 Swal.fire({
                     icon: "success",

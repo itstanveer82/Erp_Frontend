@@ -1,9 +1,9 @@
-// ====================================================================
+// ==========================================================================================
 //      Get the logged-in employee's user and profile details.
 //      GET /api/users/me  → Fetches basic logged-in user information.
 //      GET /api/profiles/me → Fetches employee profile details and profile photo.
 //      Used to display the current employee's profile information.
-// =====================================================================
+// ==========================================================================================
 function fetchCurrentUserProfile() {
     return Promise.all([
         apiRequest("/api/users/me"),
@@ -36,6 +36,9 @@ function fetchCurrentUserProfile() {
                 joiningDate: u.joiningDate || d.joiningDate || "Not available",
                 reportingManager: u.reportingManager || d.reportingManager || "Not available",
 
+                roles: u.roles || [], 
+                permissions: u.permissions || [],
+
                 profileImage:
                     overriddenProfileImage ||
                     realPhotoUrl ||
@@ -54,17 +57,18 @@ function fetchCurrentUserProfile() {
 }
 
 
-// =========================================
+// ==========================================================================================
 //      Get and download the logged-in employee's profile photo.
 //      GET /api/profile-photos/me          → Fetches the employee's profile photo details.
 //      GET /api/profile-photos/me/download → Downloads the employee's profile photo file.
 //      Used to display or download the current employee's profile photo.)
-// =========================================
+// ==========================================================================================
 let overriddenProfileImage = null;
 let cachedRealPhotoUrl = null;
 let realPhotoFetchedOnce = false;
-
+// ---------------------------------------------------------------------------------------
 // Fetches real profile photo once, caches the blob-URL,
+// ---------------------------------------------------------------------------------------
 function getRealProfilePhotoUrl() {
     if (realPhotoFetchedOnce) {
         return Promise.resolve(cachedRealPhotoUrl);
@@ -323,28 +327,33 @@ function deleteMyEmergencyContact(contactId) {
     });
 }
 
-
+// ---------------------------------------------------------------------------------------
 //  GET /api/family-members/me
+// ---------------------------------------------------------------------------------------
 function fetchMyFamilyMembers() {
     return apiRequest("/api/family-members/me");
 }
-// Real endpoint: POST /api/family-members/me
+// ---------------------------------------------------------------------------------------
+//  POST /api/family-members/me
+// ---------------------------------------------------------------------------------------
 function addMyFamilyMember(payload) {
     return apiRequest("/api/family-members/me", {
         method: "POST",
         body: JSON.stringify(payload)
     });
 }
-
-// Real endpoint: PUT /api/family-members/me/{id}
+// ---------------------------------------------------------------------------------------
+//  PUT /api/family-members/me/{id}
+// ---------------------------------------------------------------------------------------
 function updateMyFamilyMember(id, payload) {
     return apiRequest(`/api/family-members/me/${id}`, {
         method: "PUT",
         body: JSON.stringify(payload)
     });
 }
-
-// Real endpoint: DELETE /api/family-members/me/{id}
+// ---------------------------------------------------------------------------------------
+//  DELETE /api/family-members/me/{id}
+// ---------------------------------------------------------------------------------------
 function deleteMyFamilyMember(id) {
     return apiRequest(`/api/family-members/me/${id}`, {
         method: "DELETE"
@@ -354,29 +363,33 @@ function deleteMyFamilyMember(id) {
 // ==================================================================================================
 //              EDUCATION DETAILS
 // ==================================================================================================
-
+// ---------------------------------------------------------------------------------------
 //  GET /api/education-details/me
+// ---------------------------------------------------------------------------------------
 function fetchMyEducationDetails() {
     return apiRequest("/api/education-details/me");
 }
-
+// ---------------------------------------------------------------------------------------
 //  POST /api/education-details/me
+// ---------------------------------------------------------------------------------------
 function addMyEducationDetail(payload) {
     return apiRequest("/api/education-details/me", {
         method: "POST",
         body: JSON.stringify(payload)
     });
 }
-
+// ---------------------------------------------------------------------------------------
 //  PUT /api/education-details/me/{id}
+// ---------------------------------------------------------------------------------------
 function updateMyEducationDetail(id, payload) {
     return apiRequest(`/api/education-details/me/${id}`, {
         method: "PUT",
         body: JSON.stringify(payload)
     });
 }
-
+// ---------------------------------------------------------------------------------------
 //  DELETE /api/education-details/me/{id}
+// ---------------------------------------------------------------------------------------
 function deleteMyEducationDetail(id) {
     return apiRequest(`/api/education-details/me/${id}`, {
         method: "DELETE"
@@ -387,29 +400,33 @@ function deleteMyEducationDetail(id) {
 // ====================================================================================================
 //              EXPERIENCE DETAILS
 // ====================================================================================================
-
+// ---------------------------------------------------------------------------------------
 //  GET /api/experience-details/me
+// ---------------------------------------------------------------------------------------
 function fetchMyExperienceDetails() {
     return apiRequest("/api/experience-details/me");
 }
-
+// ---------------------------------------------------------------------------------------
 //  POST /api/experience-details/me
+// ---------------------------------------------------------------------------------------
 function addMyExperienceDetail(payload) {
     return apiRequest("/api/experience-details/me", {
         method: "POST",
         body: JSON.stringify(payload)
     });
 }
-
+// ---------------------------------------------------------------------------------------
 //  PUT /api/experience-details/me/{id}
+// ---------------------------------------------------------------------------------------
 function updateMyExperienceDetail(id, payload) {
     return apiRequest(`/api/experience-details/me/${id}`, {
         method: "PUT",
         body: JSON.stringify(payload)
     });
 }
-
+// ---------------------------------------------------------------------------------------
 //  DELETE /api/experience-details/me/{id}
+// ---------------------------------------------------------------------------------------
 function deleteMyExperienceDetail(id) {
     return apiRequest(`/api/experience-details/me/${id}`, {
         method: "DELETE"
@@ -420,21 +437,24 @@ function deleteMyExperienceDetail(id) {
 // ===================================================================================================
 //                  EMPLOYEE SKILLS
 // ===================================================================================================
-
+// ---------------------------------------------------------------------------------------
 //  GET /api/employee-skills/me
+// ---------------------------------------------------------------------------------------
 function fetchMySkills() {
     return apiRequest("/api/employee-skills/me");
 }
-
+// ---------------------------------------------------------------------------------------
 //  POST /api/employee-skills/me
+// ---------------------------------------------------------------------------------------
 function addMySkill(payload) {
     return apiRequest("/api/employee-skills/me", {
         method: "POST",
         body: JSON.stringify(payload)
     });
 }
-
+// ---------------------------------------------------------------------------------------
 //  DELETE /api/employee-skills/me/{id}
+// ---------------------------------------------------------------------------------------
 function deleteMySkill(id) {
     return apiRequest(`/api/employee-skills/me/${id}`, {
         method: "DELETE"
@@ -445,29 +465,33 @@ function deleteMySkill(id) {
 // ===================================================================================================
 //              NOMINEE DETAILS
 // ===================================================================================================
-
+// ---------------------------------------------------------------------------------------
 //  GET /api/nominee-details/me
+// ---------------------------------------------------------------------------------------
 function fetchMyNominees() {
     return apiRequest("/api/nominee-details/me");
 }
-
+// ---------------------------------------------------------------------------------------
 //  POST /api/nominee-details/me
+// ---------------------------------------------------------------------------------------
 function addMyNominee(payload) {
     return apiRequest("/api/nominee-details/me", {
         method: "POST",
         body: JSON.stringify(payload)
     });
 }
-
+// ---------------------------------------------------------------------------------------
 //  PUT /api/nominee-details/me/{id}
+// ---------------------------------------------------------------------------------------
 function updateMyNominee(id, payload) {
     return apiRequest(`/api/nominee-details/me/${id}`, {
         method: "PUT",
         body: JSON.stringify(payload)
     });
 }
-
+// ---------------------------------------------------------------------------------------
 //  DELETE /api/nominee-details/me/{id}
+// ---------------------------------------------------------------------------------------
 function deleteMyNominee(id) {
     return apiRequest(`/api/nominee-details/me/${id}`, {
         method: "DELETE"
@@ -478,8 +502,9 @@ function deleteMyNominee(id) {
 // =================================================================================================
 //                  BANK INFORMATION
 // =================================================================================================
-
+// ---------------------------------------------------------------------------------------
 //  GET /api/bank-information/me
+// ---------------------------------------------------------------------------------------
 function fetchMyBankInformation() {
     return apiRequest("/api/bank-information/me");
 }
@@ -488,15 +513,48 @@ function fetchMyBankInformation() {
 // =================================================================================================
 //              USER PROFILE (extended)
 // =================================================================================================
-
+// ---------------------------------------------------------------------------------------
 //  GET /api/profiles/me
+// ---------------------------------------------------------------------------------------
 function fetchMyExtendedProfile() {
     return apiRequest("/api/profiles/me");
 }
-
+// ---------------------------------------------------------------------------------------
 //  PUT /api/profiles/me
+// ---------------------------------------------------------------------------------------
 function updateMyExtendedProfile(payload) {
     return apiRequest("/api/profiles/me", {
+        method: "PUT",
+        body: JSON.stringify(payload)
+    });
+}
+
+// =================================================================================================
+//                  ADDRESS (Personal Information)
+// =================================================================================================
+// ---------------------------------------------------------------------------------------
+//  GET /api/addresses/me
+// ---------------------------------------------------------------------------------------
+function fetchMyAddress() {
+    return apiRequest("/api/addresses/me")
+        .catch(function (error) {
+            return { success: false, data: null };
+        });
+}
+// ---------------------------------------------------------------------------------------
+//  POST /api/addresses/me
+// ---------------------------------------------------------------------------------------
+function addMyAddress(payload) {
+    return apiRequest("/api/addresses/me", {
+        method: "POST",
+        body: JSON.stringify(payload)
+    });
+}
+// ---------------------------------------------------------------------------------------
+//  PUT /api/addresses/me/{id}
+// ---------------------------------------------------------------------------------------
+function updateMyAddress(id, payload) {
+    return apiRequest(`/api/addresses/me/${id}`, {
         method: "PUT",
         body: JSON.stringify(payload)
     });
