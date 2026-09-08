@@ -1,0 +1,1184 @@
+/* =========================================================
+   DASHBOARD — WELCOME BANNER
+   ========================================================= */
+.dashboard-welcome {
+    background: linear-gradient(120deg,
+            rgba(23, 37, 68) 40%,
+            rgba(13, 71, 161, 0.85) 80%,
+            rgba(194, 24, 91, 0.85) 100%);
+    border-radius: 16px;
+    padding: 28px 30px;
+    margin-bottom: 22px;
+    color: #fff;
+    box-shadow: 0 6px 20px rgba(23, 162, 184, 0.18);
+}
+
+.dashboard-welcome .page-label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    color: rgba(255, 255, 255, 0.85);
+    margin: 0 0 6px;
+}
+
+.dashboard-welcome h1 {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0 0 4px;
+    color: #fff;
+}
+
+.dashboard-welcome p {
+    font-size: 13.5px;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0;
+}
+
+/* =========================================================
+   DASHBOARD — STAT CARDS
+   ========================================================= */
+.stats-row {
+    margin-bottom: 6px;
+}
+
+.dashboard-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 20px 22px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    height: 100%;
+    box-shadow: 0 2px 10px rgba(20, 30, 50, 0.06);
+    border: 1px solid #f1f3f6;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+html[data-theme="dark"] .dashboard-card {
+    border: none;
+}
+
+
+
+
+.dashboard-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(20, 30, 50, 0.10);
+}
+
+.dashboard-card .stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 19px;
+    font-weight: 700;
+    flex: 0 0 auto;
+    background: #e6f7fa;
+    color: #17a2b8;
+}
+
+/* alag alag card ke icon ko color diya (nth-child order: Attendance, Leave, Corrections, Payslip) */
+.stats-row .col-12:nth-child(1) .stat-icon {
+    background: #e6f7fa;
+    color: #17a2b8;
+}
+
+.stats-row .col-12:nth-child(2) .stat-icon {
+    background: #eef2ff;
+    color: #3949ab;
+}
+
+.stats-row .col-12:nth-child(3) .stat-icon {
+    background: #fff4e0;
+    color: #a15c00;
+}
+
+.stats-row .col-12:nth-child(4) .stat-icon {
+    background: #e6f7ec;
+    color: #1a7f4b;
+}
+
+.dashboard-card span {
+    display: block;
+    font-size: 12.5px;
+    color: #8a9098;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.dashboard-card h2 {
+    font-size: 21px;
+    font-weight: 800;
+    color: #1c2126;
+    margin: 0;
+}
+
+/* =========================================================
+   DASHBOARD — PANELS (chart / tasks / leave / feeds)
+   ========================================================= */
+.dash-row-2,
+.dash-row-3 {
+    margin-top: 18px;
+}
+
+.dash-panel {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 2px 10px rgba(20, 30, 50, 0.06);
+    border: 1px solid #f1f3f6;
+    padding: 20px 22px;
+    height: 100%;
+}
+
+html[data-theme="dark"] .dash-panel {
+    border: none;
+}
+
+.dash-panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f1f3f6;
+}
+
+.dash-panel-head h6 {
+    margin: 0;
+    font-weight: 700;
+    font-size: 15px;
+    color: #1c2126;
+}
+
+.dash-panel-head h6 span {
+    color: #9aa1ab;
+    font-weight: 500;
+    font-size: 12.5px;
+}
+
+.dash-panel-head a {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #17a2b8;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.dash-panel-head a:hover {
+    text-decoration: underline;
+}
+
+.dash-legend {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px dashed #eef0f3;
+    font-size: 11.5px;
+    color: #6c757d;
+}
+
+.dash-legend i {
+    width: 9px;
+    height: 9px;
+    border-radius: 3px;
+    display: inline-block;
+    margin-right: 6px;
+}
+
+/* ---------- Tasks ---------- */
+.dash-task-item {
+    padding: 14px 0;
+    border-bottom: 1px solid #f4f5f7;
+}
+
+.dash-task-item:first-child {
+    padding-top: 2px;
+}
+
+.dash-task-item:last-child {
+    border-bottom: none;
+    padding-bottom: 2px;
+}
+
+.dash-task-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.dash-task-ico {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+.dash-task-title {
+    font-size: 13.8px;
+    font-weight: 600;
+    margin: 0;
+    color: #1c2126;
+}
+
+.dash-task-desc {
+    font-size: 12px;
+    color: #9aa1ab;
+    margin: 2px 0 8px;
+}
+
+.dash-task-badge {
+    font-size: 10.5px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+}
+
+.dash-progress {
+    height: 6px;
+    border-radius: 20px;
+    background: #eef0f3;
+    overflow: hidden;
+}
+
+.dash-progress-bar {
+    height: 100%;
+    border-radius: 20px;
+    transition: width 0.3s ease;
+}
+
+/* ---------- Leave overview ---------- */
+.dash-leave-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 13px 0;
+    border-bottom: 1px solid #f4f5f7;
+}
+
+.dash-leave-row:first-child {
+    padding-top: 2px;
+}
+
+.dash-leave-row:last-child {
+    border-bottom: none;
+    padding-bottom: 2px;
+}
+
+.dash-leave-ico {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+}
+
+.dash-leave-name {
+    font-size: 13.8px;
+    font-weight: 600;
+    color: #1c2126;
+}
+
+.dash-leave-days {
+    font-size: 16px;
+    font-weight: 800;
+    text-align: right;
+    color: #1c2126;
+}
+
+.dash-leave-sub {
+    font-size: 11px;
+    color: #9aa1ab;
+    text-align: right;
+}
+
+/* ---------- Feeds: celebrations / announcements / events ---------- */
+.dash-feed-row {
+    display: flex;
+    gap: 12px;
+    padding: 13px 0;
+    border-bottom: 1px solid #f4f5f7;
+    align-items: flex-start;
+}
+
+.dash-feed-row:first-child {
+    padding-top: 2px;
+}
+
+.dash-feed-row:last-child {
+    border-bottom: none;
+    padding-bottom: 2px;
+}
+
+.dash-feed-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12.5px;
+    font-weight: 700;
+}
+
+.dash-feed-ico {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+.dash-feed-title {
+    font-size: 13.5px;
+    font-weight: 600;
+    margin: 0;
+    color: #1c2126;
+}
+
+.dash-feed-sub {
+    font-size: 11.8px;
+    color: #9aa1ab;
+    margin: 2px 0 0;
+    line-height: 1.4;
+}
+
+.dash-feed-time {
+    font-size: 11px;
+    color: #c1c7cf;
+    white-space: nowrap;
+    padding-top: 2px;
+}
+
+.dash-event-row {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    padding: 13px 0;
+    border-bottom: 1px solid #f4f5f7;
+}
+
+.dash-event-row:first-child {
+    padding-top: 2px;
+}
+
+.dash-event-row:last-child {
+    border-bottom: none;
+    padding-bottom: 2px;
+}
+
+.dash-event-date {
+    width: 46px;
+    height: 46px;
+    border-radius: 11px;
+    background: #eef2ff;
+    color: #3949ab;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.1;
+    flex: 0 0 auto;
+}
+
+.dash-event-date .d {
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.dash-event-date .m {
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+}
+
+.dash-event-title {
+    font-size: 13.5px;
+    font-weight: 600;
+    margin: 0;
+    color: #1c2126;
+}
+
+.dash-event-sub {
+    font-size: 11.8px;
+    color: #9aa1ab;
+    margin: 2px 0 0;
+}
+
+
+
+/*  =======================
+        Skills Section
+    ======================= */
+
+.skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 14px;
+    margin-top: 16px;
+}
+
+.skill-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 16px 18px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    border-left: 4px solid #17a2b8;
+    position: relative;
+
+}
+
+.skill-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    gap: 8px;
+}
+
+.skill-card-name {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1c2126;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    word-break: break-word;
+}
+
+.skill-certified-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #e6f7ec;
+    color: #1a7f4b;
+    font-size: 11px;
+    flex-shrink: 0;
+}
+
+.skill-remove-btn {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: none;
+    background: #fde8e8;
+    color: #b3261e;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.skill-remove-btn:hover {
+    background: #fbd4d4;
+}
+
+.skill-proficiency-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.72rem;
+    color: #9aa1ab;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 6px;
+}
+
+.skill-proficiency-track {
+    width: 100%;
+    height: 3px;
+    border-radius: 999px;
+    background: #eef0f3;
+    overflow: hidden;
+}
+
+.skill-proficiency-fill {
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.3s ease;
+}
+
+.skill-proficiency-fill.level-beginner {
+    width: 25%;
+    background: #dc6f6f;
+}
+
+.skill-proficiency-fill.level-intermediate {
+    width: 50%;
+    background: #d6a94a;
+}
+
+.skill-proficiency-fill.level-advanced {
+    width: 75%;
+    background: #4a90d6;
+}
+
+.skill-proficiency-fill.level-expert {
+    width: 100%;
+    background: #1a7f4b;
+}
+
+.skills-empty-text {
+    color: #6c757d;
+    font-size: 0.9rem;
+    padding: 12px 0;
+}
+
+/* Add-skill form card thoda cleaner */
+.skills-add-form-card .form-label {
+    font-weight: 600;
+    font-size: 0.82rem;
+    color: #34383f;
+}
+
+/* Mobile-only "+ Add" button — desktop pe hidden */
+.skills-mobile-add-btn {
+    display: none;
+}
+
+
+html[data-theme="dark"] .skill-card {
+    background: transparent !important;
+    color: white !important;
+}
+
+html[data-theme="dark"] .skill-card-name {
+    color: white !important;
+}
+
+.skill-name {
+    color: black !important;
+}
+
+html[data-theme="dark"] .skill-name {
+    color: white !important;
+}
+
+html[data-theme="dark"] .skills-add-form-card .form-label {
+    background: transparent !important;
+    color: white !important;
+}
+
+
+html[data-theme="dark"] .skills-desktop-form {
+    background: #0F172A !important;
+}
+
+
+
+html[data-theme="dark"] .form-label {
+    background: transparent !important;
+    color: white;
+}
+
+html[data-theme="dark"] .leave-policy-dropdown {
+    background: #0a1325 !important;
+    color: white;
+}
+
+html[data-theme="dark"] .leave-policy-toggle:hover {
+    background: transparent;
+    color: rgb(255, 174, 0);
+    letter-spacing: 1px;
+}
+
+html[data-theme="dark"] .leave-policy-content li {
+    color: white;
+}
+
+
+
+
+/*  ======================= 
+        Education Cards 
+    ======================= */
+.education-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+}
+
+.education-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    border-left: 4px solid #17a2b8;
+    position: relative;
+}
+
+.education-card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.education-card-icon {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    border-radius: 10px;
+    background: #e6f7fa;
+    color: #17a2b8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+.education-card-title h5 {
+    margin: 0 0 2px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1c2126;
+}
+
+.education-card-title p {
+    margin: 0;
+    font-size: 0.82rem;
+    color: #6c757d;
+}
+
+.education-card-actions {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    display: flex;
+    gap: 6px;
+}
+
+.education-card-actions button {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.education-edit-btn {
+    background: #eef2ff;
+    color: #3949ab;
+}
+
+.education-edit-btn:hover {
+    background: #dde3fb;
+}
+
+.education-delete-btn {
+    background: #fde8e8;
+    color: #b3261e;
+}
+
+.education-delete-btn:hover {
+    background: #fbd4d4;
+}
+
+.education-card-details {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px 16px;
+    padding-top: 12px;
+    border-top: 1px solid #eef0f3;
+}
+
+.education-detail-item span {
+    display: block;
+    font-size: 0.72rem;
+    color: #9aa1ab;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 2px;
+}
+
+.education-detail-item strong {
+    font-size: 0.85rem;
+    color: #1c2126;
+}
+
+
+
+
+
+/* =========================================================
+   THEME TOGGLE BUTTON
+   ========================================================= */
+.theme-toggle-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.theme-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.22);
+    transform: scale(1.05);
+}
+
+/* =========================================================
+   DARK MODE
+   ========================================================= */
+html[data-theme="dark"] body {
+    background: #0f172a;
+    color: #e5e9f0;
+}
+
+html[data-theme="dark"] .dashboard-sidebar {
+    background: #0b1220 !important;
+}
+
+html[data-theme="dark"] .sidebar-item {
+    color: #b7c0cf;
+}
+
+html[data-theme="dark"] .sidebar-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+html[data-theme="dark"] .sidebar-item.active {
+    background: #17a2b8;
+    color: #fff;
+}
+
+html[data-theme="dark"] .dashboard-main {
+    background: #0f172a;
+}
+
+html[data-theme="dark"] .dashboard-card,
+html[data-theme="dark"] .dash-panel,
+html[data-theme="dark"] .attendance-stat-card,
+html[data-theme="dark"] .leave-balance-card,
+html[data-theme="dark"] .education-card,
+html[data-theme="dark"] .about-card,
+html[data-theme="dark"] .overview-card {
+    background: rgba(255, 255, 255, 0.055);
+    box-shadow: none;
+}
+
+html[data-theme="dark"] .dashboard-card h2,
+html[data-theme="dark"] .dash-panel-head h6,
+html[data-theme="dark"] .dash-task-title,
+html[data-theme="dark"] .dash-leave-name,
+html[data-theme="dark"] .dash-feed-title,
+html[data-theme="dark"] .dash-event-title,
+html[data-theme="dark"] h1,
+html[data-theme="dark"] h2,
+html[data-theme="dark"] h3,
+html[data-theme="dark"] h4,
+html[data-theme="dark"] h5,
+html[data-theme="dark"] h6 {
+    color: #f1f4f9;
+}
+
+html[data-theme="dark"] .dashboard-card span,
+html[data-theme="dark"] .dash-task-desc,
+html[data-theme="dark"] .dash-leave-sub,
+html[data-theme="dark"] .dash-feed-sub,
+html[data-theme="dark"] .dash-event-sub,
+html[data-theme="dark"] .profile-label,
+html[data-theme="dark"] p {
+    color: #97a3b8;
+}
+
+html[data-theme="dark"] .dash-panel-head,
+html[data-theme="dark"] .dash-task-item,
+html[data-theme="dark"] .dash-leave-row,
+html[data-theme="dark"] .dash-feed-row,
+html[data-theme="dark"] .dash-event-row {
+    border-color: #24304a;
+}
+
+html[data-theme="dark"] .profile-info-item {
+    background: #1c2740;
+    color: #e5e9f0;
+    border-color: #2a3654;
+}
+
+html[data-theme="dark"] .calendar-day {
+    background: rgba(255, 255, 255, 0.027) !important;
+}
+
+html[data-theme="dark"] .form-control,
+html[data-theme="dark"] .form-select {
+    background: #1c2740;
+    color: #e5e9f0;
+    border-color: #2a3654;
+}
+
+
+.calendar-day.day-present {
+    background: #e6f7ec;
+    color: #1a7f4b;
+}
+
+.calendar-day.day-absent {
+    background: #fde8e8;
+    color: #b3261e;
+}
+
+.calendar-day.day-leave {
+    background: #fff4e0;
+    color: #a15c00;
+}
+
+.calendar-day.day-weekend {
+    background: #eceff3;
+    color: #8a8f98;
+}
+
+.calendar-day .day-number {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+html[data-theme="dark"] .calendar-day.day-present {
+    color: #13f580;
+}
+
+html[data-theme="dark"] .calendar-day.day-absent {
+    color: #fa1b0f;
+}
+
+html[data-theme="dark"] .calendar-day.day-leave {
+    color: #ff9203;
+}
+
+html[data-theme="dark"] .calendar-day.day-weekend {
+    color: #4984f3;
+}
+
+/* =========================================================
+   DARK MODE — Fix low-contrast data text
+   ========================================================= */
+
+/* Stat card big numbers, table data, all strong/bold values */
+html[data-theme="dark"] .dashboard-card h2,
+html[data-theme="dark"] .dash-stat-value,
+html[data-theme="dark"] .dash-leave-days,
+html[data-theme="dark"] .attendance-stat-card h4,
+html[data-theme="dark"] .leave-balance-card h4,
+html[data-theme="dark"] .profile-info-item strong,
+html[data-theme="dark"] .education-detail-item strong,
+html[data-theme="dark"] .about-text strong,
+html[data-theme="dark"] .overview-kv strong,
+html[data-theme="dark"] .session-meta-item strong,
+html[data-theme="dark"] .fb-profile-meta h2,
+html[data-theme="dark"] td,
+html[data-theme="dark"] strong {
+    color: #f1f4f9 !important;
+}
+
+html[data-theme="dark"] .erp-table td {
+    color: white !important;
+    background: rgba(255, 255, 255, 0.014) !important;
+    border: none;
+}
+
+/* Labels / secondary text under the data */
+html[data-theme="dark"] .dashboard-card span,
+html[data-theme="dark"] .attendance-stat-card span,
+html[data-theme="dark"] .leave-balance-card span,
+html[data-theme="dark"] .profile-label,
+html[data-theme="dark"] .education-detail-item span,
+html[data-theme="dark"] .about-text span,
+html[data-theme="dark"] .overview-kv span,
+html[data-theme="dark"] .session-meta-item span,
+html[data-theme="dark"] .dash-task-desc,
+html[data-theme="dark"] .dash-leave-sub,
+html[data-theme="dark"] .dash-feed-sub,
+html[data-theme="dark"] .dash-event-sub,
+html[data-theme="dark"] .text-muted,
+html[data-theme="dark"] small {
+    color: #9aa8c0 !important;
+}
+
+/* Table headers */
+html[data-theme="dark"] table.admin-table th {
+    color: #b7c0cf !important;
+}
+
+html[data-theme="dark"] .erp-table th {
+    color: rgb(53, 245, 245) !important;
+    background: rgba(255, 255, 255, 0.041);
+}
+
+/* Task/feed/event titles (main line text) */
+html[data-theme="dark"] .dash-task-title,
+html[data-theme="dark"] .dash-leave-name,
+html[data-theme="dark"] .dash-feed-title,
+html[data-theme="dark"] .dash-event-title,
+html[data-theme="dark"] .approval-title,
+html[data-theme="dark"] .emp-name {
+    color: #f1f4f9 !important;
+}
+
+/* Chart legend text */
+html[data-theme="dark"] .dash-legend {
+    color: #9aa8c0 !important;
+}
+
+/* Form inputs — text visible while typing/viewing */
+html[data-theme="dark"] .form-control,
+html[data-theme="dark"] .form-select,
+html[data-theme="dark"] textarea {
+    color: #f1f4f9 !important;
+}
+
+html[data-theme="dark"] .form-control::placeholder {
+    color: #6b7a90 !important;
+}
+
+html[data-theme="dark"] .readonly-field {
+    background: #1c2740 !important;
+    color: #9aa8c0 !important;
+}
+
+/* Status badges — keep readable backgrounds with matching text */
+html[data-theme="dark"] .status-badge,
+html[data-theme="dark"] .pill,
+html[data-theme="dark"] .badge {
+    filter: brightness(1.25);
+    background: transparent !important;
+}
+
+.permission-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
+}
+
+.permission-chip {
+    background: #f7f9fc;
+    color: #495057;
+    border: 1px solid #e3e7ed;
+    border-radius: 6px;
+    padding: 5px 12px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+html[data-theme="dark"] .permission-chip {
+    background: transparent !important;
+    color: white;
+}
+
+
+
+
+/* =========================================================
+   LIGHT MODE (default) — Navbar & Sidebar softer navy
+   ========================================================= */
+.admin-navbar {
+    background: #1e2f52 !important;
+    border-bottom: none !important;
+    box-shadow: none !important;
+    transition: background 0.25s ease;
+}
+
+.dashboard-sidebar {
+    background: #1e2f52;
+    transition: background 0.25s ease;
+}
+
+/* =========================================================
+   DARK MODE — Navbar & Sidebar go darker + accent border
+   ========================================================= */
+html[data-theme="dark"] .admin-navbar {
+    background: #0b1220 !important;
+    border-bottom: 1px solid #1c2740 !important;
+}
+
+html[data-theme="dark"] .dashboard-sidebar {
+    background: #0b1220 !important;
+    border-right: 1px solid #1c2740;
+}
+
+html[data-theme="dark"] .sidebar-header span {
+    color: #5f7592;
+}
+
+html[data-theme="dark"] .sidebar-item {
+    color: #a9bbd3;
+}
+
+html[data-theme="dark"] .sidebar-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+}
+
+html[data-theme="dark"] .sidebar-item.active {
+    background: linear-gradient(90deg, #17a2b8, #3949ab);
+    color: #fff;
+}
+
+html[data-theme="dark"] .sidebar-subitem {
+    color: #8698b3;
+}
+
+html[data-theme="dark"] .sidebar-subitem:hover {
+    color: #fff;
+}
+
+/* Theme toggle button appearance per mode */
+html[data-theme="dark"] .theme-toggle-btn {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+html[data-theme="dark"] .theme-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.16);
+}
+
+/* Navbar system-in/out buttons — keep readable on both */
+html[data-theme="dark"] .system-in {
+    background: rgba(25, 135, 84, 0.18);
+    color: #4ade80;
+}
+
+html[data-theme="dark"] .system-out {
+    background: rgba(220, 53, 69, 0.18);
+    color: #f87171;
+}
+
+/* Profile dropdown in dark mode */
+html[data-theme="dark"] .employee-profile-dropdown {
+    background: #16213a;
+    border-color: #24304a;
+}
+
+html[data-theme="dark"] .profile-dropdown-header {
+    border-bottom-color: #24304a;
+}
+
+html[data-theme="dark"] .profile-menu-btn,
+html[data-theme="dark"] .employee-profile-menu-btn {
+    color: #d6dce6;
+}
+
+html[data-theme="dark"] .profile-menu-btn:hover,
+html[data-theme="dark"] .employee-profile-menu-btn:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+
+
+/* Profile Cover section (dark mode only — light mode untouched) */
+
+/* Profile card ka apna white background — ye ab dark card jaisa dikhega */
+html[data-theme="dark"] .employee-profile {
+    background: #16213a !important;
+    border-color: #24304a !important;
+}
+
+/* Cover image sirf 82% height leta hai; niche ka 18% gap isi header ka
+   background dikhata tha (white) — ab wo transparent hoga taaki upar wala
+   .employee-profile ka dark background dikhe, koi white patch na bache */
+html[data-theme="dark"] .profile-header {
+    background: transparent !important;
+}
+
+html[data-theme="dark"] .profile-cover {
+    background-color: transparent !important;
+}
+
+
+html[data-theme="dark"] .cover-edit-btn:hover {
+    background: #138a9c !important;
+}
+
+/* Profile tab buttons (About / Personal Info / Bank Info / etc.) —
+   in light mode inka bg+text halka dark tha jo white gap pe dikhta tha;
+   ab wahi gap dark hai, isliye inhe light colors dene padenge */
+html[data-theme="dark"] .profile-info-btn {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #e5e9f0 !important;
+    border-color: rgba(255, 255, 255, 0.18) !important;
+}
+
+html[data-theme="dark"] .profile-info-btn:hover {
+    background: rgba(255, 255, 255, 0.18) !important;
+}
+
+html[data-theme="dark"] .profile-info-btn.active {
+    background: #17a2b8 !important;
+    color: #fff !important;
+    border-color: #17a2b8 !important;
+}
+
+/* Same fix, mobile width pe bhi (kyunki .profile-cover / .cover-edit-btn
+   ke liye ek purana !important mobile-only override already maujood hai) */
+@media (max-width: 767.98px) {
+    html[data-theme="dark"] .profile-cover {
+        background: transparent !important;
+    }
+
+    html[data-theme="dark"] .cover-edit-btn {
+        background: #17a2b8 !important;
+        color: #fff !important;
+    }
+
+    html[data-theme="dark"] .profile-info-btn {
+        background: rgba(255, 255, 255, 0.12) !important;
+        color: #e5e9f0 !important;
+        border-color: rgba(255, 255, 255, 0.2) !important;
+    }
+
+    html[data-theme="dark"] .profile-info-btn.active {
+        background: #17a2b8 !important;
+        color: #fff !important;
+    }
+}
+
+
+
+/* ---------- Responsive ---------- */
+@media (max-width: 767.98px) {
+    .dashboard-welcome {
+        padding: 22px 20px;
+    }
+
+    .dashboard-welcome h1 {
+        font-size: 20px;
+    }
+
+    .dash-panel {
+        padding: 16px 18px;
+    }
+
+    .dashboard-card {
+        padding: 16px 18px;
+    }
+}

@@ -391,3 +391,66 @@ function demoUpdateProfileImage(file) {
     console.log("Demo update profile image:", file && file.name);
     return demoDelay({ message: "Profile photo updated successfully." }, 600);
 }
+
+
+// =========================================================================
+//                      Dashboard API 
+// =========================================================================
+
+// Suggested real endpoint: GET /api/employee/me/attendance-chart?month=YYYY-MM
+function demoGetDashboardAttendanceChart() {
+    return demoDelay({
+        labels: ["6 Aug", "7 Aug", "8 Aug", "9 Aug", "10 Aug", "11 Aug", "12 Aug"],
+        present: [7, 6, 8, 7, 0, 6, 7],
+        late: [1, 1, 0, 1, 0, 1, 0],
+        absent: [0, 1, 0, 0, 0, 1, 1],
+        weeklyOff: [0, 0, 0, 0, 8, 0, 0]
+    });
+}
+
+// Suggested real endpoint: GET /api/employee/me/tasks
+function demoGetDashboardTasks() {
+    return demoDelay([
+        { title: "Complete project report", desc: "Prepare and submit the Q2 report", status: "In Progress", progress: 60 },
+        { title: "Update employee documents", desc: "Collect and verify documents", status: "Pending", progress: 30 },
+        { title: "Monthly meeting preparation", desc: "Prepare slides and discussion points", status: "Completed", progress: 100 }
+    ]);
+}
+
+// Suggested real endpoint: GET /api/employee/me/leave-overview
+function demoGetDashboardLeaveOverview() {
+    return demoDelay([
+        { type: "Casual Leave", remaining: 8 },
+        { type: "Sick Leave", remaining: 5 },
+        { type: "Paid Leave", remaining: 10 }
+    ]);
+}
+
+// Suggested real endpoint: GET /api/employee/celebrations
+function demoGetDashboardCelebrations() {
+    return demoDelay([
+        { name: "Rahul Sharma", note: "Birthday Today", initials: "RS" },
+        { name: "Priya Singh", note: "12 Sep", initials: "PS" },
+        { name: "Amit Kumar", note: "2 Years Work Anniversary", initials: "AK" },
+        { name: "Neha Sharma", note: "5 Years Work Anniversary", initials: "NS" }
+    ]);
+}
+
+// Suggested real endpoint: GET /api/announcements
+function demoGetDashboardAnnouncements() {
+    return demoDelay([
+        { title: "Company meeting scheduled", desc: "All employees are requested to join the company meeting on 15 Aug 2026 at 11:00 AM in Conference Hall A.", time: "2d ago" },
+        { title: "New holiday announcement", desc: "Office will remain closed on 18 Aug 2026 (Independence Day).", time: "1d ago" },
+        { title: "Payroll processing completed", desc: "July 2026 payroll has been processed successfully.", time: "2d ago" }
+    ]);
+}
+
+// Suggested real endpoint: GET /api/employee/upcoming-events
+function demoGetDashboardEvents() {
+    return demoDelay([
+        { day: "15", month: "AUG", title: "Independence Day", sub: "Friday · Company Holiday" },
+        { day: "22", month: "AUG", title: "Team Building Event", sub: "Friday · 10:00 AM - 04:00 PM" },
+        { day: "28", month: "AUG", title: "Project Review Meeting", sub: "Thursday · 11:00 AM - 12:30 PM" }
+    ]);
+}
+

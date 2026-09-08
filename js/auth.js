@@ -218,7 +218,7 @@ if (loginForm) {
                 ) {
 
                     window.location.href =
-                        "../employee/employee-dashboard.html";
+                        "../employee/dashboard.html";
 
                 } else {
 
@@ -675,5 +675,5 @@ function logout() {
 
     // Go back to login page
     window.location.href =
-        "../auth/login.html";
+        "../index.html";
 }

@@ -335,7 +335,205 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("statCorrections").textContent = s.pendingCorrections;
             document.getElementById("statLastPayslip").textContent = s.lastPayslipMonth;
         });
+
+        demoGetDashboardAttendanceChart().then(function (res) {
+            renderDashboardAttendanceChart(res.data);
+        });
+
+        demoGetDashboardTasks().then(function (res) {
+            renderDashboardTasks(res.data);
+        });
+
+        demoGetDashboardLeaveOverview().then(function (res) {
+            renderDashboardLeaveOverview(res.data);
+        });
+
+        demoGetDashboardCelebrations().then(function (res) {
+            renderDashboardCelebrations(res.data);
+        });
+
+        demoGetDashboardAnnouncements().then(function (res) {
+            renderDashboardAnnouncements(res.data);
+        });
+
+        demoGetDashboardEvents().then(function (res) {
+            renderDashboardEvents(res.data);
+        });
+
     }
+
+
+    // ==============================================================================================
+    //      DASHBOARD — Attendance Chart
+    // ==============================================================================================
+    let dashAttendanceChartInstance = null;
+
+    function renderDashboardAttendanceChart(data) {
+        const ctx = document.getElementById("dashAttendanceChart");
+        if (!ctx) return;
+
+        if (dashAttendanceChartInstance) {
+            dashAttendanceChartInstance.destroy();
+        }
+
+        dashAttendanceChartInstance = new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels: data.labels,
+                datasets: [
+                    { label: "Present", data: data.present, backgroundColor: "#1a7f4b", stack: "a", borderRadius: 3 },
+                    { label: "Late", data: data.late, backgroundColor: "#a15c00", stack: "a", borderRadius: 3 },
+                    { label: "Absent", data: data.absent, backgroundColor: "#b3261e", stack: "a", borderRadius: 3 },
+                    { label: "Weekly Off", data: data.weeklyOff, backgroundColor: "#c7cfda", stack: "a", borderRadius: 3 }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { display: false }, stacked: true, ticks: { font: { size: 10.5 } } },
+                    y: { stacked: true, grid: { color: "#f1f3f6" }, ticks: { font: { size: 10.5 } } }
+                }
+            }
+        });
+    }
+
+    // ==============================================================================================
+    //      DASHBOARD — My Tasks
+    // ==============================================================================================
+    function renderDashboardTasks(tasks) {
+        const container = document.getElementById("dashTasksList");
+        if (!container) return;
+
+        const statusStyle = {
+            "In Progress": { bg: "#fff4e0", color: "#a15c00", bar: "#a15c00" },
+            "Pending": { bg: "#eef2ff", color: "#3949ab", bar: "#3949ab" },
+            "Completed": { bg: "#e6f7ec", color: "#1a7f4b", bar: "#1a7f4b" }
+        };
+
+        container.innerHTML = tasks.map(function (t) {
+            const style = statusStyle[t.status] || statusStyle["Pending"];
+            return `
+            <div class="dash-task-item">
+                <div class="dash-task-row">
+                    <div class="dash-task-ico" style="background:${style.bg};color:${style.color};">📄</div>
+                    <div class="flex-grow-1">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <p class="dash-task-title">${escapeHtml(t.title)}</p>
+                            <span class="dash-task-badge" style="background:${style.bg};color:${style.color};">${escapeHtml(t.status)}</span>
+                        </div>
+                        <p class="dash-task-desc">${escapeHtml(t.desc)}</p>
+                        <div class="dash-progress"><div class="dash-progress-bar" style="width:${t.progress}%;background:${style.bar};"></div></div>
+                    </div>
+                </div>
+            </div>
+        `;
+        }).join("");
+    }
+
+    // ==============================================================================================
+    //      DASHBOARD — Leave Overview
+    // ==============================================================================================
+    function renderDashboardLeaveOverview(rows) {
+        const container = document.getElementById("dashLeaveOverview");
+        if (!container) return;
+
+        const iconStyle = {
+            "Casual Leave": { bg: "#e6f7fa", color: "#17a2b8", icon: "🌂" },
+            "Sick Leave": { bg: "#fde8e8", color: "#b3261e", icon: "❤️" },
+            "Paid Leave": { bg: "#eef2ff", color: "#3949ab", icon: "💼" }
+        };
+
+        container.innerHTML = rows.map(function (r) {
+            const style = iconStyle[r.type] || { bg: "#eef0f3", color: "#6c757d", icon: "📌" };
+            return `
+            <div class="dash-leave-row">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="dash-leave-ico" style="background:${style.bg};color:${style.color};">${style.icon}</div>
+                    <div class="dash-leave-name">${escapeHtml(r.type)}</div>
+                </div>
+                <div>
+                    <div class="dash-leave-days">${r.remaining}</div>
+                    <div class="dash-leave-sub">Days Remaining</div>
+                </div>
+            </div>
+        `;
+        }).join("");
+    }
+
+    // ==============================================================================================
+    //      DASHBOARD — Celebrations
+    // ==============================================================================================
+    function renderDashboardCelebrations(rows) {
+        const container = document.getElementById("dashCelebrations");
+        if (!container) return;
+
+        const colors = ["#e6f7fa,#17a2b8", "#fde8e8,#b3261e", "#e6f7ec,#1a7f4b", "#fff4e0,#a15c00"];
+
+        container.innerHTML = rows.map(function (c, i) {
+            const [bg, color] = colors[i % colors.length].split(",");
+            return `
+            <div class="dash-feed-row">
+                <div class="dash-feed-avatar" style="background:${bg};color:${color};">${escapeHtml(c.initials)}</div>
+                <div class="flex-grow-1">
+                    <p class="dash-feed-title">${escapeHtml(c.name)}</p>
+                    <p class="dash-feed-sub">${escapeHtml(c.note)}</p>
+                </div>
+            </div>
+        `;
+        }).join("");
+    }
+
+    // ==============================================================================================
+    //      DASHBOARD — Announcements
+    // ==============================================================================================
+    function renderDashboardAnnouncements(rows) {
+        const container = document.getElementById("dashAnnouncements");
+        if (!container) return;
+
+        const icons = [
+            { icon: "📢", bg: "#e6f7fa", color: "#17a2b8" },
+            { icon: "📅", bg: "#fff4e0", color: "#a15c00" },
+            { icon: "🧾", bg: "#e6f7ec", color: "#1a7f4b" }
+        ];
+
+        container.innerHTML = rows.map(function (a, i) {
+            const ic = icons[i % icons.length];
+            return `
+            <div class="dash-feed-row">
+                <div class="dash-feed-ico" style="background:${ic.bg};color:${ic.color};">${ic.icon}</div>
+                <div class="flex-grow-1">
+                    <p class="dash-feed-title">${escapeHtml(a.title)}</p>
+                    <p class="dash-feed-sub">${escapeHtml(a.desc)}</p>
+                </div>
+                <div class="dash-feed-time">${escapeHtml(a.time)}</div>
+            </div>
+        `;
+        }).join("");
+    }
+
+    // ==============================================================================================
+    //      DASHBOARD — Upcoming Events
+    // ==============================================================================================
+    function renderDashboardEvents(rows) {
+        const container = document.getElementById("dashEvents");
+        if (!container) return;
+
+        container.innerHTML = rows.map(function (e) {
+            return `
+            <div class="dash-event-row">
+                <div class="dash-event-date"><span class="d">${escapeHtml(e.day)}</span><span class="m">${escapeHtml(e.month)}</span></div>
+                <div class="flex-grow-1">
+                    <p class="dash-event-title">${escapeHtml(e.title)}</p>
+                    <p class="dash-event-sub">${escapeHtml(e.sub)}</p>
+                </div>
+            </div>
+        `;
+        }).join("");
+    }
+
+
+
 
     // ==============================================================================================
     //               MY ATTENDANCE
@@ -921,11 +1119,6 @@ document.addEventListener("DOMContentLoaded", function () {
         <div class="employee-profile">
             <div class="profile-header">
 
-               <!--- <div class="profile-cover">
-                    <div class="profile-cover-image-wrapper">
-                        <img src="../assets/image/cover-earth-image.jpg" alt="Profile Cover" class="profile-cover-image">
-                    </div>
-                </div> -->
                 <div class="profile-cover">
                     <div class="profile-cover-image-wrapper">
                         <img src="${currentCoverImage || '../assets/image/cover-earth-image.jpg'}" alt="Profile Cover" class="profile-cover-image">
@@ -2618,7 +2811,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     <div class="education-card-icon">🎓</div>
                     <div class="education-card-title">
                         <h5>${escapeHtml(e.degree)}</h5>
-                        <p>${escapeHtml(e.institution)}</p>
+                        <p class="pt-1">${escapeHtml(e.institution)}</p>
                     </div>
                 </div>
 
@@ -3283,6 +3476,34 @@ document.addEventListener("DOMContentLoaded", function () {
             employeeProfileDropdown.classList.remove("show");
         });
     }
+
+
+    // ==============================================================================================
+    //      THEME TOGGLE (Dark / Light)
+    // ==============================================================================================
+    const themeToggleButton = document.getElementById("themeToggleButton");
+    const themeToggleIcon = document.getElementById("themeToggleIcon");
+
+    function applyTheme(theme) {
+        document.documentElement.setAttribute("data-theme", theme);
+        themeToggleIcon.textContent = theme === "dark" ? "☀️" : "🌙";
+        localStorage.setItem("erp_theme", theme);
+    }
+
+    const savedTheme = localStorage.getItem("erp_theme") || "light";
+    applyTheme(savedTheme);
+
+    if (themeToggleButton) {
+        themeToggleButton.addEventListener("click", function () {
+            const current = document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
+            applyTheme(current === "dark" ? "light" : "dark");
+        });
+    }
+
+
+
+
+
 });
 
 const logoutPanel = document.getElementById("logoutPanel");
