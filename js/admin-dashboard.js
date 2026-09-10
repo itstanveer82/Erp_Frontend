@@ -1,11 +1,35 @@
+/**
+ * ADMIN DASHBOARD CONTROLLER
+ * ---------------------------------------------------------------
+ * Runs once the DOM is ready. This single handler owns the ENTIRE
+ * admin dashboard: auth guard, header/profile rendering, the view
+ * router (dashboard/profile/employees/users/roles/permissions/...),
+ * and every API call (roles, permissions, users, sessions,
+ * change-password). There is no module system — everything below
+ * is a nested function or event listener inside this one closure.
+ * ---------------------------------------------------------------
+ */
 document.addEventListener("DOMContentLoaded", function () {
+
+    // =========================================================
     // AUTHENTICATION CHECK
+    // If there's no saved auth token, kick the user back to the
+    // login page immediately.
+    // =========================================================
     const authData = getAuthData();
     if (!authData || !authData.token) {
         window.location.href = "../auth/login.html";
         return;
     }
+
+    // =========================================================
     // USER DATA
+    // Pulls the logged-in admin's name/email out of whichever
+    // source actually has it — the `user` sub-object, the
+    // top-level authData, or (as a last resort) localStorage —
+    // since different login flows may have populated different
+    // fields.
+    // =========================================================
     const user = authData.user || {};
     const firstName =
         user.firstName ||
@@ -25,6 +49,9 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("email:", email);
     console.log("authdataaaaaaa:", authData);
 
+    // Builds the display name, trying every possible source in
+    // order, and finally falling back to the email or a generic
+    // "System Admin" label if nothing else is available.
     const fullName =
         user.name ||
         user.fullName ||
@@ -36,7 +63,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // Get roles from user object, authData object, or localStorage
-
+    // Same "try every possible source" pattern as above, applied
+    // to the admin's assigned roles.
     let userRoles = [];
     if (Array.isArray(user.roles) && user.roles.length > 0) {
         userRoles = user.roles;
@@ -53,6 +81,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Get permissions from user object, authData object, or localStorage
+    // Simpler than the roles lookup above — only checks the two
+    // object sources, no localStorage fallback for permissions.
     let userPermissions = [];
     if (Array.isArray(user.permissions)) {
         userPermissions = user.permissions;
@@ -61,6 +91,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // FOR DEBUGGING PURPOSES, LOG USER DATA TO CONSOLE
+    // Dumps the whole resolved identity to the console — useful
+    // during development, but should be stripped (or gated behind
+    // a debug flag) before shipping to production.
     console.log("Auth Data:", authData);
     console.log("User:", user);
     console.log("Full Name:", fullName);
@@ -68,7 +101,11 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("Roles:", userRoles);
     console.log("Permissions:", userPermissions);
 
+    // =========================================================
     // USER INFORMATION ELEMENTS
+    // Grabs the DOM nodes that show the admin's name/role in the
+    // navbar and on the dashboard welcome banner.
+    // =========================================================
     const userName =
         document.getElementById("userName");
     const userRole =
@@ -77,7 +114,10 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("dashboardWelcome");
     const currentRole =
         document.getElementById("currentRole");
+
     // NAVBAR USER INFORMATION
+    // Fills the navbar name/role text, if those elements exist
+    // on the page (they may not, depending on markup version).
     if (userName) {
         userName.textContent = fullName;
     }
@@ -89,7 +129,10 @@ document.addEventListener("DOMContentLoaded", function () {
                     .join(", ")
                 : "ADMIN";
     }
+
     // DASHBOARD WELCOME
+    // Sets the "Welcome back, <first name>" heading on the
+    // dashboard view.
     if (dashboardWelcome) {
         const welcomeName =
             firstName ||
@@ -98,7 +141,9 @@ document.addEventListener("DOMContentLoaded", function () {
         dashboardWelcome.textContent =
             `Welcome back, ${welcomeName}`;
     }
+
     // CURRENT ROLE
+    // Fills the small "Current Role" badge on the dashboard view.
     if (currentRole) {
         currentRole.textContent =
             userRoles.length > 0
@@ -107,7 +152,13 @@ document.addEventListener("DOMContentLoaded", function () {
                     .join(", ")
                 : "ADMIN";
     }
+
+    // =========================================================
     // USER INITIALS
+    // Builds a 2-letter initials string for the avatar circle:
+    // prefer first+last name initials, fall back to splitting
+    // the full name on spaces, and finally default to "AD".
+    // =========================================================
     let initials = "";
     if (firstName) {
         initials += firstName.charAt(0);
@@ -132,7 +183,12 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     initials = initials.toUpperCase();
 
+    // =========================================================
     // ADMIN PROFILE DROPDOWN
+    // Grabs both the header (top navbar) and dropdown-panel
+    // versions of the avatar/name/role display, since the same
+    // info is duplicated in two places in the markup.
+    // =========================================================
     const adminProfileButton =
         document.getElementById("adminProfileButton");
     const adminProfileDropdown =
@@ -153,7 +209,9 @@ document.addEventListener("DOMContentLoaded", function () {
         userRoles.length > 0
             ? userRoles.map(getDisplayName).join(", ")
             : "ADMIN";
+
     // Header profile data
+    // Fills the always-visible header avatar/name/role.
     if (headerAdminInitials) {
         headerAdminInitials.textContent = initials;
     }
@@ -163,7 +221,10 @@ document.addEventListener("DOMContentLoaded", function () {
     if (headerAdminRole) {
         headerAdminRole.textContent = displayRole;
     }
+
     // Dropdown profile data
+    // Fills the matching fields inside the dropdown panel that
+    // opens when the header button is clicked.
     if (dropdownAdminInitials) {
         dropdownAdminInitials.textContent = initials;
     }
@@ -173,7 +234,11 @@ document.addEventListener("DOMContentLoaded", function () {
     if (dropdownAdminRole) {
         dropdownAdminRole.textContent = displayRole;
     }
+
     // Open / close dropdown
+    // Toggles the dropdown on button click, closes it on any
+    // other click in the document, and stops clicks *inside* the
+    // dropdown from bubbling up and immediately closing it again.
     if (adminProfileButton && adminProfileDropdown) {
         adminProfileButton.addEventListener("click", function (event) {
             event.stopPropagation();
@@ -189,7 +254,13 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         );
     }
-    // DASHBOARD ROLES
+
+    /**
+     * DASHBOARD ROLES
+     * Renders the logged-in admin's own roles as small badges
+     * inside the "Your Access" card on the dashboard view.
+     * Shows a placeholder message if there are no roles.
+     */
     function renderDashboardRoles() {
         const dashboardRoles =
             document.getElementById("dashboardRoles");
@@ -215,7 +286,13 @@ document.addEventListener("DOMContentLoaded", function () {
             dashboardRoles.appendChild(roleBadge);
         });
     }
-    // DASHBOARD PERMISSIONS
+
+    /**
+     * DASHBOARD PERMISSIONS
+     * Renders the logged-in admin's own permissions as tags
+     * inside the "Your Access" card, and updates the permission
+     * count badge next to the section heading.
+     */
     function renderDashboardPermissions() {
         const dashboardPermissions =
             document.getElementById(
@@ -253,9 +330,18 @@ document.addEventListener("DOMContentLoaded", function () {
             );
         });
     }
+
+    // Run both render functions immediately so the dashboard
+    // view shows roles/permissions as soon as the page loads,
+    // without waiting for any user interaction.
     renderDashboardRoles();
     renderDashboardPermissions();
+
+    // =========================================================
     // PROFILE INFORMATION
+    // Grabs every element on the "My Profile" view that needs to
+    // be filled in with the logged-in admin's details.
+    // =========================================================
     const profileName =
         document.getElementById("profileName");
     const profileEmail =
@@ -284,6 +370,9 @@ document.addEventListener("DOMContentLoaded", function () {
         );
     const profilePrimaryRole =
         document.getElementById("profilePrimaryRole");
+
+    // Fills each profile field if the corresponding element
+    // exists on the page — falls back to "--" for missing data.
     if (profileName) {
         profileName.textContent =
             fullName;
@@ -317,21 +406,49 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
+
+    // =========================================================
+    // MOBILE SIDEBAR TOGGLE (via brand logo click)
+    // On small screens, clicking the brand logo/name opens or
+    // closes the sidebar instead of navigating to dashboard.html.
+    // On desktop widths, the click is left alone so it behaves
+    // like a normal link.
+    // =========================================================
     const brandToggle = document.getElementById("brandToggle");
     const dashboardSidebar = document.getElementById("dashboardSidebar");
+    const sidebarBackdrop = document.getElementById("sidebarBackdrop");
 
     if (brandToggle && dashboardSidebar) {
         brandToggle.addEventListener("click", function (e) {
-            // Only hijack the click on mobile widths; let desktop navigate normally
             if (window.innerWidth <= 991) {
                 e.preventDefault();
                 e.stopPropagation();
                 dashboardSidebar.classList.toggle("show");
+                if (sidebarBackdrop) {
+                    sidebarBackdrop.classList.toggle("show");
+                }
             }
         });
     }
+    // Clicking anywhere outside the open mobile sidebar (and outside
+    // the brand-logo toggle button) closes it.
+    document.addEventListener("click", function (event) {
+        if (!dashboardSidebar || !dashboardSidebar.classList.contains("show")) {
+            return;
+        }
+        const clickedInsideSidebar = dashboardSidebar.contains(event.target);
+        const clickedToggleButton = brandToggle && brandToggle.contains(event.target);
 
-    // PROFILE ROLES
+        if (!clickedInsideSidebar && !clickedToggleButton) {
+            dashboardSidebar.classList.remove("show");
+        }
+    });
+    /**
+     * PROFILE ROLES
+     * Same rendering pattern as renderDashboardRoles(), but
+     * targets the role-tag container on the Profile view instead
+     * of the dashboard's "Your Access" card.
+     */
     function renderProfileRoles() {
         if (!profileRoles) {
             return;
@@ -355,7 +472,13 @@ document.addEventListener("DOMContentLoaded", function () {
             profileRoles.appendChild(roleBadge);
         });
     }
-    // PROFILE PERMISSIONS
+
+    /**
+     * PROFILE PERMISSIONS
+     * Same rendering pattern as renderDashboardPermissions(),
+     * but targets the Profile view's permission-tag container
+     * and its own permission-count badge.
+     */
     function renderProfilePermissions() {
         if (profilePermissionCount) {
             profilePermissionCount.textContent =
@@ -385,9 +508,319 @@ document.addEventListener("DOMContentLoaded", function () {
             );
         });
     }
+
+    // Run both immediately, same reasoning as the dashboard
+    // versions above — Profile view should be pre-populated even
+    // before the user navigates to it.
     renderProfileRoles();
     renderProfilePermissions();
+
+    // =========================================================
+    // ADMIN PROFILE PHOTO
+    // Fetches and displays the logged-in admin's own profile
+    // photo (same "/me" photo endpoints already used elsewhere
+    // in this backend) and lets the admin upload a new one.
+    // Falls back to the initials avatar wherever no photo exists.
+    // Uses getAuthData()/API_BASE_URL already resolved above by
+    // apiRequest() — no new dependencies added.
+    // =========================================================
+    let adminOverriddenProfileImage = null;
+    let adminCachedPhotoUrl = null;
+    let adminPhotoFetchedOnce = false;
+
+    // Minimal fetch wrapper for the photo endpoints — same shape as
+    // apiRequest() but skips the JSON-refresh retry logic, since a
+    // missing photo (404) is an expected, non-fatal outcome here.
+    async function adminPhotoApiRequest(endpoint, options = {}) {
+        const authData =
+            typeof getAuthData === "function" ? getAuthData() : null;
+        const token = authData ? authData.token : null;
+
+        const headers = { ...(options.headers || {}) };
+        if (token) {
+            headers["Authorization"] = `Bearer ${token}`;
+        }
+
+        const response = await fetch(API_BASE_URL + endpoint, {
+            ...options,
+            headers,
+            cache: "no-store"
+        });
+
+        let data = {};
+        try {
+            data = await response.json();
+        } catch (error) {
+            data = {};
+        }
+
+        if (!response.ok) {
+            const apiError = new Error(
+                data.message || `Request failed with status ${response.status}`
+            );
+            apiError.responseData = data;
+            apiError.status = response.status;
+            throw apiError;
+        }
+        return data;
+    }
+
+    // Downloads the binary photo file and turns it into a local blob URL.
+    async function fetchAdminPhotoAsObjectUrl(downloadPath) {
+        const authData =
+            typeof getAuthData === "function" ? getAuthData() : null;
+        const token = authData ? authData.token : null;
+
+        const headers = {};
+        if (token) {
+            headers["Authorization"] = `Bearer ${token}`;
+        }
+
+        const response = await fetch(API_BASE_URL + downloadPath, {
+            headers,
+            cache: "no-store"
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to load photo (status ${response.status})`);
+        }
+
+        const blob = await response.blob();
+        return URL.createObjectURL(blob);
+    }
+
+    // GET /api/profile-photos/me → if a photo exists, download it via
+    // GET /api/profile-photos/me/download and cache the resulting blob URL.
+    function fetchAdminProfilePhotoUrl() {
+        if (adminPhotoFetchedOnce) {
+            return Promise.resolve(adminCachedPhotoUrl);
+        }
+        return adminPhotoApiRequest("/api/profile-photos/me")
+            .then(function (res) {
+                const photo = res.data;
+                if (!photo || !photo.id) {
+                    return null;
+                }
+                return fetchAdminPhotoAsObjectUrl("/api/profile-photos/me/download");
+            })
+            .catch(function (error) {
+                console.warn("Could not load admin profile photo:", error);
+                return null;
+            })
+            .then(function (url) {
+                adminCachedPhotoUrl = url;
+                adminPhotoFetchedOnce = true;
+                return url;
+            });
+    }
+
+    // POST /api/profile-photos/me — uploads the selected file as multipart form data.
+    async function uploadAdminProfilePhoto(file) {
+        const authData =
+            typeof getAuthData === "function" ? getAuthData() : null;
+        const token = authData ? authData.token : null;
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const headers = {};
+        if (token) {
+            headers["Authorization"] = `Bearer ${token}`;
+        }
+
+        const response = await fetch(API_BASE_URL + "/api/profile-photos/me", {
+            method: "POST",
+            headers,
+            body: formData
+        });
+
+        let data = {};
+        try {
+            data = await response.json();
+        } catch (error) {
+            data = {};
+        }
+
+        if (!response.ok) {
+            const apiError = new Error(
+                data.message || `Upload failed with status ${response.status}`
+            );
+            apiError.responseData = data;
+            throw apiError;
+        }
+        return data;
+    }
+
+    // Applies a resolved photo URL (or null, meaning "show initials
+    // instead") across every avatar on the page: header, dropdown,
+    // and the big avatar on the Profile view itself.
+    const headerAdminAvatarImg = document.getElementById("headerAdminAvatarImg");
+    const dropdownAdminAvatarImg = document.getElementById("dropdownAdminAvatarImg");
+    const profileAvatarImg = document.getElementById("profileAvatarImg");
+
+    function applyAdminProfilePhoto(url) {
+        [
+            { img: headerAdminAvatarImg, fallback: headerAdminInitials },
+            { img: dropdownAdminAvatarImg, fallback: dropdownAdminInitials },
+            { img: profileAvatarImg, fallback: profileInitials }
+        ].forEach(function (pair) {
+            if (!pair.img) {
+                return;
+            }
+            if (url) {
+                pair.img.src = url;
+                pair.img.classList.remove("d-none");
+                if (pair.fallback) {
+                    pair.fallback.style.display = "none";
+                }
+            } else {
+                pair.img.classList.add("d-none");
+                if (pair.fallback) {
+                    pair.fallback.style.display = "";
+                }
+            }
+        });
+    }
+
+    function loadAdminProfilePhoto() {
+        if (adminOverriddenProfileImage) {
+            applyAdminProfilePhoto(adminOverriddenProfileImage);
+            return;
+        }
+        fetchAdminProfilePhotoUrl().then(function (url) {
+            applyAdminProfilePhoto(url);
+        });
+    }
+    loadAdminProfilePhoto();
+
+    // VIEW PHOTO MODAL — opened by clicking the big avatar on the Profile view.
+    const profileAvatarClickable = document.getElementById("profileAvatarClickable");
+    const profileAvatarEditBtn = document.getElementById("profileAvatarEditBtn");
+
+    function openAdminViewPhotoModal() {
+        const img = document.getElementById("viewAdminPhotoImage");
+        const fallback = document.getElementById("viewAdminPhotoFallback");
+        const url = adminOverriddenProfileImage || adminCachedPhotoUrl;
+
+        if (url) {
+            img.src = url;
+            img.classList.remove("d-none");
+            fallback.style.display = "none";
+        } else {
+            img.classList.add("d-none");
+            fallback.textContent = initials;
+            fallback.style.display = "flex";
+        }
+        new bootstrap.Modal(document.getElementById("adminViewPhotoModal")).show();
+    }
+
+    if (profileAvatarClickable) {
+        profileAvatarClickable.addEventListener("click", function (event) {
+            // Let the edit button open the upload modal directly instead.
+            if (event.target === profileAvatarEditBtn) {
+                return;
+            }
+            openAdminViewPhotoModal();
+        });
+    }
+
+    // UPLOAD PHOTO MODAL — reachable from the edit button on the big avatar
+    // or from the view-photo modal's own camera button.
+    let selectedAdminPhotoFile = null;
+
+    function openAdminUploadPhotoModal() {
+        selectedAdminPhotoFile = null;
+
+        document.getElementById("uploadAdminPhotoInput").value = "";
+        document.getElementById("uploadAdminPhotoMessage").innerHTML = "";
+        document.getElementById("saveAdminPhotoButton").disabled = true;
+
+        const preview = document.getElementById("uploadAdminPhotoPreview");
+        const previewFallback = document.getElementById("uploadAdminPhotoPreviewFallback");
+        preview.classList.add("d-none");
+        previewFallback.style.display = "flex";
+        previewFallback.textContent = initials;
+
+        new bootstrap.Modal(document.getElementById("adminUploadPhotoModal")).show();
+    }
+
+    if (profileAvatarEditBtn) {
+        profileAvatarEditBtn.addEventListener("click", function (event) {
+            event.stopPropagation();
+            openAdminUploadPhotoModal();
+        });
+    }
+
+    const openUploadAdminPhotoButton = document.getElementById("openUploadAdminPhotoButton");
+    if (openUploadAdminPhotoButton) {
+        openUploadAdminPhotoButton.addEventListener("click", function () {
+            const viewModal = bootstrap.Modal.getInstance(document.getElementById("adminViewPhotoModal"));
+            if (viewModal) viewModal.hide();
+            openAdminUploadPhotoModal();
+        });
+    }
+
+    const uploadAdminPhotoInput = document.getElementById("uploadAdminPhotoInput");
+    if (uploadAdminPhotoInput) {
+        uploadAdminPhotoInput.addEventListener("change", function () {
+            const file = this.files[0];
+            if (!file) return;
+
+            selectedAdminPhotoFile = file;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const preview = document.getElementById("uploadAdminPhotoPreview");
+                const previewFallback = document.getElementById("uploadAdminPhotoPreviewFallback");
+                preview.src = e.target.result;
+                preview.classList.remove("d-none");
+                previewFallback.style.display = "none";
+                document.getElementById("saveAdminPhotoButton").disabled = false;
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    const saveAdminPhotoButton = document.getElementById("saveAdminPhotoButton");
+    if (saveAdminPhotoButton) {
+        saveAdminPhotoButton.addEventListener("click", function () {
+            if (!selectedAdminPhotoFile) return;
+
+            const messageBox = document.getElementById("uploadAdminPhotoMessage");
+            messageBox.innerHTML = "";
+            saveAdminPhotoButton.disabled = true;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const localPreviewUrl = e.target.result;
+
+                uploadAdminProfilePhoto(selectedAdminPhotoFile).then(function () {
+                    adminOverriddenProfileImage = localPreviewUrl;
+                    applyAdminProfilePhoto(localPreviewUrl);
+
+                    const modal = bootstrap.Modal.getInstance(document.getElementById("adminUploadPhotoModal"));
+                    if (modal) modal.hide();
+
+                    messageBox.innerHTML =
+                        `<div class="custom-alert success">Profile photo updated.</div>`;
+                }).catch(function (error) {
+                    console.error("Admin photo upload failed:", error.responseData || error);
+                    messageBox.innerHTML =
+                        `<div class="custom-alert error">${error.message || "Upload failed."}</div>`;
+                    saveAdminPhotoButton.disabled = false;
+                });
+            };
+            reader.readAsDataURL(selectedAdminPhotoFile);
+        });
+    }
+
+    // =========================================================
     // ALL VIEWS
+    // Maps each sidebar `data-view` key to its matching
+    // <section> element. This object is the single source of
+    // truth the view router (showView) uses to know what exists
+    // and what to hide/show.
+    // =========================================================
     const views = {
         dashboard:
             document.getElementById(
@@ -426,7 +859,17 @@ document.addEventListener("DOMContentLoaded", function () {
                 "reportsView"
             )
     };
-    // SHOW SELECTED VIEW
+
+    /**
+     * SHOW SELECTED VIEW (the view router)
+     * Hides every view, shows only the requested one, updates
+     * which sidebar item is marked "active", auto-closes the
+     * mobile sidebar, scrolls back to the top, and — for views
+     * backed by an API — triggers that view's data load
+     * (loadRoles/loadPermissions/loadUsers/loadEmployees).
+     *
+     * @param {string} viewName - key into the `views` object above
+     */
     function showView(viewName) {
         if (!views[viewName]) {
             console.error(
@@ -447,7 +890,10 @@ document.addEventListener("DOMContentLoaded", function () {
         views[viewName].classList.remove(
             "d-none"
         );
+
         // UPDATE ACTIVE SIDEBAR
+        // Highlights the sidebar button matching the current view
+        // and un-highlights every other one.
         document
             .querySelectorAll(
                 ".sidebar-item[data-view]"
@@ -461,8 +907,10 @@ document.addEventListener("DOMContentLoaded", function () {
                     item.classList.add("active");
                 }
             });
+
         // CLOSE MOBILE SIDEBAR
-        // CLOSE MOBILE SIDEBAR
+        // On narrow viewports, navigating to a view should also
+        // close the slide-out sidebar so the content is visible.
         if (window.innerWidth < 768) {
             const sidebar = document.getElementById("dashboardSidebar");
             if (sidebar) {
@@ -473,7 +921,11 @@ document.addEventListener("DOMContentLoaded", function () {
             top: 0,
             behavior: "smooth"
         });
+
         // LOAD API DATA
+        // Each API-backed view re-fetches its data every time it's
+        // shown, rather than caching — simple but means switching
+        // back and forth re-hits the network each time.
         if (viewName === "roles") {
             loadRoles();
         }
@@ -487,7 +939,10 @@ document.addEventListener("DOMContentLoaded", function () {
             loadEmployees(0);
         }
     }
+
     // OPEN MY PROFILE
+    // Wires the "My Profile" dropdown menu item to switch to the
+    // profile view and close the dropdown afterward.
     const profileViewButton =
         document.getElementById("profileViewButton");
     if (profileViewButton) {
@@ -498,9 +953,13 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     }
+
     // ==============================
     // SIDEBAR + QUICK ACTIONS +
     // PROFILE BUTTON
+    // Generic delegated wiring: ANY element with a `data-view`
+    // attribute anywhere on the page (sidebar buttons, quick
+    // action cards, etc.) triggers showView() with that value.
     // ==============================
     document
         .querySelectorAll("[data-view]")
@@ -517,12 +976,25 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             );
         });
+
     // ==============================
     // LOAD ALL ROLES
     // GET /api/roles
     // ==============================
+    // Module-level (closure-level) state tracking which role is
+    // currently selected for editing / permission-assignment —
+    // read by the click-delegation handler and the save handlers
+    // further down.
     let selectedRoleId = null;
     let selectedRole = null;
+
+    /**
+     * loadRoles()
+     * Fetches every role from the backend and renders one
+     * "role card" per role into #rolesCardsContainer, each with
+     * its permission tags and Edit / Permissions / Delete
+     * buttons wired up.
+     */
     async function loadRoles() {
         const rolesCardsContainer =
             document.getElementById(
@@ -560,6 +1032,8 @@ document.addEventListener("DOMContentLoaded", function () {
             }
             rolesCardsContainer.innerHTML = "";
             roles.forEach(function (role) {
+                // Build the permission-tag list for this role card
+                // (or a "No permissions" placeholder if it has none).
                 const permissions =
                     Array.isArray(role.permissions)
                         ? role.permissions
@@ -582,6 +1056,8 @@ document.addEventListener("DOMContentLoaded", function () {
                             No permissions
                         </span>
                     `;
+
+                // Build the card element itself.
                 const roleCard =
                     document.createElement("div");
                 roleCard.className =
@@ -639,6 +1115,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     </div>
                 </div>
             `;
+
+                // Wire this specific card's Edit button: opens the
+                // edit-role modal pre-filled with this role's data.
                 roleCard.querySelector(".edit-role-btn")
                     .addEventListener("click", function () {
                         selectedRoleId = role.id;
@@ -649,6 +1128,9 @@ document.addEventListener("DOMContentLoaded", function () {
                             role.description || "";
                         editRoleModal.show();
                     });
+
+                // Wire this specific card's Permissions button:
+                // opens the role-permissions modal for this role.
                 roleCard.querySelector(".role-permissions-btn")
                     .addEventListener("click", function () {
                         selectedRoleId = role.id;
@@ -656,10 +1138,13 @@ document.addEventListener("DOMContentLoaded", function () {
                         loadRolePermissions(role);
                         rolePermissionsModal.show();
                     });
+
+                // Wire this specific card's Delete button.
                 roleCard.querySelector(".delete-role-btn")
                     .addEventListener("click", function () {
                         deleteRole(role.id);
                     });
+
                 rolesCardsContainer.appendChild(
                     roleCard
                 );
@@ -679,7 +1164,10 @@ document.addEventListener("DOMContentLoaded", function () {
         `;
         }
     }
-    // selectedRoleId
+
+    // Bootstrap modal instances for the two role-related modals,
+    // created once up front so they can be `.show()`/`.hide()`n
+    // from anywhere below.
     const editRoleModal =
         new bootstrap.Modal(
             document.getElementById("editRoleModal")
@@ -688,6 +1176,20 @@ document.addEventListener("DOMContentLoaded", function () {
         new bootstrap.Modal(
             document.getElementById("rolePermissionsModal")
         );
+
+    /**
+     * Delegated click handler for role-card action buttons.
+     * NOTE: this duplicates some of the per-card wiring already
+     * done inside loadRoles() above (edit/permissions), since
+     * both a direct listener AND this document-level delegated
+     * listener respond to the same buttons — worth checking for
+     * double-firing when refactoring.
+     *
+     * Handles:
+     *  - .edit-role-btn        -> opens edit-role modal
+     *  - .role-permissions-btn -> loads + opens permissions modal
+     *  - .delete-role-btn      -> confirms and DELETEs the role
+     */
     document.addEventListener(
         "click",
         async function (event) {
@@ -697,6 +1199,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 event.target.closest(".role-permissions-btn");
             const deleteButton =
                 event.target.closest(".delete-role-btn");
+
             // EDIT
             if (editButton) {
                 selectedRoleId =
@@ -711,7 +1214,12 @@ document.addEventListener("DOMContentLoaded", function () {
                     editButton.dataset.roleDescription;
                 editRoleModal.show();
             }
+
             // PERMISSIONS
+            // Re-fetches both roles and permissions fresh (rather
+            // than reusing already-loaded data) to build the
+            // checkbox list, then marks the ones already assigned
+            // to this role as checked.
             if (permissionsButton) {
                 selectedRoleId =
                     permissionsButton.dataset.roleId;
@@ -763,24 +1271,73 @@ document.addEventListener("DOMContentLoaded", function () {
                     ).join("");
                 rolePermissionsModal.show();
             }
+
+
             // DELETE
+            // Confirms with a SweetAlert2 dialog before calling
+            // DELETE, then shows a success/error message and
+            // reloads the role list.
             if (deleteButton) {
                 const roleId =
                     deleteButton.dataset.roleId;
-                if (!confirm("Delete this role?")) {
+
+                const result = await Swal.fire({
+                    title: "Are you sure?",
+                    text: "This role will be permanently deleted.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Yes, Delete",
+                    confirmButtonColor: "#dc2626",
+                    customClass: {
+                        popup: "swal-small-popup"
+                    }
+                });
+                if (!result.isConfirmed) {
                     return;
                 }
-                await apiRequest(
-                    `/api/roles/${roleId}`,
-                    {
-                        method: "DELETE"
-                    }
-                );
-                loadRoles();
+
+                try {
+                    await apiRequest(
+                        `/api/roles/${roleId}`,
+                        {
+                            method: "DELETE"
+                        }
+                    );
+
+                    Swal.fire({
+                        title: "Deleted!",
+                        text: "Role deleted successfully.",
+                        icon: "success",
+                        timer: 1800,
+                        showConfirmButton: false,
+                        customClass: {
+                            popup: "swal-small-popup"
+                        }
+                    });
+
+                    loadRoles();
+                } catch (error) {
+                    console.error(
+                        "Failed to delete role:",
+                        error
+                    );
+
+                    Swal.fire({
+                        title: "Failed",
+                        text: error.message || "Failed to delete role",
+                        icon: "error",
+                        customClass: {
+                            popup: "swal-small-popup"
+                        }
+                    });
+                }
             }
         }
     );
-    //save edit role fucntion for when the edit role modal is submitted
+
+    // save edit role function for when the edit role modal is submitted
+    // PUT /api/roles/{selectedRoleId} with the new name/description,
+    // then closes the modal and reloads the role list.
     document
         .getElementById("saveEditRoleButton")
         .addEventListener(
@@ -806,7 +1363,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 loadRoles();
             }
         );
-    //save role permissions function for when the role permissions modal is submitted
+
+    // save role permissions function for when the role permissions modal is submitted
+    // Collects every checked permission checkbox and POSTs the
+    // full list to /api/roles/{id}/permissions (replaces the
+    // role's permission set rather than diffing add/remove).
     document
         .getElementById("saveRolePermissionsButton")
         .addEventListener(
@@ -836,7 +1397,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 loadRoles();
             }
         );
+
+    // =========================================================
     // ADD ROLE
+    // Opens a blank "Add New Role" modal, validates the form on
+    // submit, POSTs the new role, and reloads the role list on
+    // success (shows an inline error message on failure).
+    // =========================================================
     const addRoleModal = new bootstrap.Modal(
         document.getElementById("addRoleModal")
     );
@@ -885,10 +1452,18 @@ document.addEventListener("DOMContentLoaded", function () {
                 </div>`;
             }
         });
+
     // ==============================
     // LOAD ALL PERMISSIONS
     // GET /api/permissions
     // ==============================
+
+    /**
+     * loadPermissions()
+     * Fetches every permission and renders one table row per
+     * permission into #permissionsTableBody, each with an Edit
+     * button carrying the permission's data in `data-*` attrs.
+     */
     async function loadPermissions() {
         const permissionsTableBody =
             document.getElementById(
@@ -987,6 +1562,14 @@ document.addEventListener("DOMContentLoaded", function () {
         `;
         }
     }
+
+    // =========================================================
+    // ADD PERMISSION
+    // Opens the "Add New Permission" modal, POSTs the new
+    // permission on submit, shows a success message, reloads the
+    // table, then auto-closes the modal and resets the form
+    // after a short delay.
+    // =========================================================
     const addPermissionModal =
         new bootstrap.Modal(
             document.getElementById(
@@ -1023,6 +1606,12 @@ document.addEventListener("DOMContentLoaded", function () {
                         })
                     }
                 );
+                // NOTE: references the global `addPermissionMessage`/
+                // `addPermissionForm` identifiers directly instead of
+                // document.getElementById(...) like the rest of the
+                // file — these happen to work only because elements
+                // with matching `id` attributes are auto-exposed as
+                // global variables by the browser; fragile pattern.
                 addPermissionMessage.innerHTML = `<div class="custom-alert success">Permission added successfully.</div>`;
                 loadPermissions();
                 setTimeout(function () {
@@ -1033,7 +1622,13 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         );
 
+    // =========================================================
     // EDIT PERMISSION
+    // Only wires up if both the modal and its form exist on the
+    // page. Clicking any .edit-permission-btn in the table (event
+    // delegated from the table body) opens the modal pre-filled;
+    // submitting PUTs the update and refreshes the table.
+    // =========================================================
     let selectedPermissionId = null;
     const editPermissionModalElement =
         document.getElementById("editPermissionModal");
@@ -1121,6 +1716,14 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         );
     }
+
+    // =========================================================
+    // REMOVE PERMISSION (by manually-entered ID)
+    // A separate, simpler flow from Edit: the admin types a
+    // permission ID directly into a form field and submits it
+    // for deletion. Only wires up if all three related elements
+    // exist on the page.
+    // =========================================================
     const removePermissionModalElement =
         document.getElementById("removePermissionModal");
     const removePermissionButton =
@@ -1169,6 +1772,10 @@ document.addEventListener("DOMContentLoaded", function () {
                         removePermissionForm.reset();
                     }, 1200);
                 } catch (error) {
+                    // Backend rejects deletion of a permission that's
+                    // still assigned to a role — that's assumed to be
+                    // the cause of any error here, though the caught
+                    // error could technically be something else.
                     removePermissionMessage.innerHTML =
                         `<div class="custom-alert error">
                 ${escapeHtml(
@@ -1182,7 +1789,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     }
-    //for roles modal
+
+    // for roles modal
+    // Bootstrap modal instance for assigning roles to a single
+    // user (used by the Users view, see loadUsers() below).
     const userRolesModalElement =
         document.getElementById(
             "userRolesModal"
@@ -1198,8 +1808,23 @@ document.addEventListener("DOMContentLoaded", function () {
                 userRolesModalElement
             );
     }
-    // load User function
+
+    // ==============================
+    // LOAD USERS
+    // GET /api/users
+    // ==============================
+    // Cache of the last-fetched user list, so the "Roles" button
+    // click handler further down can look up a user by id without
+    // re-fetching.
     let loadedUsers = [];
+
+    /**
+     * loadUsers()
+     * Fetches the paginated user list (`response.data.content`)
+     * and renders one table row per user into #usersTableBody,
+     * with role tags, an Active/Inactive status label, and
+     * Roles / Enable / Disable action buttons.
+     */
     async function loadUsers() {
         const usersTableBody =
             document.getElementById(
@@ -1274,6 +1899,9 @@ document.addEventListener("DOMContentLoaded", function () {
                             : "Inactive";
                     const row =
                         document.createElement("tr");
+                    // Row shows either a "Disable" or an "Enable"
+                    // button depending on the user's current
+                    // `enabled` state.
                     row.innerHTML = `
                     <td class="table-role-name">
                         ${escapeHtml(fullName)}
@@ -1346,6 +1974,14 @@ document.addEventListener("DOMContentLoaded", function () {
         `;
         }
     }
+
+    /**
+     * Delegated click handler for the per-user "Roles" button.
+     * Looks the user up in the cached `loadedUsers` list, opens
+     * the roles modal, and fetches the full role list to build a
+     * checkbox for each one (checking the ones the user already
+     * has).
+     */
     document.addEventListener(
         "click",
         async function (event) {
@@ -1358,6 +1994,8 @@ document.addEventListener("DOMContentLoaded", function () {
             }
             const userId =
                 button.dataset.userId;
+            // Stashed on `window` so the separate Save handler
+            // (bound to #saveUserRolesButton, below) can read it.
             window.selectedUserId =
                 userId;
             const user =
@@ -1457,7 +2095,15 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
     );
-    // for disabling user function
+
+    /**
+     * Delegated click handler for the per-user "Disable" button.
+     * Confirms via native dialog, then calls DELETE on the user
+     * (a soft-delete/disable, based on the endpoint being reused
+     * for what the UI calls "Disable"), and reloads the user
+     * table. Re-enables the button and restores its label if the
+     * call fails.
+     */
     document.addEventListener(
         "click",
         async function (event) {
@@ -1508,6 +2154,15 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
     );
+
+    // NOTE: there is no matching delegated handler here for
+    // ".user-enable-btn" — the "Enable" button rendered in
+    // loadUsers() for disabled users has no click listener wired
+    // to it anywhere in this file, so it currently does nothing.
+
+    // Save button for the user-roles modal: collects checked
+    // role checkboxes and POSTs them as the user's new role set,
+    // then closes the modal and reloads the user table.
     document
         .getElementById(
             "saveUserRolesButton"
@@ -1559,7 +2214,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             }
         );
+
+    // =========================================================
     // SESSION MANAGEMENT
+    // Grabs every element the session modal needs and creates
+    // the Bootstrap modal instance up front.
+    // =========================================================
     const sessionsButton =
         document.getElementById(
             "sessionsButton"
@@ -1577,6 +2237,7 @@ document.addEventListener("DOMContentLoaded", function () {
             "sessionsModal"
         );
     let sessionsModal = null;
+
     // INITIALIZE SESSION MODAL
     if (sessionsModalElement) {
         sessionsModal =
@@ -1584,7 +2245,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 sessionsModalElement
             );
     }
+
     // OPEN SESSION MODAL
+    // Shows the modal first (so the loading spinner is visible
+    // immediately), then fetches the session list.
     if (sessionsButton) {
         sessionsButton.addEventListener(
             "click",
@@ -1602,10 +2266,21 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         );
     }
+
     // ==============================
     // LOAD SESSIONS
     // GET /api/sessions
     // ==============================
+
+    /**
+     * loadSessions()
+     * Fetches every active session for the logged-in admin and
+     * renders one Bootstrap card per session, showing device
+     * info, IP, and login/last-used/expiry dates. The current
+     * session gets a "Current Device" badge instead of a Revoke
+     * button; every other session gets a Revoke button wired to
+     * revokeSession().
+     */
     async function loadSessions() {
         if (!sessionsList) {
             console.error(
@@ -1769,6 +2444,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             );
             // REVOKE BUTTON EVENTS
+            // Wired directly per-card here (not delegated), since
+            // the cards are freshly created each load anyway.
             sessionsList
                 .querySelectorAll(
                     ".revoke-session-btn"
@@ -1803,10 +2480,20 @@ document.addEventListener("DOMContentLoaded", function () {
         `;
         }
     }
+
     // ==============================
     // REVOKE SESSION
     // DELETE /api/sessions/{sessionId}
     // ==============================
+
+    /**
+     * revokeSession(sessionId)
+     * Confirms with the admin, calls DELETE on the given session,
+     * shows a success/error message, and refreshes the session
+     * list either way (on success) so the UI stays in sync.
+     *
+     * @param {string|number} sessionId
+     */
     async function revokeSession(sessionId) {
         if (
             sessionId === null ||
@@ -1815,13 +2502,22 @@ document.addEventListener("DOMContentLoaded", function () {
         ) {
             return;
         }
-        const confirmed =
-            confirm(
-                "Are you sure you want to revoke this session?"
-            );
-        if (!confirmed) {
+
+        const result = await Swal.fire({
+            title: "Are you sure?",
+            text: "This will log the device out of this session.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, Revoke",
+            confirmButtonColor: "#dc2626",
+            customClass: {
+                popup: "swal-small-popup"
+            }
+        });
+        if (!result.isConfirmed) {
             return;
         }
+
         try {
             const response =
                 await apiRequest(
@@ -1834,14 +2530,18 @@ document.addEventListener("DOMContentLoaded", function () {
                 "Revoke Session Response:",
                 response
             );
-            if (sessionsMessage) {
-                sessionsMessage.innerHTML = `
-                <div
-                    class="alert alert-success">
-                    Session revoked successfully.
-                </div>
-            `;
-            }
+
+            Swal.fire({
+                title: "Revoked!",
+                text: "Session revoked successfully.",
+                icon: "success",
+                timer: 1800,
+                showConfirmButton: false,
+                customClass: {
+                    popup: "swal-small-popup"
+                }
+            });
+
             // Reload updated session list
             await loadSessions();
         } catch (error) {
@@ -1849,20 +2549,26 @@ document.addEventListener("DOMContentLoaded", function () {
                 "Failed to revoke session:",
                 error
             );
-            if (sessionsMessage) {
-                sessionsMessage.innerHTML = `
-                <div
-                    class="alert alert-danger">
-                    ${escapeHtml(
-                    error.message ||
-                    "Failed to revoke session"
-                )}
-                </div>
-            `;
-            }
+
+            Swal.fire({
+                title: "Failed",
+                text: error.message || "Failed to revoke session",
+                icon: "error",
+                customClass: {
+                    popup: "swal-small-popup"
+                }
+            });
         }
     }
+
+    // =========================================================
     // LOGOUT
+    // Two separate logout buttons (sidebar + dropdown menu) each
+    // get their own listener. Both prefer the shared logout()
+    // helper from auth.js if it exists; otherwise they manually
+    // clear cookies/localStorage/sessionStorage as a fallback
+    // before redirecting to the login page.
+    // =========================================================
     const logoutButton =
         document.getElementById(
             "logoutButton"
@@ -1888,7 +2594,12 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         );
     }
+
     // DROPDOWN LOGOUT
+    // Same idea as above, but clears storage more broadly
+    // (localStorage.clear() + sessionStorage.clear()) rather than
+    // removing specific keys — inconsistent with the sidebar
+    // logout handler just above it.
     const dropdownLogoutButton =
         document.getElementById("dropdownLogoutButton");
     if (dropdownLogoutButton) {
@@ -1906,53 +2617,51 @@ document.addEventListener("DOMContentLoaded", function () {
                 "../auth/login.html";
         });
     }
-    // =========================================
+
+    // =========================================================
     // ADMIN DASHBOARD - RESET PASSWORD
     // Uses ACTUAL API
     // POST /api/auth/change-password
-
-    // CLICK HANDLER
-    // Handles:
-    // 1. Reset Password button
-    // 2. Reset Password form submit
-    // =========================================
+    //
+    // Two delegated (document-level) listeners handle this whole
+    // feature:
+    //   1. click  -> toggles the reset-password form open/closed
+    //   2. submit -> validates + submits the password change
+    // Delegation is used (instead of a direct listener on the
+    // button/form) presumably because of the duplicate-id issue
+    // noted in the HTML annotations — there are two elements with
+    // id="resetPasswordFormWrapper" on the page.
+    // =========================================================
     document.addEventListener("click", function (event) {
-        // OPEN / CLOSE RESET PASSWORD FORM
         const resetButton =
             event.target.closest("#resetPasswordToggleButton");
         if (!resetButton) {
             return;
         }
         event.preventDefault();
-        console.log("Reset Password button clicked");
-        const resetPasswordFormWrapper =
-            document.getElementById(
-                "resetPasswordFormWrapper"
-            );
         const resetPasswordMessage =
-            document.getElementById(
-                "resetPasswordMessage"
-            );
-        if (!resetPasswordFormWrapper) {
-            console.error(
-                "ERROR: resetPasswordFormWrapper not found"
-            );
-            return;
-        }
-        resetPasswordFormWrapper.classList.toggle(
-            "d-none"
-        );
-        console.log(
-            "Reset password form toggled"
-        );
+            document.getElementById("resetPasswordMessage");
         if (resetPasswordMessage) {
             resetPasswordMessage.innerHTML = "";
         }
+        const resetPasswordModalEl =
+            document.getElementById("resetPasswordModal");
+        if (!resetPasswordModalEl) {
+            console.error("ERROR: resetPasswordModal not found");
+            return;
+        }
+        new bootstrap.Modal(resetPasswordModalEl).show();
     });
-    // =========================================
+
+    // =========================================================
     // FORM SUBMIT
     // Event delegation
-    // =========================================
+    // Validates all fields are filled, new/confirm passwords
+    // match, and the new password meets the minimum length,
+    // before calling the change-password endpoint. Disables the
+    // submit button while the request is in flight and restores
+    // it in a `finally` block regardless of outcome.
+    // =========================================================
     document.addEventListener(
         "submit",
         async function (event) {
@@ -2092,6 +2801,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     return;
                 }
                 // SUCCESS
+                // Shows a success message, resets the form, then
+                // hides the form wrapper and clears the message
+                // after 1.5s.
                 resetPasswordMessage.innerHTML =
                     `<div class="custom-alert success">
                     ${escapeHtml(
@@ -2101,14 +2813,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 </div>`;
                 form.reset();
                 setTimeout(function () {
-                    const wrapper =
-                        document.getElementById(
-                            "resetPasswordFormWrapper"
-                        );
-                    if (wrapper) {
-                        wrapper.classList.add(
-                            "d-none"
-                        );
+                    const modalEl =
+                        document.getElementById("resetPasswordModal");
+                    const modal =
+                        modalEl && bootstrap.Modal.getInstance(modalEl);
+                    if (modal) {
+                        modal.hide();
                     }
                     resetPasswordMessage.innerHTML = "";
                 }, 1500);
@@ -2125,6 +2835,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     )}
                 </div>`;
             } finally {
+                // Always re-enable the submit button, whether the
+                // request succeeded, failed, or returned a
+                // backend-level failure.
                 if (submitButton) {
                     submitButton.disabled = false;
                     submitButton.textContent =
@@ -2133,10 +2846,17 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
     );
-    // ==============================
-    // GET DISPLAY NAME
-    // Handles strings and API objects
-    // ==============================
+
+    /**
+     * GET DISPLAY NAME
+     * Handles strings and API objects
+     * Normalizes a role/permission value into a human-readable
+     * string, whether it arrives as a plain string or as an
+     * object with one of several possible name-ish fields.
+     *
+     * @param {string|object|null|undefined} value
+     * @returns {string}
+     */
     function getDisplayName(value) {
         if (
             value === null ||
@@ -2159,7 +2879,18 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         return String(value);
     }
-    // ESCAPE HTML
+
+    /**
+     * ESCAPE HTML
+     * Safely escapes a value for injection into innerHTML by
+     * round-tripping it through a throwaway <div>'s textContent
+     * -> innerHTML. Used everywhere user- or API-supplied text is
+     * inserted into template strings, to prevent HTML/script
+     * injection.
+     *
+     * @param {*} value
+     * @returns {string}
+     */
     function escapeHtml(value) {
         if (
             value === null ||
@@ -2173,7 +2904,17 @@ document.addEventListener("DOMContentLoaded", function () {
             String(value);
         return div.innerHTML;
     }
-    // FORMAT SESSION DATE
+
+    /**
+     * FORMAT SESSION DATE
+     * Formats an ISO date string (or any Date-parseable value)
+     * into a short, locale-aware "en-IN" date+time string for
+     * display in the sessions list. Returns "--" for missing or
+     * invalid dates.
+     *
+     * @param {string|number|Date} dateValue
+     * @returns {string}
+     */
     function formatSessionDate(dateValue) {
         if (!dateValue) {
             return "--";
@@ -2194,8 +2935,24 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         );
     }
+
+    // End of the DOMContentLoaded handler — everything above this
+    // point runs once, on page load.
 });
-// ==============================
+
+
+// =========================================================
+// LEGACY "ADD EMPLOYEE" SUBMIT HANDLER (outside DOMContentLoaded)
+// This block runs at script-parse time, NOT inside the
+// DOMContentLoaded callback above, so it depends on the DOM
+// already being ready when this script tag executes (works only
+// because the <script> is placed at the end of <body>).
+//
+// It posts to a made-up "/api/employees" endpoint with fields
+// (gender/shift as raw strings, an "rms" array) that don't match
+// the real backend's CreateEmployeeRequest DTO — see the removal
+// note directly below this block.
+// =========================================================
 const addEmployeeForm = document.getElementById("addEmployeeForm");
 if (addEmployeeForm) {
     addEmployeeForm.addEventListener("submit", async function (event) {
@@ -2248,9 +3005,20 @@ if (addEmployeeForm) {
         }
     });
 }
+
 // NOTE: Add/Edit/View Employee logic now lives in js/employees.js,
 // wired to the real employee-service endpoints (see that file for
 // the endpoint list). The old stub above used a made-up "/api/employees"
 // endpoint and fields (gender/shift as raw strings, "rms" array) that
 // never matched the actual CreateEmployeeRequest DTO, so it has been
 // removed in favor of the real implementation.
+//
+// DEAD-CODE FLAG: despite this comment saying the old stub "has been
+// removed", the `addEmployeeForm` submit-handler block directly above
+// is still present and still runs (it will attach its listener as
+// long as an element with id="addEmployeeForm" exists on the page —
+// and it does, in dashboard.html). If js/employees.js *also* attaches
+// a submit listener to the same #addEmployeeForm, both handlers will
+// fire on submit, double-submitting the form to two different
+// endpoints. Worth confirming with whoever owns employees.js and
+// deleting this block if it's truly meant to be replaced.

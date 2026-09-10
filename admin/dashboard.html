@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
     <!-- CSS -->
     <link rel="stylesheet" href="../css/admin-dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
 <body>
@@ -34,11 +35,12 @@
             <div class="admin-profile-wrapper">
                 <button type="button" id="adminProfileButton" class="admin-profile-button">
                     <div class="admin-profile-avatar">
-                        <span id="headerAdminInitials">AD</span>
+                        <img id="headerAdminAvatarImg" class="admin-avatar-img d-none" src="" alt="Admin">
+                        <span id="headerAdminInitials"></span>
                     </div>
                     <div class="admin-profile-info">
-                        <strong id="headerAdminName">System Admin</strong>
-                        <small id="headerAdminRole">ADMIN</small>
+                        <strong id="headerAdminName"></strong>
+                        <small id="headerAdminRole"></small>
                     </div>
                 </button>
 
@@ -46,14 +48,15 @@
                 <div id="adminProfileDropdown" class="admin-profile-dropdown">
                     <div class="admin-dropdown-header">
                         <div class="admin-dropdown-avatar">
-                            <span id="dropdownAdminInitials">AD</span>
+                            <img id="dropdownAdminAvatarImg" class="admin-avatar-img d-none" src="" alt="Admin">
+                            <span id="dropdownAdminInitials"></span>
                         </div>
                         <div>
                             <strong id="dropdownAdminName">
-                                System Admin
+
                             </strong>
                             <span id="dropdownAdminRole">
-                                ADMIN
+
                             </span>
                         </div>
                     </div>
@@ -61,16 +64,21 @@
 
                     <!-- Opens the Profile view (#profileView) -->
                     <button type="button" id="profileViewButton" class="admin-profile-menu-btn">
-                        ◍ &nbsp; My Profile
+                        <i class="fa-solid fa-user"></i>
+                        <span>My Profile</span>
                     </button>
+
                     <!-- Opens the Session Management modal (#sessionsModal) -->
                     <button type="button" id="sessionsButton" class="admin-profile-menu-btn">
-                        ◷ &nbsp; Session Management
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                        <span>Session Management</span>
                     </button>
-                    <!-- Logs the admin out (clears auth + redirects to login) -->
+
+                    <!-- Logs the admin out -->
                     <button type="button" id="dropdownLogoutButton"
                         class="admin-profile-menu-btn admin-logout-menu-btn">
-                        ⇥ &nbsp; Logout
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        <span>Logout</span>
                     </button>
                 </div>
             </div>
@@ -82,8 +90,9 @@
     <!-- DASHBOARD LAYOUT: two-column shell — sidebar nav on the left, main content on the right -->
     <div class="dashboard-layout">
         <!-- Mobile Sidebar Button -->
-    
-        <!-- SIDEBAR: view-switcher nav — each button's data-view maps to a <section id="...View"> below -->
+
+        <!-- SIDEBAR: view-switcher nav — each button's data-view maps to a <section id="...View"> below-->
+        <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
         <aside class="dashboard-sidebar collapse d-md-block" id="dashboardSidebar">
             <div class="sidebar-header">
                 <span>
@@ -94,35 +103,35 @@
                 <!-- Dashboard: shows #dashboardView (default active view) -->
                 <button class="sidebar-item active" type="button" data-view="dashboard">
                     <span class="menu-icon">
-                        ▦
+                        <i class="fa-solid fa-table-columns"></i>
                     </span>
                     Dashboard
                 </button>
                 <!-- Employees: shows #employeesView -->
                 <button class="sidebar-item" type="button" data-view="employees">
                     <span class="menu-icon">
-                        ♙
+                        <i class="fa-solid fa-users"></i>
                     </span>
                     Employees
                 </button>
                 <!-- Attendance: shows #attendanceView -->
                 <button class="sidebar-item" type="button" data-view="attendance">
                     <span class="menu-icon">
-                        ◷
+                        <i class="fa-solid fa-clock"></i>
                     </span>
                     Attendance
                 </button>
                 <!-- Payroll: shows #payrollView -->
                 <button class="sidebar-item" type="button" data-view="payroll">
                     <span class="menu-icon">
-                        ₹
+                        <i class="fa-solid fa-rupee-sign"></i>
                     </span>
                     Payroll
                 </button>
                 <!-- Reports: shows #reportsView -->
                 <button class="sidebar-item" type="button" data-view="reports">
                     <span class="menu-icon">
-                        ▤
+                        <i class="fa-solid fa-chart-bar"></i>
                     </span>
                     Reports
                 </button>
@@ -133,14 +142,14 @@
                 <!-- Users: shows #usersView, id used by JS to gate visibility by permission -->
                 <button class="sidebar-item administration-item" id="usersMenuButton" type="button" data-view="users">
                     <span class="menu-icon">
-                        ♙
+                        <i class="fa-solid fa-user"></i>
                     </span>
                     Users
                 </button>
                 <!-- Roles: shows #rolesView, id used by JS to gate visibility by permission -->
                 <button class="sidebar-item administration-item" id="rolesMenuButton" type="button" data-view="roles">
                     <span class="menu-icon">
-                        ◉
+                        <i class="fa-solid fa-user-tag"></i>
                     </span>
                     Roles
                 </button>
@@ -148,7 +157,7 @@
                 <button class="sidebar-item administration-item" id="permissionsMenuButton" type="button"
                     data-view="permissions">
                     <span class="menu-icon">
-                        ⚿
+                        <i class="fa-solid fa-lock"></i>
                     </span>
                     Permissions
                 </button>
@@ -207,7 +216,7 @@
                                     Total Employees
                                 </span>
                                 <h2 id="totalEmployees">
-                                    --
+                                    2.5K
                                 </h2>
                             </div>
                         </div>
@@ -370,152 +379,103 @@
 
             <!-- // PROFILE VIEW: admin's own profile — basic info, contact, roles, permissions, password reset -->
             <section id="profileView" class="content-view d-none">
-                <div class="page-header">
-                    <div>
-                        <p class="page-label">
-                            MY ACCOUNT
-                        </p>
-                        <h1>
-                            My Profile
-                        </h1>
-                        <p>
-                            View your account information and assigned access.
-                        </p>
-                    </div>
-                </div>
+                <div class="">
 
+                </div>
 
                 <!-- ADMIN PROFILE CARD: wraps every profile sub-section below -->
                 <div class="admin-profile-page-card">
-                    <!-- PROFILE HEADER: large avatar + name + role badge -->
-                    <div class="profile-header">
-                        <div class="profile-avatar">
-                            <span id="profileInitials">
-                                AD
-                            </span>
+                    <!-- PROFILE COVER WRAP: cover image fills the whole banner; the header (avatar+name)
+                         is overlaid directly on top of it instead of sitting in a separate white strip -->
+                    <div class="admin-profile-cover-wrap">
+                        <div class="admin-profile-cover">
+                            <img src="../assets/image/cover-earth-image.jpg" alt="Cover"
+                                class="admin-profile-cover-image">
                         </div>
-                        <div class="profile-main-info">
-                            <h2 id="profileName">
-                                System Admin
-                            </h2>
-                            <p id="profileRole">
-                                ADMIN
-                            </p>
-                            <span class="profile-status">
-                                <span class="status-dot"></span>
-                                Active Administrator
-                            </span>
+
+                        <!-- PROFILE HEADER: large avatar + name + role badge, overlaid on the cover -->
+                        <div class="profile-header">
+
+                            <div class="profile-avatar" id="profileAvatarClickable">
+
+                                <img id="profileAvatarImg" class="admin-avatar-img d-none" src=""
+                                    alt="Admin profile photo">
+
+                                <span id="profileInitials"></span>
+
+                                <button type="button" id="profileAvatarEditBtn" class="admin-avatar-edit-btn"
+                                    title="Change photo" aria-label="Change profile photo">
+
+                                    <i class="fa-solid fa-camera"></i>
+
+                                </button>
+
+                            </div>
+
+
+                            <div class="profile-main-info">
+
+                                <h2 id="profileName">
+                                    Loading...
+                                </h2>
+
+                                <p id="profileRole"></p>
+
+                                <span class="profile-status">
+                                    <span class="status-dot"></span>
+                                    Active Administrator
+                                </span>
+
+                            </div>
+
                         </div>
                     </div>
-
 
                     <!-- BASIC INFORMATION: read-only full name + primary role -->
                     <div class="profile-section">
                         <div class="profile-section-title">
                             <span class="profile-section-icon">
-                                👤
+                                <i class="fa-solid fa-user"></i>
                             </span>
                             <div>
-                                <h4>
-                                    Basic Information
-                                </h4>
-                                <p>
-                                    Administrator account details
-                                </p>
+                                <h4>Basic Information</h4>
+                                <p>Administrator account details</p>
                             </div>
                         </div>
                         <div class="profile-info-grid">
                             <div class="profile-info-item">
-                                <span class="profile-label">
-                                    Full Name
-                                </span>
-                                <strong id="profileFullName">
-                                    System Admin
-                                </strong>
+                                <span class="profile-label">Full Name</span>
+                                <strong id="profileFullName">Loading...</strong>
                             </div>
                             <div class="profile-info-item">
-                                <span class="profile-label">
-                                    Primary Role
-                                </span>
-                                <strong id="profilePrimaryRole">
-                                    ADMIN
-                                </strong>
+                                <span class="profile-label">Primary Role</span>
+                                <strong id="profilePrimaryRole"></strong>
                             </div>
                         </div>
                     </div>
 
-
-                    <!-- CONTACT INFORMATION: email display + button that reveals the password-reset form below it -->
+                    <!-- CONTACT INFORMATION: email display + button that opens the reset-password modal -->
                     <div class="profile-section">
                         <div class="profile-section-title">
                             <span class="profile-section-icon">
-                                📞
+                                <i class="fa-solid fa-envelope"></i>
                             </span>
                             <div>
-                                <h4>
-                                    Contact Information
-                                </h4>
-                                <p>
-                                    Your registered account details
-                                </p>
+                                <h4>Contact Information</h4>
+                                <p>Your registered account details</p>
                             </div>
                         </div>
                         <div class="profile-info-grid">
                             <div class="profile-info-item">
-                                <span class="profile-label">
-                                    Email Address
-                                </span>
-                                <strong id="profileEmail">
-                                    --
-                                </strong>
+                                <span class="profile-label">Email Address</span>
+                                <strong id="profileEmail">--</strong>
                             </div>
                             <div class="profile-info-item profile-password-card">
-                                <span class="profile-label">
-                                    Password
-                                </span>
-                                <!-- Toggles #resetPasswordFormWrapper (first instance, inline variant) open/closed -->
+                                <span class="profile-label">Password</span>
+                                <!-- Opens #resetPasswordModal -->
                                 <button type="button" id="resetPasswordToggleButton" class="btn-reset-password">
                                     Reset Password
                                 </button>
-                            </div>
-
-
-                            <!-- RESET PASSWORD FORM (inline variant, hidden by default): current/new/confirm password fields
-                                 NOTE: id="resetPasswordFormWrapper" and its inner ids (#resetPasswordForm,
-                                 #resetPasswordMessage, #currentPasswordField, #newPasswordField, #confirmPasswordField)
-                                 are duplicated again further down (the "management-card" variant) — duplicate IDs
-                                 are invalid HTML and only the first match will be found by getElementById. -->
-
-                            <div id="resetPasswordFormWrapper" class="reset-password-form-wrapper d-none">
-                                <form id="resetPasswordForm">
-                                    <div id="resetPasswordMessage"></div>
-                                    <div class="form-group">
-                                        <label for="currentPasswordField">
-                                            Current Password
-                                        </label>
-                                        <input type="password" id="currentPasswordField" class="form-control"
-                                            autocomplete="current-password">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="newPasswordField">
-                                            New Password
-                                        </label>
-                                        <input type="password" id="newPasswordField" class="form-control"
-                                            autocomplete="new-password">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="confirmPasswordField">
-                                            Confirm New Password
-                                        </label>
-                                        <input type="password" id="confirmPasswordField" class="form-control"
-                                            autocomplete="new-password">
-                                    </div>
-                                    <div class="reset-password-actions">
-                                        <button type="submit" class="btn btn-primary">
-                                            Update Password
-                                        </button>
-                                    </div>
-                                </form>
                             </div>
                         </div>
                     </div>
@@ -524,15 +484,11 @@
                     <div class="profile-section">
                         <div class="profile-section-title">
                             <span class="profile-section-icon">
-                                🛡️
+                                <i class="fa-solid fa-user-tag"></i>
                             </span>
                             <div>
-                                <h4>
-                                    Assigned Roles
-                                </h4>
-                                <p>
-                                    Roles assigned to your account
-                                </p>
+                                <h4>Assigned Roles</h4>
+                                <p>Roles assigned to your account</p>
                             </div>
                         </div>
                         <div id="profileRoles" class="profile-access-tags">
@@ -543,79 +499,65 @@
                     <div class="profile-section">
                         <div class="profile-section-title">
                             <span class="profile-section-icon">
-                                🔐
+                                <i class="fa-solid fa-lock"></i>
                             </span>
                             <div>
-                                <h4>
-                                    Assigned Permissions
-                                </h4>
-                                <p>
-                                    Access permissions available to your account
-                                </p>
+                                <h4>Assigned Permissions</h4>
+                                <p>Access permissions available to your account</p>
                             </div>
                         </div>
                         <div class="profile-permission-heading">
-                            <span>
-                                Permissions
-                            </span>
-                            <span id="profilePermissionCount" class="profile-permission-count">
-                                0
-                            </span>
+                            <span>Permissions</span>
+                            <span id="profilePermissionCount" class="profile-permission-count">0</span>
                         </div>
                         <div id="profilePermissions" class="profile-access-tags">
                         </div>
                     </div>
                 </div>
-
-
-                <!-- RESET PASSWORD (second, duplicate-id variant — dead/unreachable via getElementById, see note above) -->
-                <div id="resetPasswordFormWrapper" class="d-none management-card admin-reset-password-card">
-                    <div class="admin-reset-password-header">
-                        <div>
-                            <h4>
-                                Reset Password
-                            </h4>
-                            <p>
-                                Update your account password securely.
-                            </p>
-                        </div>
-                    </div>
-                    <div id="resetPasswordMessage"></div>
-                    <form id="resetPasswordForm">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">
-                                    Current Password
-                                    <span class="required-star">*</span>
-                                </label>
-                                <input type="password" id="currentPasswordField" class="form-control" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">
-                                    New Password
-                                    <span class="required-star">*</span>
-                                </label>
-                                <input type="password" id="newPasswordField" class="form-control" minlength="6"
-                                    required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">
-                                    Confirm New Password
-                                    <span class="required-star">*</span>
-                                </label>
-                                <input type="password" id="confirmPasswordField" class="form-control" minlength="6"
-                                    required>
-                            </div>
-                        </div>
-                        <div class="admin-password-action-row">
-                            <button type="submit" class="primary-action-btn">
-                                Update Password
-                            </button>
-                        </div>
-                    </form>
-                </div>
             </section>
 
+            <!-- RESET PASSWORD MODAL -->
+            <div class="modal fade" id="resetPasswordModal" tabindex="-1" aria-labelledby="resetPasswordModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <div>
+                                <h5 class="modal-title" id="resetPasswordModalLabel">Reset Password</h5>
+                                <small class="text-muted">Update your account password securely.</small>
+                            </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div id="resetPasswordMessage"></div>
+                            <form id="resetPasswordForm">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Current Password <span
+                                                class="required-star">*</span></label>
+                                        <input type="password" id="currentPasswordField" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">New Password <span
+                                                class="required-star">*</span></label>
+                                        <input type="password" id="newPasswordField" class="form-control" minlength="6"
+                                            required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Confirm New Password <span
+                                                class="required-star">*</span></label>
+                                        <input type="password" id="confirmPasswordField" class="form-control"
+                                            minlength="6" required>
+                                    </div>
+                                </div>
+                                <div class="admin-password-action-row">
+                                    <button type="submit" class="primary-action-btn">Update Password</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <!-- SESSION MANAGEMENT MODAL: lists active login sessions/devices for this account, with revoke actions -->
             <div class="modal fade" id="sessionsModal" tabindex="-1" aria-labelledby="sessionsModalLabel"
@@ -646,9 +588,66 @@
                             <!-- SESSION LIST: one card per active session, injected by JS -->
                             <div id="sessionsList" class="sessions-list">
                                 <div class="text-center py-4">
-                                    Loading sessions...
+                                    <span class="text-muted">
+                                        Loading sessions...
+                                    </span>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW PHOTO MODAL: shows the admin's current profile photo full-size, with an edit shortcut -->
+            <div class="modal fade" id="adminViewPhotoModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-sm">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Profile Photo</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body admin-view-photo-body">
+                            <div class="admin-view-photo-wrapper">
+                                <img id="viewAdminPhotoImage" src="" alt="Profile Photo"
+                                    class="admin-view-photo-image d-none">
+                                <span id="viewAdminPhotoFallback" class="admin-view-photo-fallback"></span>
+                                <button type="button" id="openUploadAdminPhotoButton"
+                                    class="admin-avatar-edit-btn admin-view-photo-edit-btn"
+                                    title="Change Photo"><i class="fa-solid fa-camera"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- UPLOAD PHOTO MODAL: pick a file, preview it, then POST it to /api/profile-photos/me -->
+            <div class="modal fade" id="adminUploadPhotoModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Update Profile Photo</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div id="uploadAdminPhotoMessage"></div>
+
+                            <div class="admin-upload-photo-preview-wrapper">
+                                <img id="uploadAdminPhotoPreview" src="" alt="Preview"
+                                    class="admin-upload-photo-preview d-none">
+                                <span id="uploadAdminPhotoPreviewFallback"
+                                    class="admin-upload-photo-preview-fallback"></span>
+                            </div>
+
+                            <div class="mb-0 mt-3">
+                                <label class="form-label">Choose Image</label>
+                                <input type="file" id="uploadAdminPhotoInput" class="form-control" accept="image/*">
+                                <small class="text-muted">JPG or PNG, max 2MB recommended.</small>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="secondary-action-btn" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" id="saveAdminPhotoButton" class="primary-action-btn" disabled>Save
+                                Photo</button>
                         </div>
                     </div>
                 </div>
@@ -670,7 +669,7 @@
                             from the admin panel.
                         </p>
                     </div>
-                    <div>
+                    <div class="page-header-action">
                         <!-- Opens #addEmployeeModal -->
                         <button type="button" id="addEmployeeButton" class="primary-action-btn">
                             + Add Employee
@@ -1184,11 +1183,11 @@
                     <div class="d-flex flex-column align-items-end gap-2">
                         <!-- Opens #addPermissionModal -->
                         <button type="button" id="addPermissionButton" class="primary-action-btn">
-                            + Add New Permission
+                            + Add Permission
                         </button>
                         <!-- Opens #removePermissionModal -->
                         <button type="button" id="removePermissionButton" class="remove-permission-btn">
-                            🗑 Remove Permission
+                            <i class="fa-solid fa-trash"></i> Remove Permission
                         </button>
                     </div>
                 </div>
@@ -1347,7 +1346,7 @@
                                     Cancel
                                 </button>
                                 <button type="submit" class="remove-permission-btn">
-                                    🗑 Remove Permission
+                                    <i class="fa-solid fa-trash"></i> Remove Permission
                                 </button>
                             </div>
                         </form>
@@ -1415,7 +1414,7 @@
         </main>
     </div>
 
-    
+
     <!-- ADD / EDIT ROLE MODAL: a second, unused-looking generic role form (id="roleModal") — appears to duplicate
          the purpose of #addRoleModal/#editRoleModal above; check whether this is still wired to any button before keeping it -->
     <div class="modal fade" id="roleModal" tabindex="-1" aria-hidden="true">
@@ -1477,6 +1476,8 @@
     <script src="../js/auth.js"></script>
     <script src="../js/employees.js"></script>
     <script src="../js/admin-dashboard.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
 
 </html>
