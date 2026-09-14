@@ -11,14 +11,14 @@ async function apiRequest(endpoint, options = {}, _isRetry = false) {
         if (typeof getAuthData === "function") {
             authData = getAuthData();
         }
- 
+
         const token = authData ? authData.token : null;
         const skipAuthHandling = AUTH_ENDPOINTS_NO_REFRESH.includes(endpoint);
         const headers = {
             "Content-Type": "application/json",
             ...(options.headers || {})
         };
- 
+
         // Add JWT only when a token exists
         // and this is NOT the login/refresh request
 
@@ -78,12 +78,11 @@ async function apiRequest(endpoint, options = {}, _isRetry = false) {
                     refreshError
                 );
 
-                if (typeof logout === "function") {
+                if (typeof logout === "function" && !options.skipAutoLogoutOn401) {
                     logout();
                 }
-
                 throw refreshError;
-                }
+            }
         }
 
         // if (!response.ok) {
@@ -92,9 +91,9 @@ async function apiRequest(endpoint, options = {}, _isRetry = false) {
         //         `Request failed with status ${response.status}`
         //     );
         // }
- 
+
         // Edit by Araj
- 
+
         if (!response.ok) {
             const apiError = new Error(
                 data?.message ||

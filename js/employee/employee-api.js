@@ -6,8 +6,8 @@
 // ==========================================================================================
 function fetchCurrentUserProfile() {
     return Promise.all([
-        apiRequest("/api/users/me"),
-        apiRequest("/api/profiles/me").catch(function (error) {
+        apiRequest("/api/employees/me"),
+        apiRequest("/api/employees/me/profile-image").catch(function (error) {
             if (error.message && error.message.includes("No profile found")) {
                 return { data: {} };
             }
@@ -36,7 +36,7 @@ function fetchCurrentUserProfile() {
                 joiningDate: u.joiningDate || d.joiningDate || "Not available",
                 reportingManager: u.reportingManager || d.reportingManager || "Not available",
 
-                roles: u.roles || [], 
+                roles: u.roleName ? [u.roleName] : (u.roles || []),
                 permissions: u.permissions || [],
 
                 profileImage:
@@ -73,21 +73,13 @@ function getRealProfilePhotoUrl() {
     if (realPhotoFetchedOnce) {
         return Promise.resolve(cachedRealPhotoUrl);
     }
-    return photoApiRequest("/api/profile-photos/me")
+    return photoApiRequest("/api/employees/me/profile-image")
         .then(function (res) {
             const photo = res.data;
 
             if (!photo || !photo.id) {
                 return null;
             }
-            const downloadPath = "/api/profile-photos/me/download";
-            console.log("Downloading photo binary from:", downloadPath);
-
-            return fetchProfilePhotoAsObjectUrl(downloadPath)
-                .then(function (blobUrl) {
-                    console.log("Photo blob URL created:", blobUrl);
-                    return blobUrl;
-                });
         })
         .catch(function (error) {
             console.warn("Could not load real profile photo:", error);
@@ -208,7 +200,7 @@ async function uploadProfilePhoto(file) {
         headers["Authorization"] = `Bearer ${token}`;
     }
 
-    const response = await fetch(API_BASE_URL + "/api/profile-photos/me", {
+    const response = await fetch(API_BASE_URL + "/api/employees/me/profile-image", {
         method: "POST",
         headers: headers,
         body: formData
@@ -238,7 +230,7 @@ async function uploadProfilePhoto(file) {
 //      Removes the current profile photo from the employee's account.
 // =============================================================================================
 function deleteProfilePhoto() {
-    return photoApiRequest("/api/profile-photos/me", {
+    return photoApiRequest("/api/employees/me/profile-image", {
         method: "DELETE"
     });
 }
@@ -250,7 +242,7 @@ function deleteProfilePhoto() {
 //      Returns the sessions currently active for the employee.
 // ============================================================================================
 function getEmployeeSessions() {
-    return apiRequest("/api/sessions");
+    return apiRequest("/api/sessions/my");
 }
 
 // ============================================================================================

@@ -199,7 +199,7 @@ if (loginForm) {
                 const roles =
                     Array.isArray(data.data.user?.roles)
                         ? data.data.user.roles
-                        : [];
+                        : (data.data.role ? [data.data.role] : []);
 
 
                 console.log(
@@ -408,12 +408,14 @@ function saveAuthData(data, remember) {
             loginData.user || null,
 
         email:
-            loginData.user?.email || "",
+            loginData.user?.email ||
+            loginData.email ||           // ← real API: flat "email"
+            "",
 
         role:
             Array.isArray(loginData.user?.roles)
                 ? loginData.user.roles[0] || ""
-                : "",
+                : (loginData.role || ""),
 
         // Remember-me state is needed when
         // the access token is refreshed.
@@ -472,24 +474,6 @@ function getAuthData() {
         return null;
     }
 }
-
-
-// ============================================================
-// REFRESH ACCESS TOKEN
-// ============================================================
-//
-// IMPORTANT:
-//
-// Do NOT call apiRequest() here.
-//
-// We intentionally use fetch() directly so that:
-//
-// /api/auth/refresh-token
-//
-// does not trigger another refresh attempt.
-//
-// This prevents an infinite refresh loop.
-//
 
 let refreshInFlight = null;
 
@@ -659,21 +643,25 @@ if (logoutButton) {
     );
 }
 
-
 // ============================================================
 // LOGOUT FUNCTION
 // ============================================================
+    async function logout() {
 
-function logout() {
+        try {
+            // Call backend so the session/token is invalidated server-side too
+            await apiRequest("/api/auth/logout", { method: "POST" });
+        } catch (error) {
+            console.error("Logout API failed (proceeding with local logout):", error);
+        }
 
-    // Delete authentication cookie
-    deleteCookie("authData");
+        // Delete authentication cookie
+        deleteCookie("authData");
 
-    // Clean up any old storage data
-    localStorage.removeItem("authData");
-    sessionStorage.removeItem("authData");
+        // Clean up any old storage data
+        localStorage.removeItem("authData");
+        sessionStorage.removeItem("authData");
 
-    // Go back to login page
-    window.location.href =
-        "../index.html";
-}
+        // Go back to login page
+        window.location.href = "../auth/login.html";
+    }

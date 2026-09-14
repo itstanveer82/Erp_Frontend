@@ -16,20 +16,6 @@ function demoDelay(data, ms = 400) {
 // Suggested real endpoint: GET /api/employee/me/profile
 function demoGetProfile() {
     return demoDelay({
-        // employeeCode: "EMP-1312",
-        // systemId: "SYS-1042",
-        // firstName: "Mohd",
-        // lastName: "Tanveer Ansari",
-        // profileImage: "../assets/image/Image01.jpg",
-        // email: "tannu1312@gmail.com",
-        // phone: "+91 888193***",
-        // departmentName: "IT",
-        // designation: "Software Developer",
-        // joiningDate: "2026-08-01",
-        // reportingManager: "RM",
-        // systemStatus: "OUT",
-        // dateOfBirth: "1998-04-15",
-        // gender: "Male"
 
     });
 }
