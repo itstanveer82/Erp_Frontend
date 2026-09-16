@@ -1,350 +1,808 @@
-    // ============================================================
-    // EMPLOYEES MODULE
-    // Backend APIs
-    //
-    // GET    /api/employees
-    // GET    /api/employees/inactive
-    // GET    /api/employees/{id}
-    // POST   /api/employees
-    // PUT    /api/employees/{id}
-    // DELETE /api/employees/{id}
-    // PUT    /api/employees/{id}/restore
-    // GET    /api/departments
-    // ============================================================
+// ============================================================
+// EMPLOYEES MODULE
+// Backend APIs
+//
+// GET    /api/employees
+// GET    /api/employees/inactive
+// GET    /api/employees/{id}
+// POST   /api/employees
+// PUT    /api/employees/{id}
+// DELETE /api/employees/{id}
+// PUT    /api/employees/{id}/restore
+// GET    /api/departments
+// ============================================================
 
-    const EMP_PAGE_SIZE = 10;
+const EMP_PAGE_SIZE = 10;
 
-    let empCurrentPage = 0;
-    let empSearchQuery = "";
-    let empIncludeInactive = false;
-    let empMasterDataCache = {};
-    let empSelectedId = null;
-    let empAllRows = [];
+let empCurrentPage = 0;
+let empSearchQuery = "";
+let empIncludeInactive = false;
+let empMasterDataCache = {};
+let empSelectedId = null;
+let empAllRows = [];
 
 
-    // ============================================================
-    // HELPERS
-    // ============================================================
+// ============================================================
+// HELPERS
+// ============================================================
 
-    function escapeHtmlEmp(value) {
-        if (value === null || value === undefined) {
-            return "";
-        }
-
-        const div = document.createElement("div");
-        div.textContent = String(value);
-        return div.innerHTML;
+function escapeHtmlEmp(value) {
+    if (value === null || value === undefined) {
+        return "";
     }
 
+    const div = document.createElement("div");
+    div.textContent = String(value);
+    return div.innerHTML;
+}
 
-    function getErrorMessage(error, fallback) {
-        return (
-            error?.responseData?.message ||
-            error?.response?.data?.message ||
-            error?.message ||
-            fallback
+
+function getErrorMessage(error, fallback) {
+    return (
+        error?.responseData?.message ||
+        error?.response?.data?.message ||
+        error?.message ||
+        fallback
+    );
+}
+
+
+
+// ============================================================
+// ROLE DROPDOWN
+// GET /api/roles
+// ============================================================
+
+async function loadEmployeeRoleDropdown() {
+
+    const roleSelect =
+        document.getElementById("addEmpRole");
+
+    if (!roleSelect) {
+
+        console.error(
+            "addEmpRole dropdown not found"
         );
+
+        return;
     }
 
 
-    // ============================================================
-    // MASTER DATA
-    // ============================================================
+    // Loading state
+    roleSelect.innerHTML =
+        `<option value="">Loading roles...</option>`;
 
-    async function fetchDepartments() {
 
-        if (empMasterDataCache.DEPARTMENT) {
-            return empMasterDataCache.DEPARTMENT;
-        }
+    try {
 
-        try {
-            const response = await apiRequest("/api/departments");
+        const response =
+            await apiRequest("/api/roles");
 
-            const list = Array.isArray(response.data)
+
+        console.log(
+            "Roles API Response:",
+            response
+        );
+
+
+        // API response:
+        // {
+        //     success: true,
+        //     data: [...]
+        // }
+
+        const roles =
+            Array.isArray(response.data)
                 ? response.data
                 : [];
 
-            empMasterDataCache.DEPARTMENT = list;
 
-            return list;
+        // Reset dropdown
+        roleSelect.innerHTML =
+            `<option value="">Select Role</option>`;
 
-        } catch (error) {
 
-            console.error("Failed to load departments:", error);
+        // Add roles
+        roles.forEach(function (role) {
 
-            return [];
+            const option =
+                document.createElement("option");
+
+
+            option.value =
+                role.id;
+
+
+            option.textContent =
+                role.name ||
+                role.roleName ||
+                role.code ||
+                `Role ${role.id}`;
+
+
+            roleSelect.appendChild(option);
+
+        });
+
+
+        // No roles
+        if (roles.length === 0) {
+
+            roleSelect.innerHTML =
+                `<option value="">
+                    No roles found
+                </option>`;
+
         }
+
+    } catch (error) {
+
+        console.error(
+            "Failed to load roles:",
+            error
+        );
+
+
+        roleSelect.innerHTML =
+            `<option value="">
+                Failed to load roles
+            </option>`;
+
     }
 
+}
 
-    async function fetchShifts() {
 
-        if (empMasterDataCache.SHIFT) {
-            return empMasterDataCache.SHIFT;
-        }
 
-        try {
-            const response = await apiRequest("/api/shifts");
+// ============================================================
+// MANAGER DROPDOWN
+// GET /api/employees/managers
+// ============================================================
+// async function loadEmployeeManagerDropdown() {
+//     const managerSelect = document.getElementById("addEmpManagerId");
 
-            const list = Array.isArray(response.data)
+//     if (!managerSelect) {
+//         console.warn("Manager dropdown #addEmpManagerId not found");
+//         return;
+//     }
+
+//     managerSelect.innerHTML =
+//         `<option value="">Loading managers...</option>`;
+
+//     try {
+//         const response =
+//             await apiRequest("/api/employees/managers");
+
+//         console.log("Managers API response:", response);
+
+//         const managers = Array.isArray(response.data)
+//             ? response.data
+//             : [];
+
+//         managerSelect.innerHTML =
+//             `<option value="">Select Manager</option>`;
+
+//         managers.forEach(function (manager) {
+
+//             const option = document.createElement("option");
+
+//             // Swagger API field
+//             option.value = manager.employeeId;
+
+//             // Swagger API field
+//             option.textContent =
+//                 manager.fullName ||
+//                 `Manager ${manager.employeeId}`;
+
+//             managerSelect.appendChild(option);
+//         });
+
+//         console.log("Managers loaded:", managers);
+
+//     } catch (error) {
+
+//         console.error(
+//             "Failed to load managers:",
+//             error
+//         );
+
+//         managerSelect.innerHTML =
+//             `<option value="">Failed to load managers</option>`;
+//     }
+// }
+
+async function loadEmployeeManagerDropdown() {
+    const managerSelect = document.getElementById("addEmpManagerId");
+
+    if (!managerSelect) {
+        console.warn("Manager dropdown #addEmpManagerId not found");
+        return;
+    }
+
+    managerSelect.innerHTML =
+        `<option value="">Loading managers...</option>`;
+
+    try {
+        const response =
+            await apiRequest("/api/employees/managers");
+
+        console.log("Managers API response:", response);
+
+        const managers = Array.isArray(response.data)
+            ? response.data
+            : [];
+
+        managerSelect.innerHTML =
+            `<option value="">Select Manager</option>`;
+
+        managers.forEach(function (manager) {
+            const option = document.createElement("option");
+
+            option.value = manager.employeeId;
+
+            option.textContent =
+                manager.fullName ||
+                `Manager ${manager.employeeId}`;
+
+            managerSelect.appendChild(option);
+        });
+
+    } catch (error) {
+        console.error("Failed to load managers:", error);
+
+        managerSelect.innerHTML =
+            `<option value="">Failed to load managers</option>`;
+    }
+}
+
+
+// async function loadEmployeeDepartmentDropdown() {
+//     const departmentSelect =
+//         document.getElementById("addEmpDepartment");
+
+//     if (!departmentSelect) {
+//         console.warn("Department dropdown #addEmpDepartment not found");
+//         return;
+//     }
+
+//     departmentSelect.innerHTML =
+//         `<option value="">Loading departments...</option>`;
+
+//     try {
+//         const departments = await fetchDepartments();
+
+//         console.log("Departments loaded:", departments);
+
+//         populateSelect(
+//             departmentSelect,
+//             departments,
+//             "Select Department"
+//         );
+
+//     } catch (error) {
+//         console.error("Failed to load departments:", error);
+
+//         departmentSelect.innerHTML =
+//             `<option value="">Failed to load departments</option>`;
+//     }
+// }
+
+async function loadEmployeeDepartmentDropdown() {
+
+    const departmentSelect =
+        document.getElementById("addEmpDepartment");
+
+    if (!departmentSelect) {
+        console.warn(
+            "Department dropdown #addEmpDepartment not found"
+        );
+        return;
+    }
+
+    departmentSelect.innerHTML =
+        `< option value = "" > Loading departments...</option > `;
+
+    try {
+
+        const response =
+            await apiRequest("/api/departments");
+
+        console.log(
+            "Departments API response:",
+            response
+        );
+
+        const departments =
+            Array.isArray(response.data)
                 ? response.data
                 : [];
 
-            empMasterDataCache.SHIFT = list;
+        departmentSelect.innerHTML =
+            `< option value = "" > Select Department</option > `;
 
-            return list;
+        departments.forEach(function (department) {
 
-        } catch (error) {
+            const option =
+                document.createElement("option");
 
-            console.error("Failed to load shifts:", error);
+            // API: id
+            option.value = department.id;
 
-            return [];
-        }
+            // API: name
+            option.textContent = department.name;
+
+            departmentSelect.appendChild(option);
+        });
+
+        console.log(
+            "Departments loaded:",
+            departments
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Failed to load departments:",
+            error
+        );
+
+        departmentSelect.innerHTML =
+            `< option value = "" > Failed to load departments</option > `;
     }
+}
 
 
-    // Backend request mein roleId INTEGER hai.
-    // Isliye yahan numeric IDs use kar rahe hain.
-    const EMP_ROLE_OPTIONS = [
-        { id: 1, name: "ADMIN" },
-        { id: 2, name: "HR" },
-        { id: 3, name: "EMPLOYEE" }
-    ];
 
 
-    function populateSelect(selectEl, list, placeholder, selectedId) {
+addEmployeeButton.addEventListener(
+    "click",
+    async function () {
 
-        if (!selectEl) {
-            return;
+        if (addEmployeeForm) {
+            addEmployeeForm.reset();
         }
 
-        selectEl.innerHTML =
-            `<option value="">${escapeHtmlEmp(placeholder)}</option>` +
-            list.map(function (item) {
-
-                const isSelected =
-                    selectedId != null &&
-                    String(item.id) === String(selectedId);
-
-                return `
-                    <option value="${escapeHtmlEmp(item.id)}"
-                        ${isSelected ? "selected" : ""}>
-                        ${escapeHtmlEmp(item.name)}
-                    </option>
-                `;
-
-            }).join("");
-    }
+        if (addEmployeeMessage) {
+            addEmployeeMessage.innerHTML = "";
+        }
 
 
-    async function loadMasterDataDropdowns() {
+        addEmployeeModal.show();
 
-        const [departments, shifts] = await Promise.all([
-            fetchDepartments(),
-            fetchShifts()
+
+        await Promise.all([
+
+            loadEmployeeRoleDropdown(),
+
+            loadEmployeeManagerDropdown(),
+
+            loadEmployeeDepartmentDropdown()
+
         ]);
+
+    }
+);
+
+addEmployeeButton.addEventListener(
+    "click",
+    async function () {
+
+        if (addEmployeeForm) {
+            addEmployeeForm.reset();
+        }
+
+        if (addEmployeeMessage) {
+            addEmployeeMessage.innerHTML = "";
+        }
+
+
+        addEmployeeModal.show();
+
+
+        await Promise.all([
+
+            loadEmployeeRoleDropdown(),
+
+            loadEmployeeManagerDropdown(),
+
+            fetchDepartments()
+
+        ]);
+
+
+        // Populate department
+        const departments =
+            await fetchDepartments();
 
         populateSelect(
             document.getElementById("addEmpDepartment"),
             departments,
-            "Select department"
+            "Select Department"
         );
 
-        populateSelect(
-            document.getElementById("addEmpRole"),
-            EMP_ROLE_OPTIONS,
-            "Select role"
-        );
-
-        populateSelect(
-            document.getElementById("addEmpShift"),
-            shifts,
-            "Select shift"
-        );
-
-        populateSelect(
-            document.getElementById("editEmpDepartment"),
-            departments,
-            "Select department"
-        );
-
-        populateSelect(
-            document.getElementById("editEmpRole"),
-            EMP_ROLE_OPTIONS,
-            "Select role"
-        );
     }
+);
+
+// ============================================================
+// OPEN ADD EMPLOYEE MODAL
+// ============================================================
+
+if (addEmployeeButton) {
+
+    addEmployeeButton.addEventListener(
+        "click",
+        async function () {
+
+            // Reset form
+            if (addEmployeeForm) {
+                addEmployeeForm.reset();
+            }
 
 
-    // ============================================================
-    // LOAD EMPLOYEES
-    // ============================================================
+            // Clear message
+            if (addEmployeeMessage) {
+                addEmployeeMessage.innerHTML = "";
+            }
 
-    async function loadEmployees(page = 0) {
 
-        const tableBody =
-            document.getElementById("employeesTableBody");
+            // Open modal
+            addEmployeeModal.show();
 
-        if (!tableBody) {
-            return;
-        }
 
-        empCurrentPage = page;
+            // =================================================
+            // LOAD ROLE
+            // =================================================
 
-        tableBody.innerHTML = `
-            <tr>
-                <td colspan="8" class="text-center py-4">
-                    Loading employees...
-                </td>
-            </tr>
-        `;
+            await loadEmployeeRoleDropdown();
 
-        try {
 
-            const endpoint =
-                empIncludeInactive
-                    ? "/api/employees/inactive"
-                    : "/api/employees";
+            // =================================================
+            // LOAD MANAGER
+            // =================================================
 
-            const response = await apiRequest(endpoint);
+            await loadEmployeeManagerDropdown();
 
-            const employees =
-                Array.isArray(response.data)
-                    ? response.data
-                    : [];
 
-            // Ye row jis endpoint se aayi hai wahi uska active/inactive
-            // sach hai (status text field pe bharosa nahi kar sakte).
-            employees.forEach(function (emp) {
-                emp.__isActiveRow = !empIncludeInactive;
-            });
+            // =================================================
+            // LOAD DEPARTMENT
+            // =================================================
 
-            const query =
-                empSearchQuery.trim().toLowerCase();
+            const departments =
+                await fetchDepartments();
 
-            empAllRows = query
-                ? employees.filter(function (emp) {
 
-                    const haystack = [
-                        emp.employeeCode,
-                        emp.empCode,
-                        emp.firstName,
-                        emp.lastName,
-                        emp.email,
-                        emp.empEmail
-                    ]
-                        .filter(Boolean)
-                        .join(" ")
-                        .toLowerCase();
-
-                    return haystack.includes(query);
-
-                })
-                : employees;
-
-            const start =
-                empCurrentPage * EMP_PAGE_SIZE;
-
-            const pageRows =
-                empAllRows.slice(
-                    start,
-                    start + EMP_PAGE_SIZE
-                );
-
-            renderEmployeesTable(pageRows);
-
-            renderEmployeesPagination();
-
-        } catch (error) {
-
-            console.error(
-                "Failed to load employees:",
-                error
+            populateSelect(
+                document.getElementById("addEmpDepartment"),
+                departments,
+                "Select Department"
             );
 
-            tableBody.innerHTML = `
-                <tr>
-                    <td colspan="8"
-                        class="text-center py-4 text-danger">
-                        ${escapeHtmlEmp(
-                getErrorMessage(
-                    error,
-                    "Failed to load employees"
-                )
-            )}
-                    </td>
-                </tr>
-            `;
         }
+    );
+
+}
+
+async function loadMasterDataDropdowns() {
+
+    const [departments, shifts] = await Promise.all([
+        fetchDepartments(),
+        fetchShifts()
+    ]);
+
+
+    populateSelect(
+        document.getElementById("addEmpDepartment"),
+        departments,
+        "Select department"
+    );
+
+
+    populateSelect(
+        document.getElementById("addEmpShift"),
+        shifts,
+        "Select shift"
+    );
+
+
+    populateSelect(
+        document.getElementById("editEmpDepartment"),
+        departments,
+        "Select department"
+    );
+
+}
+
+
+
+// ============================================================
+// MASTER DATA
+// ============================================================
+
+async function fetchDepartments() {
+
+    if (empMasterDataCache.DEPARTMENT) {
+        return empMasterDataCache.DEPARTMENT;
     }
 
+    try {
+        const response = await apiRequest("/api/departments");
 
-    // ============================================================
-    // RENDER EMPLOYEE TABLE
-    // ============================================================
+        const list = Array.isArray(response.data)
+            ? response.data
+            : [];
 
-    function renderEmployeesTable(employees) {
+        empMasterDataCache.DEPARTMENT = list;
 
-        const tableBody =
-            document.getElementById("employeesTableBody");
+        return list;
 
-        if (!tableBody) {
-            return;
-        }
+    } catch (error) {
 
-        if (!employees.length) {
+        console.error("Failed to load departments:", error);
 
-            tableBody.innerHTML = `
+        return [];
+    }
+}
+
+
+async function fetchShifts() {
+
+    if (empMasterDataCache.SHIFT) {
+        return empMasterDataCache.SHIFT;
+    }
+
+    try {
+        const response = await apiRequest("/api/shifts");
+
+        const list = Array.isArray(response.data)
+            ? response.data
+            : [];
+
+        empMasterDataCache.SHIFT = list;
+
+        return list;
+
+    } catch (error) {
+
+        console.error("Failed to load shifts:", error);
+
+        return [];
+    }
+}
+
+
+function populateSelect(selectEl, list, placeholder, selectedId) {
+
+    if (!selectEl) {
+        return;
+    }
+
+    selectEl.innerHTML =
+        `< option value = "" > ${escapeHtmlEmp(placeholder)}</option > ` +
+        list.map(function (item) {
+
+            const isSelected =
+                selectedId != null &&
+                String(item.id) === String(selectedId);
+
+            return `
+    < option value = "${escapeHtmlEmp(item.id)}"
+                        ${isSelected ? "selected" : ""}>
+    ${escapeHtmlEmp(item.name)}
+                    </option >
+    `;
+
+        }).join("");
+}
+
+
+async function loadMasterDataDropdowns() {
+
+    const [departments, shifts] = await Promise.all([
+        fetchDepartments(),
+        fetchShifts()
+    ]);
+
+    populateSelect(
+        document.getElementById("addEmpDepartment"),
+        departments,
+        "Select department"
+    );
+
+    populateSelect(
+        document.getElementById("addEmpRole"),
+        EMP_ROLE_OPTIONS,
+        "Select role"
+    );
+
+    populateSelect(
+        document.getElementById("addEmpShift"),
+        shifts,
+        "Select shift"
+    );
+
+    populateSelect(
+        document.getElementById("editEmpDepartment"),
+        departments,
+        "Select department"
+    );
+
+    populateSelect(
+        document.getElementById("editEmpRole"),
+        EMP_ROLE_OPTIONS,
+        "Select role"
+    );
+}
+
+
+// ============================================================
+// LOAD EMPLOYEES
+// ============================================================
+
+async function loadEmployees(page = 0) {
+
+    const tableBody =
+        document.getElementById("employeesTableBody");
+
+    if (!tableBody) {
+        return;
+    }
+
+    empCurrentPage = page;
+
+    tableBody.innerHTML = `
+    < tr >
+    <td colspan="8" class="text-center py-4">
+        Loading employees...
+    </td>
+            </tr >
+    `;
+
+    try {
+
+        const endpoint =
+            empIncludeInactive
+                ? "/api/employees/inactive"
+                : "/api/employees";
+
+        const response = await apiRequest(endpoint);
+
+        const employees =
+            Array.isArray(response.data)
+                ? response.data
+                : [];
+
+        // Ye row jis endpoint se aayi hai wahi uska active/inactive
+        // sach hai (status text field pe bharosa nahi kar sakte).
+        employees.forEach(function (emp) {
+            emp.__isActiveRow = !empIncludeInactive;
+        });
+
+        const query =
+            empSearchQuery.trim().toLowerCase();
+
+        empAllRows = query
+            ? employees.filter(function (emp) {
+
+                const haystack = [
+                    emp.employeeCode,
+                    emp.empCode,
+                    emp.firstName,
+                    emp.lastName,
+                    emp.email,
+                    emp.empEmail
+                ]
+                    .filter(Boolean)
+                    .join(" ")
+                    .toLowerCase();
+
+                return haystack.includes(query);
+
+            })
+            : employees;
+
+        const start =
+            empCurrentPage * EMP_PAGE_SIZE;
+
+        const pageRows =
+            empAllRows.slice(
+                start,
+                start + EMP_PAGE_SIZE
+            );
+
+        renderEmployeesTable(pageRows);
+
+        renderEmployeesPagination();
+
+    } catch (error) {
+
+        console.error(
+            "Failed to load employees:",
+            error
+        );
+
+        tableBody.innerHTML = `
+    < tr >
+    <td colspan="8"
+        class="text-center py-4 text-danger">
+        ${escapeHtmlEmp(
+            getErrorMessage(
+                error,
+                "Failed to load employees"
+            )
+        )}
+    </td>
+                </tr >
+    `;
+    }
+}
+
+
+// ============================================================
+// RENDER EMPLOYEE TABLE
+// ============================================================
+
+function renderEmployeesTable(employees) {
+
+    const tableBody =
+        document.getElementById("employeesTableBody");
+
+    if (!tableBody) {
+        return;
+    }
+
+    if (!employees.length) {
+
+        tableBody.innerHTML = `
                 <tr>
                     <td colspan="8"
                         class="text-center py-4 text-muted">
                         No employees found
                     </td>
                 </tr>
-            `;
+             `;
 
-            return;
-        }
+        return;
+    }
 
-        tableBody.innerHTML = "";
+    tableBody.innerHTML = "";
 
-        employees.forEach(function (emp) {
+    employees.forEach(function (emp) {
 
-            const empId =
-                emp.id ?? emp.empId;
+        const empId =
+            emp.id ?? emp.empId;
 
-            const empCode =
-                emp.employeeCode ?? emp.empCode;
+        const empCode =
+            emp.employeeCode ?? emp.empCode;
 
-            const email =
-                emp.email ?? emp.empEmail;
+        const email =
+            emp.email ?? emp.empEmail;
 
-            const roleLabel =
-                emp.role ??
-                emp.roleName ??
-                (emp.roleId != null
-                    ? `Role #${emp.roleId}`
-                    : "--");
+        const roleLabel =
+            emp.role ??
+            emp.roleName ??
+            (emp.roleId != null
+                ? `Role #${emp.roleId} `
+                : "--");
 
-              const isActive =
+        const isActive =
             emp.__isActiveRow !== undefined
                 ? emp.__isActiveRow
                 : (emp.status !== undefined
                     ? String(emp.status).toUpperCase() === "ACTIVE"
                     : (emp.active !== undefined ? emp.active : !emp.deleted));
-                        
-            const fullName =
-                `${emp.firstName || ""} ${emp.lastName || ""}`
-                    .trim() || "--";
 
-            const statusBadge = isActive
-                ? `<span class="text-success">Active</span>`
-                : `<span class="text-danger">Inactive</span>`;
+        const fullName =
+            `${emp.firstName || ""} ${emp.lastName || ""} `
+                .trim() || "--";
 
-            const row = document.createElement("tr");
+        const statusBadge = isActive
+            ? `<span class="text-success" > Active</span > `
+            : `<span class="text-danger" > Inactive</span > `;
 
-            row.innerHTML = `
-                <td>${escapeHtmlEmp(empCode || "--")}</td>
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+    <td> ${escapeHtmlEmp(empCode || "--")}</td >
 
                 <td>${escapeHtmlEmp(fullName)}</td>
 
@@ -385,7 +843,7 @@
 
                         ${isActive
 
-                    ? `
+                ? `
                                 <button
                                     type="button"
                                     class="btn btn-outline-danger btn-sm emp-deactivate-btn"
@@ -394,7 +852,7 @@
                                 </button>
                             `
 
-                    : `
+                : `
                                 <button
                                     type="button"
                                     class="btn btn-outline-success btn-sm emp-reactivate-btn"
@@ -408,165 +866,165 @@
                                     Delete
                                 </button>
                             `
-                }
+            }
 
                     </div>
 
                 </td>
-            `;
+`;
 
-            tableBody.appendChild(row);
-        });
-    }
+        tableBody.appendChild(row);
+    });
+}
 
 
-    // ============================================================
-    // ACCOUNT STATUS
-    // ============================================================
+// ============================================================
+// ACCOUNT STATUS
+// ============================================================
 
-    function accountStatusBadge(status) {
+function accountStatusBadge(status) {
 
-        if (status === "CREATED") {
-
-            return `
-                <span class="text-success">
-                    Login Active
-                </span>
-            `;
-        }
-
-        if (status === "FAILED") {
-
-            return `
-                <span class="text-danger">
-                    Login Failed
-                </span>
-            `;
-        }
+    if (status === "CREATED") {
 
         return `
-            <span class="text-muted">
-                Pending
-            </span>
-        `;
+    < span class="text-success" >
+        Login Active
+                </span >
+    `;
     }
 
+    if (status === "FAILED") {
 
-    // ============================================================
-    // PAGINATION
-    // ============================================================
-
-    function renderEmployeesPagination() {
-
-        const container =
-            document.getElementById(
-                "employeesPagination"
-            );
-
-        if (!container) {
-            return;
-        }
-
-        const totalPages =
-            Math.ceil(
-                empAllRows.length /
-                EMP_PAGE_SIZE
-            );
-
-        if (totalPages <= 1) {
-
-            container.innerHTML = "";
-
-            return;
-        }
-
-        let html =
-            `<ul class="pagination pagination-sm mb-0">`;
-
-        for (
-            let i = 0;
-            i < totalPages;
-            i++
-        ) {
-
-            html += `
-                <li class="page-item
-                    ${i === empCurrentPage ? "active" : ""}">
-
-                    <button
-                        type="button"
-                        class="page-link emp-page-btn"
-                        data-page="${i}">
-                        ${i + 1}
-                    </button>
-
-                </li>
-            `;
-        }
-
-        html += `</ul>`;
-
-        container.innerHTML = html;
+        return `
+    < span class="text-danger" >
+        Login Failed
+                </span >
+    `;
     }
 
+    return `
+    <span class="text-muted" >
+        Pending
+            </span >
+    `;
+}
 
-    // ============================================================
-    // VIEW EMPLOYEE DETAILS
-    // ============================================================
 
-    function renderEmployeeDetails(emp) {
+// ============================================================
+// PAGINATION
+// ============================================================
 
-        const body =
-            document.getElementById(
-                "viewEmployeeBody"
-            );
+function renderEmployeesPagination() {
 
-        if (!body) {
-            return;
-        }
+    const container =
+        document.getElementById(
+            "employeesPagination"
+        );
 
-        if (!emp) {
+    if (!container) {
+        return;
+    }
 
-            body.innerHTML =
-                `<div class="text-muted">No data.</div>`;
+    const totalPages =
+        Math.ceil(
+            empAllRows.length /
+            EMP_PAGE_SIZE
+        );
 
-            return;
-        }
+    if (totalPages <= 1) {
 
-        const fullName =
-            `${emp.firstName || ""} ${emp.lastName || ""}`
-                .trim() || "--";
+        container.innerHTML = "";
 
-        const email =
-            emp.email ?? emp.empEmail;
+        return;
+    }
 
-        const empCode =
-            emp.employeeCode ?? emp.empCode;
+    let html =
+        `< ul class="pagination pagination-sm mb-0" > `;
 
-        const roleLabel =
-            emp.role ??
-            emp.roleName ??
-            (emp.roleId != null
-                ? `Role #${emp.roleId}`
-                : "--");
+    for (
+        let i = 0;
+        i < totalPages;
+        i++
+    ) {
 
-        const deptLabel =
-            emp.department?.name ??
-            emp.departmentName ??
-            (emp.departmentId != null
-                ? `Dept #${emp.departmentId}`
-                : "--");
+        html += `
+    < li class="page-item
+                    ${i === empCurrentPage ? "active" : ""} ">
 
-        const isActive =
-            emp.__isActiveRow !== undefined
-                ? emp.__isActiveRow
-                : (emp.status !== undefined
-                    ? String(emp.status).toUpperCase() === "ACTIVE"
-                    : (emp.active !== undefined ? emp.active : !emp.deleted));
+    < button
+type = "button"
+class="page-link emp-page-btn"
+data - page="${i}" >
+    ${i + 1}
+                    </button >
 
-        body.innerHTML = `
+                </li >
+    `;
+    }
 
-            <div class="profile-info-grid">
+    html += `</ul > `;
+
+    container.innerHTML = html;
+}
+
+
+// ============================================================
+// VIEW EMPLOYEE DETAILS
+// ============================================================
+
+function renderEmployeeDetails(emp) {
+
+    const body =
+        document.getElementById(
+            "viewEmployeeBody"
+        );
+
+    if (!body) {
+        return;
+    }
+
+    if (!emp) {
+
+        body.innerHTML =
+            `< div class="text-muted" > No data.</div > `;
+
+        return;
+    }
+
+    const fullName =
+        `${emp.firstName || ""} ${emp.lastName || ""} `
+            .trim() || "--";
+
+    const email =
+        emp.email ?? emp.empEmail;
+
+    const empCode =
+        emp.employeeCode ?? emp.empCode;
+
+    const roleLabel =
+        emp.role ??
+        emp.roleName ??
+        (emp.roleId != null
+            ? `Role #${emp.roleId} `
+            : "--");
+
+    const deptLabel =
+        emp.department?.name ??
+        emp.departmentName ??
+        (emp.departmentId != null
+            ? `Dept #${emp.departmentId} `
+            : "--");
+
+    const isActive =
+        emp.__isActiveRow !== undefined
+            ? emp.__isActiveRow
+            : (emp.status !== undefined
+                ? String(emp.status).toUpperCase() === "ACTIVE"
+                : (emp.active !== undefined ? emp.active : !emp.deleted));
+
+    body.innerHTML = `
+
+    < div class="profile-info-grid" >
 
                 <div class="profile-info-item">
                     <span class="profile-label">
@@ -619,8 +1077,8 @@
 
                     <strong>
                         ${escapeHtmlEmp(
-            emp.designation || "--"
-        )}
+        emp.designation || "--"
+    )}
                     </strong>
                 </div>
 
@@ -654,8 +1112,8 @@
 
                     <strong>
                         ${escapeHtmlEmp(
-            emp.joiningDate || "--"
-        )}
+        emp.joiningDate || "--"
+    )}
                     </strong>
                 </div>
 
@@ -667,11 +1125,11 @@
 
                     <strong>
                         ${emp.managerId != null
-                ? escapeHtmlEmp(
-                    emp.managerId
-                )
-                : "--"
-            }
+            ? escapeHtmlEmp(
+                emp.managerId
+            )
+            : "--"
+        }
                     </strong>
                 </div>
 
@@ -683,147 +1141,158 @@
 
                     <strong>
                         ${isActive
-                ? "Active"
-                : "Inactive"}
+            ? "Active"
+            : "Inactive"}
                     </strong>
                 </div>
 
-            </div>
-        `;
-    }
+            </div >
+    `;
+}
 
 
-    // ============================================================
-    // DOM READY
-    // ============================================================
+// ============================================================
+// DOM READY
+// ============================================================
 
-    document.addEventListener(
-        "DOMContentLoaded",
-        function () {
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
 
-            // ====================================================
-            // SEARCH
-            // ====================================================
+        // ====================================================
+        // SEARCH
+        // ====================================================
 
-            const searchInput =
-                document.getElementById(
-                    "employeeSearchInput"
-                );
+        const searchInput =
+            document.getElementById(
+                "employeeSearchInput"
+            );
 
-            const includeInactiveToggle =
-                document.getElementById(
-                    "employeeIncludeInactive"
-                );
+        const includeInactiveToggle =
+            document.getElementById(
+                "employeeIncludeInactive"
+            );
 
-            let searchDebounce;
+        let searchDebounce;
 
 
-            if (searchInput) {
+        if (searchInput) {
 
-                searchInput.addEventListener(
-                    "input",
-                    function () {
+            searchInput.addEventListener(
+                "input",
+                function () {
 
-                        clearTimeout(
-                            searchDebounce
+                    clearTimeout(
+                        searchDebounce
+                    );
+
+                    searchDebounce =
+                        setTimeout(
+                            function () {
+
+                                empSearchQuery =
+                                    searchInput
+                                        .value
+                                        .trim();
+
+                                loadEmployees(0);
+
+                            },
+                            350
                         );
-
-                        searchDebounce =
-                            setTimeout(
-                                function () {
-
-                                    empSearchQuery =
-                                        searchInput
-                                            .value
-                                            .trim();
-
-                                    loadEmployees(0);
-
-                                },
-                                350
-                            );
-                    }
-                );
-            }
+                }
+            );
+        }
 
 
-            if (includeInactiveToggle) {
+        if (includeInactiveToggle) {
 
-                includeInactiveToggle.addEventListener(
-                    "change",
-                    function () {
+            includeInactiveToggle.addEventListener(
+                "change",
+                function () {
 
-                        empIncludeInactive =
-                            includeInactiveToggle.checked;
+                    empIncludeInactive =
+                        includeInactiveToggle.checked;
 
-                        loadEmployees(0);
-                    }
-                );
-            }
+                    loadEmployees(0);
+                }
+            );
+        }
 
+        // ============================================================
+        // ADD EMPLOYEE MODAL
+        // ============================================================
 
-            // ====================================================
-            // ADD EMPLOYEE MODAL
-            // ====================================================
+        const addEmployeeModalEl =
+            document.getElementById("addEmployeeModal");
 
-            const addEmployeeModalEl =
-                document.getElementById(
-                    "addEmployeeModal"
-                );
+        if (addEmployeeModalEl) {
+
+            // --------------------------------------------------------
+            // BOOTSTRAP MODAL INSTANCE
+            // --------------------------------------------------------
 
             const addEmployeeModal =
-                addEmployeeModalEl
-                    ? new bootstrap.Modal(
-                        addEmployeeModalEl
-                    )
-                    : null;
+                new bootstrap.Modal(addEmployeeModalEl);
+
+
+            // --------------------------------------------------------
+            // FORM ELEMENTS
+            // --------------------------------------------------------
 
             const addEmployeeButton =
-                document.getElementById(
-                    "addEmployeeButton"
-                );
+                document.getElementById("addEmployeeButton");
 
             const addEmployeeForm =
-                document.getElementById(
-                    "addEmployeeForm"
-                );
+                document.getElementById("addEmployeeForm");
 
             const addEmployeeMessage =
-                document.getElementById(
-                    "addEmployeeMessage"
-                );
+                document.getElementById("addEmployeeMessage");
 
 
-            // OPEN ADD MODAL
-            if (
-                addEmployeeButton &&
-                addEmployeeModal
-            ) {
+            // ========================================================
+            // OPEN ADD EMPLOYEE MODAL
+            // ========================================================
+
+            if (addEmployeeButton) {
 
                 addEmployeeButton.addEventListener(
                     "click",
                     async function () {
 
+                        // Reset form
                         if (addEmployeeForm) {
                             addEmployeeForm.reset();
                         }
 
+                        // Clear old message
                         if (addEmployeeMessage) {
                             addEmployeeMessage.innerHTML = "";
                         }
 
+
+                        // Open modal
                         addEmployeeModal.show();
 
-                        await loadMasterDataDropdowns();
+
+                        // ------------------------------------------------
+                        // LOAD DROPDOWNS
+                        // ------------------------------------------------
+
+                        await loadEmployeeRoleDropdown();
+                        await loadEmployeeManagerDropdown();
+                        await loadEmployeeDepartmentDropdown();
+
                     }
                 );
+
             }
 
 
-            // ====================================================
+            // ========================================================
             // CREATE EMPLOYEE
             // POST /api/employees
-            // ====================================================
+            // ========================================================
 
             if (addEmployeeForm) {
 
@@ -834,152 +1303,102 @@
                         event.preventDefault();
 
 
+                        // ------------------------------------------------
+                        // CLEAR MESSAGE
+                        // ------------------------------------------------
+
                         if (addEmployeeMessage) {
                             addEmployeeMessage.innerHTML = "";
                         }
 
 
-                        // ----------------------------------------
-                        // GET ELEMENTS
-                        // ----------------------------------------
-
-                        const employeeCodeEl =
-                            document.getElementById(
-                                "addEmpCode"
-                            );
+                        // ------------------------------------------------
+                        // GET FORM ELEMENTS
+                        // ------------------------------------------------
 
                         const firstNameEl =
-                            document.getElementById(
-                                "addEmpFirstName"
-                            );
+                            document.getElementById("addEmpFirstName");
 
                         const lastNameEl =
-                            document.getElementById(
-                                "addEmpLastName"
-                            );
+                            document.getElementById("addEmpLastName");
 
                         const emailEl =
-                            document.getElementById(
-                                "addEmpEmail"
-                            );
+                            document.getElementById("addEmpEmail");
 
                         const phoneEl =
-                            document.getElementById(
-                                "addEmpPhone"
-                            );
+                            document.getElementById("addEmpPhone");
 
                         const genderEl =
-                            document.getElementById(
-                                "addEmpGender"
-                            );
+                            document.getElementById("addEmpGender");
 
                         const designationEl =
-                            document.getElementById(
-                                "addEmpDesignation"
-                            );
+                            document.getElementById("addEmpDesignation");
 
                         const joiningDateEl =
-                            document.getElementById(
-                                "addEmpJoiningDate"
-                            );
+                            document.getElementById("addEmpJoiningDate");
 
                         const departmentEl =
-                            document.getElementById(
-                                "addEmpDepartment"
-                            );
+                            document.getElementById("addEmpDepartment");
 
                         const roleEl =
-                            document.getElementById(
-                                "addEmpRole"
-                            );
+                            document.getElementById("addEmpRole");
 
                         const passwordEl =
-                            document.getElementById(
-                                "addEmpPassword"
-                            );
+                            document.getElementById("addEmpPassword");
 
                         const managerEl =
-                            document.getElementById(
-                                "addEmpManagerId"
-                            );
+                            document.getElementById("addEmpManagerId");
 
 
-                        // ----------------------------------------
-                        // CHECK REQUIRED ELEMENTS
-                        // ----------------------------------------
+                        // ------------------------------------------------
+                        // CHECK ELEMENTS
+                        // ------------------------------------------------
 
                         const missingFields = [];
 
-                        if (!employeeCodeEl) {
-                            missingFields.push(
-                                "addEmpCode"
-                            );
-                        }
 
                         if (!firstNameEl) {
-                            missingFields.push(
-                                "addEmpFirstName"
-                            );
+                            missingFields.push("addEmpFirstName");
                         }
 
                         if (!lastNameEl) {
-                            missingFields.push(
-                                "addEmpLastName"
-                            );
+                            missingFields.push("addEmpLastName");
                         }
 
                         if (!emailEl) {
-                            missingFields.push(
-                                "addEmpEmail"
-                            );
+                            missingFields.push("addEmpEmail");
                         }
 
                         if (!phoneEl) {
-                            missingFields.push(
-                                "addEmpPhone"
-                            );
+                            missingFields.push("addEmpPhone");
                         }
 
                         if (!genderEl) {
-                            missingFields.push(
-                                "addEmpGender"
-                            );
+                            missingFields.push("addEmpGender");
                         }
 
                         if (!designationEl) {
-                            missingFields.push(
-                                "addEmpDesignation"
-                            );
+                            missingFields.push("addEmpDesignation");
                         }
 
                         if (!joiningDateEl) {
-                            missingFields.push(
-                                "addEmpJoiningDate"
-                            );
+                            missingFields.push("addEmpJoiningDate");
                         }
 
                         if (!departmentEl) {
-                            missingFields.push(
-                                "addEmpDepartment"
-                            );
+                            missingFields.push("addEmpDepartment");
                         }
 
                         if (!roleEl) {
-                            missingFields.push(
-                                "addEmpRole"
-                            );
+                            missingFields.push("addEmpRole");
                         }
 
                         if (!passwordEl) {
-                            missingFields.push(
-                                "addEmpPassword"
-                            );
+                            missingFields.push("addEmpPassword");
                         }
 
                         if (!managerEl) {
-                            missingFields.push(
-                                "addEmpManagerId"
-                            );
+                            missingFields.push("addEmpManagerId");
                         }
 
 
@@ -993,26 +1412,24 @@
                             if (addEmployeeMessage) {
 
                                 addEmployeeMessage.innerHTML = `
-                                    <div class="custom-alert error">
-                                        Employee form configuration error.
-                                        Missing fields:
-                                        ${escapeHtmlEmp(
+    < div class="custom-alert error" >
+        Employee form configuration error.
+                                Missing fields:
+                                ${escapeHtmlEmp(
                                     missingFields.join(", ")
-                                )}
-                                    </div>
-                                `;
+                                )
+                                    }
+                            </div >
+    `;
                             }
 
                             return;
                         }
 
 
-                        // ----------------------------------------
-                        // VALUES
-                        // ----------------------------------------
-
-                        const employeeCode =
-                            employeeCodeEl.value.trim();
+                        // ------------------------------------------------
+                        // GET VALUES
+                        // ------------------------------------------------
 
                         const firstName =
                             firstNameEl.value.trim();
@@ -1048,124 +1465,140 @@
                             managerEl.value;
 
 
-                        // ----------------------------------------
-                        // BASIC VALIDATION
-                        // ----------------------------------------
-
-                        if (!employeeCode) {
-                            alert(
-                                "Employee Code is required."
-                            );
-                            employeeCodeEl.focus();
-                            return;
-                        }
+                        // =================================================
+                        // VALIDATION
+                        // =================================================
 
                         if (!firstName) {
-                            alert(
-                                "First Name is required."
-                            );
+
+                            alert("First Name is required.");
+
                             firstNameEl.focus();
+
                             return;
                         }
+
 
                         if (!email) {
-                            alert(
-                                "Work Email is required."
-                            );
+
+                            alert("Work Email is required.");
+
                             emailEl.focus();
+
                             return;
                         }
+
+
+                        if (!gender) {
+
+                            alert("Please select Gender.");
+
+                            genderEl.focus();
+
+                            return;
+                        }
+
 
                         if (!designation) {
-                            alert(
-                                "Designation is required."
-                            );
+
+                            alert("Designation is required.");
+
                             designationEl.focus();
+
                             return;
                         }
+
 
                         if (!joiningDate) {
-                            alert(
-                                "Joining Date is required."
-                            );
+
+                            alert("Joining Date is required.");
+
                             joiningDateEl.focus();
+
                             return;
                         }
+
 
                         if (!departmentId) {
-                            alert(
-                                "Please select Department."
-                            );
+
+                            alert("Please select Department.");
+
                             departmentEl.focus();
+
                             return;
                         }
+
 
                         if (!roleId) {
-                            alert(
-                                "Please select Role."
-                            );
+
+                            alert("Please select Role.");
+
                             roleEl.focus();
+
                             return;
                         }
+
 
                         if (!password) {
-                            alert(
-                                "Password is required."
-                            );
+
+                            alert("Password is required.");
+
                             passwordEl.focus();
+
                             return;
                         }
+
+
+                        if (password.length < 6) {
+
+                            alert(
+                                "Password must be at least 6 characters."
+                            );
+
+                            passwordEl.focus();
+
+                            return;
+                        }
+
 
                         if (!managerId) {
-                            alert(
-                                "Manager ID is required."
-                            );
+
+                            alert("Please select Manager.");
+
                             managerEl.focus();
+
                             return;
                         }
 
 
-                        // ----------------------------------------
-                        // EXACT BACKEND REQUEST BODY
-                        // ----------------------------------------
+                        // =================================================
+                        // BACKEND REQUEST
+                        // =================================================
 
                         const request = {
 
-                            employeeCode:
-                                employeeCode,
+                            firstName: firstName,
 
-                            firstName:
-                                firstName,
+                            lastName: lastName,
 
-                            lastName:
-                                lastName,
+                            email: email,
 
-                            email:
-                                email,
+                            phone: phone,
 
-                            phone:
-                                phone,
+                            gender: gender,
 
-                            gender:
-                                gender,
+                            designation: designation,
 
-                            designation:
-                                designation,
+                            joiningDate: joiningDate,
 
-                            joiningDate:
-                                joiningDate,
+                            departmentId: Number(departmentId),
 
-                            departmentId:
-                                Number(departmentId),
+                            roleId: Number(roleId),
 
-                            roleId:
-                                Number(roleId),
+                            password: password,
 
-                            password:
-                                password,
+                            managerId: Number(managerId)
 
-                            managerId:
-                                Number(managerId)
                         };
 
 
@@ -1175,9 +1608,9 @@
                         );
 
 
-                        // ----------------------------------------
-                        // SUBMIT
-                        // ----------------------------------------
+                        // =================================================
+                        // SUBMIT BUTTON
+                        // =================================================
 
                         const submitButton =
                             addEmployeeForm.querySelector(
@@ -1194,13 +1627,17 @@
 
                             if (submitButton) {
 
-                                submitButton.disabled =
-                                    true;
+                                submitButton.disabled = true;
 
                                 submitButton.textContent =
                                     "Creating...";
+
                             }
 
+
+                            // =================================================
+                            // POST API
+                            // =================================================
 
                             const response =
                                 await apiRequest(
@@ -1209,9 +1646,7 @@
                                         method: "POST",
 
                                         body:
-                                            JSON.stringify(
-                                                request
-                                            )
+                                            JSON.stringify(request)
                                     }
                                 );
 
@@ -1222,17 +1657,21 @@
                             );
 
 
+                            // =================================================
+                            // SUCCESS
+                            // =================================================
+
                             if (addEmployeeMessage) {
 
                                 addEmployeeMessage.innerHTML = `
-                                    <div class="custom-alert success">
-                                        ${escapeHtmlEmp(
+    < div class="custom-alert success" >
+        ${escapeHtmlEmp(
                                     response.message ||
                                     "Employee created successfully."
                                 )
                                     }
-                                    </div>
-                                `;
+                            </div >
+    `;
                             }
 
 
@@ -1244,13 +1683,13 @@
                             setTimeout(
                                 function () {
 
-                                    if (addEmployeeModal) {
-                                        addEmployeeModal.hide();
-                                    }
+                                    addEmployeeModal.hide();
+
 
                                     if (addEmployeeMessage) {
                                         addEmployeeMessage.innerHTML = "";
                                     }
+
 
                                     addEmployeeForm.reset();
 
@@ -1266,6 +1705,7 @@
                                 error
                             );
 
+
                             console.error(
                                 "Backend response:",
                                 error?.responseData ||
@@ -1276,15 +1716,16 @@
                             if (addEmployeeMessage) {
 
                                 addEmployeeMessage.innerHTML = `
-                                    <div class="custom-alert error">
-                                        ${escapeHtmlEmp(
+    < div class="custom-alert error" >
+        ${escapeHtmlEmp(
                                     getErrorMessage(
                                         error,
                                         "Failed to create employee."
                                     )
-                                )}
-                                    </div>
-                                `;
+                                )
+                                    }
+                            </div >
+    `;
                             }
 
 
@@ -1292,409 +1733,24 @@
 
                             if (submitButton) {
 
-                                submitButton.disabled =
-                                    false;
+                                submitButton.disabled = false;
 
                                 submitButton.textContent =
                                     originalText;
                             }
+
                         }
+
                     }
                 );
+
             }
 
-
-            // ====================================================
-            // CLICK ACTIONS
-            // ====================================================
-
-            document.addEventListener(
-                "click",
-                async function (event) {
-
-                    const pageBtn =
-                        event.target.closest(
-                            ".emp-page-btn"
-                        );
-
-                    const viewBtn =
-                        event.target.closest(
-                            ".emp-view-btn"
-                        );
-
-                    const editBtn =
-                        event.target.closest(
-                            ".emp-edit-btn"
-                        );
-
-                    const deactivateBtn =
-                        event.target.closest(
-                            ".emp-deactivate-btn"
-                        );
-
-                    const reactivateBtn =
-                        event.target.closest(
-                            ".emp-reactivate-btn"
-                        );
-
-                    const deleteBtn =
-                        event.target.closest(
-                            ".emp-delete-btn"
-                        );
-
-                    // --------------------------------------------
-                    // PAGINATION
-                    // --------------------------------------------
-
-                    if (pageBtn) {
-
-                        await loadEmployees(
-                            Number(
-                                pageBtn.dataset.page
-                            )
-                        );
-
-                        return;
-                    }
-
-
-                    // --------------------------------------------
-                    // VIEW
-                    // --------------------------------------------
-
-                    if (viewBtn) {
-
-                        const empId =
-                            viewBtn.dataset.empId;
-
-                        const modalEl =
-                            document.getElementById(
-                                "viewEmployeeModal"
-                            );
-
-                        const modal =
-                            modalEl
-                                ? new bootstrap.Modal(
-                                    modalEl
-                                )
-                                : null;
-
-                        const body =
-                            document.getElementById(
-                                "viewEmployeeBody"
-                            );
-
-
-                        if (body) {
-                            body.innerHTML =
-                                "Loading...";
-                        }
-
-
-                        if (modal) {
-                            modal.show();
-                        }
-
-
-                        try {
-
-                            const response =
-                                await apiRequest(
-                                    `/api/employees/${empId}`
-                                );
-
-                            renderEmployeeDetails(
-                                response.data
-                            );
-
-                        } catch (error) {
-
-                            if (body) {
-
-                                body.innerHTML = `
-                                    <div class="custom-alert error">
-                                        ${escapeHtmlEmp(
-                                    getErrorMessage(
-                                        error,
-                                        "Failed to load employee."
-                                    )
-                                )}
-                                    </div>
-                                `;
-                            }
-                        }
-
-                        return;
-                    }
-
-
-                    // --------------------------------------------
-                    // DEACTIVATE (opens modal to collect exit details)
-                    // --------------------------------------------
-
-                    if (deactivateBtn) {
-
-                        const empId =
-                            deactivateBtn.dataset.empId;
-
-                        const deactivateForm =
-                            document.getElementById(
-                                "deactivateEmployeeForm"
-                            );
-
-                        const deactivateMsg =
-                            document.getElementById(
-                                "deactivateEmployeeMessage"
-                            );
-
-                        const modalEl =
-                            document.getElementById(
-                                "deactivateEmployeeModal"
-                            );
-
-                        if (deactivateForm) {
-                            deactivateForm.reset();
-                        }
-
-                        if (deactivateMsg) {
-                            deactivateMsg.innerHTML = "";
-                        }
-
-                        document.getElementById(
-                            "deactivateEmpId"
-                        ).value = empId;
-
-                        if (modalEl) {
-                            new bootstrap.Modal(modalEl).show();
-                        }
-
-                        return;
-                    }
-
-
-                    // --------------------------------------------
-                    // REACTIVATE
-                    // --------------------------------------------
-
-                    if (reactivateBtn) {
-
-                        const empId =
-                            reactivateBtn.dataset.empId;
-
-                        try {
-
-                            reactivateBtn.disabled =
-                                true;
-
-                            await apiRequest(
-                                `/api/employees/${empId}/reactivate`,
-                                {
-                                    method: "PUT"
-                                }
-                            );
-
-                            await loadEmployees(
-                                empCurrentPage
-                            );
-
-                        } catch (error) {
-
-                            alert(
-                                getErrorMessage(
-                                    error,
-                                    "Failed to reactivate employee."
-                                )
-                            );
-
-                            reactivateBtn.disabled =
-                                false;
-                        }
-
-                        return;
-                    }
-
-
-                                    // --------------------------------------------
-                // DELETE (only allowed once employee is inactive)
-                // DELETE /api/employees/{id}
-                // --------------------------------------------
-
-                if (deleteBtn) {
-
-                    const empId =
-                        deleteBtn.dataset.empId;
-
-                    const confirmResult =
-                        await Swal.fire({
-                            icon: "warning",
-                            title: "Delete this employee?",
-                            text: "This action cannot be undone.",
-                            showCancelButton: true,
-                            confirmButtonText: "Yes, delete",
-                            cancelButtonText: "Cancel",
-                            confirmButtonColor: "#dc3545"
-                        });
-
-                    if (!confirmResult.isConfirmed) {
-                        return;
-                    }
-
-                    try {
-
-                        deleteBtn.disabled =
-                            true;
-
-                        await apiRequest(
-                            `/api/employees/${empId}`,
-                            {
-                                method: "DELETE"
-                            }
-                        );
-
-                        await loadEmployees(
-                            empCurrentPage
-                        );
-
-                        Swal.fire({
-                            icon: "success",
-                            title: "Employee deleted",
-                            timer: 1500,
-                            showConfirmButton: false
-                        });
-
-                    } catch (error) {
-
-                        Swal.fire({
-                            icon: "error",
-                            title: "Failed to delete employee",
-                            text: getErrorMessage(
-                                error,
-                                "Something went wrong."
-                            )
-                        });
-
-                        deleteBtn.disabled =
-                            false;
-                    }
-
-                    return;
-                }
-            }
-        );
-
-
-            // ====================================================
-            // DEACTIVATE EMPLOYEE SUBMIT
-            // PUT /api/employees/{id}/exit
-            // ====================================================
-
-            const deactivateEmployeeForm =
-                document.getElementById(
-                    "deactivateEmployeeForm"
-                );
-
-            if (deactivateEmployeeForm) {
-
-                deactivateEmployeeForm.addEventListener(
-                    "submit",
-                    async function (event) {
-
-                        event.preventDefault();
-
-                        const deactivateMsg =
-                            document.getElementById(
-                                "deactivateEmployeeMessage"
-                            );
-
-                        const empId =
-                            document.getElementById(
-                                "deactivateEmpId"
-                            ).value;
-
-                        const request = {
-                            exitDate:
-                                document.getElementById(
-                                    "deactivateExitDate"
-                                ).value,
-                            reason:
-                                document.getElementById(
-                                    "deactivateReason"
-                                ).value.trim(),
-                            separationMode:
-                                document.getElementById(
-                                    "deactivateSeparationMode"
-                                ).value,
-                            exitType:
-                                document.getElementById(
-                                    "deactivateExitType"
-                                ).value,
-                            exitStatus: "INITIATED"
-                        };
-
-                        const submitButton =
-                            deactivateEmployeeForm.querySelector(
-                                'button[type="submit"]'
-                            );
-
-                        try {
-
-                            if (submitButton) {
-                                submitButton.disabled = true;
-                            }
-
-                            await apiRequest(
-                                `/api/employees/${empId}/exit`,
-                                {
-                                    method: "PUT",
-                                    body: JSON.stringify(request)
-                                }
-                            );
-
-                            const modalEl =
-                                document.getElementById(
-                                    "deactivateEmployeeModal"
-                                );
-
-                            const modal =
-                                modalEl &&
-                                bootstrap.Modal.getInstance(modalEl);
-
-                            if (modal) {
-                                modal.hide();
-                            }
-
-                            await loadEmployees(empCurrentPage);
-
-                        } catch (error) {
-
-                            if (deactivateMsg) {
-
-                                deactivateMsg.innerHTML = `
-                                    <div class="custom-alert error">
-                                        ${escapeHtmlEmp(
-                                    getErrorMessage(
-                                        error,
-                                        "Failed to deactivate employee."
-                                    )
-                                )}
-                                    </div>
-                                `;
-                            }
-
-                        } finally {
-
-                            if (submitButton) {
-                                submitButton.disabled = false;
-                            }
-                        }
-                    }
-                );
-            }
-
-            // ====================================================
-            // INITIAL LOAD
-            // ====================================================
-
-            loadEmployees(0);
         }
-    );
+    }
+
+)
+
+
+
+

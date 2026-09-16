@@ -105,6 +105,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const viewLoaders = {
         "dashboard": loadDashboardSummary,
         "personal-information": loadPersonalInformation,
+        // "personal-information": null,
         "emergency-information": loadEmergencyInformation,
         "education-information": loadEducationInformation,
         "experience-information": loadExperienceInformation,
@@ -1306,14 +1307,63 @@ document.addEventListener("DOMContentLoaded", function () {
                     <!--<div><h4>About</h4><p>Your registered contact details</p></div>-->
                     <div><h3 class="fw-light">About</h3></div>
                 </div>
-                <div class="profile-info-grid">
-                    <div class="profile-info-item"><span class="profile-label">Employee Code</span><strong>${escapeHtml(p.employeeCode)}</strong></div>
-                    <div class="profile-info-item"><span class="profile-label">Full Name</span><strong>${escapeHtml(fullName)}</strong></div>
-                    <div class="profile-info-item"><span class="profile-label">Department</span><strong>${escapeHtml(p.departmentName)}</strong></div>
-                    <div class="profile-info-item"><span class="profile-label">Designation</span><strong>${escapeHtml(p.designation)}</strong></div>
-                    <div class="profile-info-item"><span class="profile-label">Birthday</span><strong>${escapeHtml(p.dateOfBirth)}</strong></div>
-                    <div class="profile-info-item"><span class="profile-label">Gender</span><strong>${escapeHtml(p.gender)}</strong></div>
-                    
+               <div class="profile-info-grid">
+
+                    <div class="profile-info-item">
+                        <span class="profile-label">Employee Code</span>
+                        <strong>${escapeHtml(p.employeeCode)}</strong>
+                    </div>
+
+                    <div class="profile-info-item">
+                        <span class="profile-label">Full Name</span>
+                        <strong>${escapeHtml(fullName)}</strong>
+                    </div>
+
+                    <div class="profile-info-item">
+                        <span class="profile-label">Department</span>
+                        <strong>${escapeHtml(p.departmentName)}</strong>
+                    </div>
+
+                    <div class="profile-info-item">
+                        <span class="profile-label">Designation</span>
+                        <strong>${escapeHtml(p.designation)}</strong>
+                    </div>
+
+                    <div class="profile-info-item">
+                        <span class="profile-label">Email</span>
+                        <strong>${escapeHtml(p.email)}</strong>
+                    </div>
+
+                    <div class="profile-info-item">
+                        <span class="profile-label">Phone</span>
+                        <strong>${escapeHtml(p.phone)}</strong>
+                    </div>
+
+                    <div class="profile-info-item">
+                        <span class="profile-label">Joining Date</span>
+                        <strong>${escapeHtml(p.joiningDate)}</strong>
+                    </div>
+
+                    <div class="profile-info-item">
+                        <span class="profile-label">Role</span>
+                        <strong>${escapeHtml(p.roleName)}</strong>
+                    </div>
+
+                    <div class="profile-info-item">
+                        <span class="profile-label">Status</span>
+                        <strong>${escapeHtml(p.status)}</strong>
+                    </div>
+
+                    <div class="profile-info-item">
+                        <span class="profile-label">Birthday</span>
+                        <strong>${escapeHtml(p.dateOfBirth)}</strong>
+                    </div>
+
+                    <div class="profile-info-item">
+                        <span class="profile-label">Gender</span>
+                        <strong>${escapeHtml(p.gender)}</strong>
+                    </div>
+
                 </div>
             </div>
 
@@ -2413,179 +2463,310 @@ document.addEventListener("DOMContentLoaded", function () {
     // ==============================================================================================
     //               Opens the personal information modal.
     // ==============================================================================================
-
     let currentPersonalInfo = null;
-    let currentAddressInfo = null;
 
     function loadPersonalInformation() {
+
         const card = document.getElementById("personalInfoCard");
-        const addressCard = document.getElementById("addressInfoCard");
 
-        card.innerHTML = `<p class="text-muted">Loading...</p>`;
+        if (!card) {
+            console.error("personalInfoCard not found");
+            return;
+        }
 
-        Promise.all([
-            fetchMyExtendedProfile(),
-            fetchMyAddress()
-        ]).then(function (results) {
-            currentPersonalInfo = results[0].data || {};
+        card.innerHTML = `
+        <p class="text-muted">Loading personal information...</p>
+    `;
 
-            // The API returns an array — find the primary address, otherwise use the first one.
-            const addressList = Array.isArray(results[1].data) ? results[1].data : [];
-            currentAddressInfo = addressList.find(function (a) { return a.primary; }) || addressList[0] || null;
+        fetchPersonalInfo()
+            .then(function (res) {
 
+                console.log("Personal Info API Response:", res);
 
-            const d = currentPersonalInfo;
-            const a = currentAddressInfo;
+                currentPersonalInfo = res.data || {};
 
-            card.innerHTML = `
-            <div class="profile-info-grid">
-                <div class="profile-info-item">
-                    <span class="profile-label">Date of Birth</span>
-                    <strong>${escapeHtml(d.dateOfBirth) || "--"}</strong>
-                </div>
-                <div class="profile-info-item">
-                    <span class="profile-label">Gender</span>
-                    <strong>${escapeHtml(d.gender) || "--"}</strong>
-                </div>
-                <div class="profile-info-item">
-                    <span class="profile-label">Marital Status</span>
-                    <strong>${escapeHtml(d.maritalStatus) || "--"}</strong>
-                </div>
-                <div class="profile-info-item">
-                    <span class="profile-label">Blood Group</span>
-                    <strong>${escapeHtml(d.bloodGroup) || "--"}</strong>
-                </div>
-                <div class="profile-info-item">
-                    <span class="profile-label">Occupation</span>
-                    <strong>${escapeHtml(d.occupation) || "--"}</strong>
-                </div>
-                <div class="profile-info-item">
-                    <span class="profile-label">Nationality</span>
-                    <strong>${escapeHtml(d.nationality) || "--"}</strong>
-                </div>
-                 <div class="profile-info-item">
-                    <span class="profile-label">Bio</span>
-                    <strong>${escapeHtml(d.bio) || "--"}</strong>
-                </div>
-                <div class="profile-info-item">
-                    <span class="profile-label">Address 1</span>
-                    <strong>${escapeHtml(a.line1) || "--"}</strong>
-                </div>
-                <div class="profile-info-item">
-                    <span class="profile-label">Address 2</span>
-                    <strong>${escapeHtml(a.line2) || "--"}</strong>
-                </div>
-                <div class="profile-info-item">
-                    <span class="profile-label">City</span>
-                    <strong>${escapeHtml(a.city) || "--"}</strong>
-                </div>
-                <div class="profile-info-item">
-                    <span class="profile-label">State</span>
-                    <strong>${escapeHtml(a.state) || "--"}</strong>
-                </div>
-                <div class="profile-info-item">
-                    <span class="profile-label">Country</span>
-                    <strong>${escapeHtml(a.country) || "--"}</strong>
-                </div>
-                <div class="profile-info-item">
-                    <span class="profile-label">Postal Code</span>
-                    <strong>${escapeHtml(a.postalCode) || "--"}</strong>
-                </div>                
-                
-            </div>
-        `;
+                const d = currentPersonalInfo;
 
-        }).catch(function (error) {
-            card.innerHTML = `<div class="custom-alert error">${escapeHtml(error.message || "Failed to load profile.")}</div>`;
-            addressCard.innerHTML = "";
-        });
+                card.innerHTML = `
+                <div class="profile-info-grid">
+
+                    <div class="profile-info-item">
+                        <span class="profile-label">Date of Birth</span>
+                        <strong>${escapeHtml(d.dateOfBirth || "--")}</strong>
+                    </div>
+
+                    <div class="profile-info-item">
+                        <span class="profile-label">Gender</span>
+                        <strong>${escapeHtml(d.gender || "--")}</strong>
+                    </div>
+
+                    <div class="profile-info-item">
+                        <span class="profile-label">Height</span>
+                        <strong>${escapeHtml(String(d.heightCm ?? "--"))} cm</strong>
+                    </div>
+
+                    <div class="profile-info-item">
+                        <span class="profile-label">Weight</span>
+                        <strong>${escapeHtml(String(d.weightKg ?? "--"))} kg</strong>
+                    </div>
+
+                    <div class="profile-info-item">
+                        <span class="profile-label">Blood Group</span>
+                        <strong>${escapeHtml(d.bloodGroup || "--")}</strong>
+                    </div>
+
+                    <div class="profile-info-item">
+                        <span class="profile-label">Marital Status</span>
+                        <strong>${escapeHtml(d.maritalStatus || "--")}</strong>
+                    </div>
+
+                    <div class="profile-info-item">
+                        <span class="profile-label">Religion</span>
+                        <strong>${escapeHtml(d.religion || "--")}</strong>
+                    </div>
+
+                    <div class="profile-info-item">
+                        <span class="profile-label">Nationality</span>
+                        <strong>${escapeHtml(d.nationality || "--")}</strong>
+                    </div>
+
+                    <div class="profile-info-item">
+                        <span class="profile-label">Aadhaar Number</span>
+                        <strong>${escapeHtml(d.aadhaarNumber || "--")}</strong>
+                    </div>
+
+                    <div class="profile-info-item">
+                        <span class="profile-label">PAN Number</span>
+                        <strong>${escapeHtml(d.panNumber || "--")}</strong>
+                    </div>
+
+                    <div class="profile-info-item">
+                        <span class="profile-label">Passport Number</span>
+                        <strong>${escapeHtml(d.passportNumber || "--")}</strong>
+                    </div>
+
+                    <div class="profile-info-item">
+                        <span class="profile-label">Driving License Number</span>
+                        <strong>${escapeHtml(d.drivingLicenseNumber || "--")}</strong>
+                    </div>
+
+                </div>
+            `;
+            })
+            .catch(function (error) {
+
+                console.error(
+                    "Personal Information API failed:",
+                    error
+                );
+
+                card.innerHTML = `
+                <div class="custom-alert error">
+                    ${escapeHtml(
+                    error.message ||
+                    "Failed to load personal information."
+                )}
+                </div>
+            `;
+            });
     }
 
     // ==============================================================================================
     //                  Profile Infomation model Open
     // ==============================================================================================
-
     function openPersonalInfoModal() {
-        if (!currentPersonalInfo) return;
 
-        document.getElementById("dobField").value = currentPersonalInfo.dateOfBirth || "";
-        document.getElementById("genderField").value = currentPersonalInfo.gender || "MALE";
-        document.getElementById("maritalStatusField").value = currentPersonalInfo.maritalStatus || "SINGLE";
-        document.getElementById("bloodGroupField").value = currentPersonalInfo.bloodGroup || "O+";
-        document.getElementById("occupationField").value = currentPersonalInfo.occupation || "";
-        document.getElementById("nationalityField").value = currentPersonalInfo.nationality || "";
-        document.getElementById("bioField").value = currentPersonalInfo.bio || "";
+        if (!currentPersonalInfo) {
+            console.warn("Personal information is not loaded yet.");
+            return;
+        }
 
-        const a = currentAddressInfo || {};
-        document.getElementById("addressLine1Field").value = a.line1 || "";
-        document.getElementById("addressLine2Field").value = a.line2 || "";
-        document.getElementById("addressCityField").value = a.city || "";
-        document.getElementById("addressStateField").value = a.state || "";
-        document.getElementById("addressCountryField").value = a.country || "";
-        document.getElementById("addressPostalCodeField").value = a.postalCode || "";
+        const d = currentPersonalInfo;
 
-        document.getElementById("personalInfoFormMessage").innerHTML = "";
+        document.getElementById("dobField").value =
+            d.dateOfBirth || "";
 
-        const modal = new bootstrap.Modal(document.getElementById("personalInfoModal"));
+        document.getElementById("genderField").value =
+            d.gender || "";
+
+        document.getElementById("bloodGroupField").value =
+            d.bloodGroup || "";
+
+        document.getElementById("maritalStatusField").value =
+            d.maritalStatus || "";
+
+        document.getElementById("nationalityField").value =
+            d.nationality || "";
+
+        // Optional fields — agar modal me exist karte hain
+        const heightField = document.getElementById("heightField");
+        if (heightField) {
+            heightField.value = d.heightCm ?? "";
+        }
+
+        const weightField = document.getElementById("weightField");
+        if (weightField) {
+            weightField.value = d.weightKg ?? "";
+        }
+
+        const religionField = document.getElementById("religionField");
+        if (religionField) {
+            religionField.value = d.religion || "";
+        }
+
+        const aadhaarField = document.getElementById("aadhaarNumberField");
+        if (aadhaarField) {
+            aadhaarField.value = d.aadhaarNumber || "";
+        }
+
+        const panField = document.getElementById("panNumberField");
+        if (panField) {
+            panField.value = d.panNumber || "";
+        }
+
+        const passportField = document.getElementById("passportNumberField");
+        if (passportField) {
+            passportField.value = d.passportNumber || "";
+        }
+
+        const drivingLicenseField =
+            document.getElementById("drivingLicenseNumberField");
+
+        if (drivingLicenseField) {
+            drivingLicenseField.value = d.drivingLicenseNumber || "";
+        }
+
+        const messageBox =
+            document.getElementById("personalInfoFormMessage");
+
+        if (messageBox) {
+            messageBox.innerHTML = "";
+        }
+
+        const modalElement =
+            document.getElementById("personalInfoModal");
+
+        if (!modalElement) {
+            console.error("personalInfoModal not found in HTML.");
+            return;
+        }
+
+        const modal = new bootstrap.Modal(modalElement);
         modal.show();
     }
 
-    const editPersonalInfoButton = document.getElementById("editPersonalInfoButton");
-    if (editPersonalInfoButton) {
-        editPersonalInfoButton.addEventListener("click", openPersonalInfoModal);
-    }
+    const personalInfoForm =
+        document.getElementById("personalInfoForm");
 
-    const personalInfoForm = document.getElementById("personalInfoForm");
     if (personalInfoForm) {
+
         personalInfoForm.addEventListener("submit", function (e) {
+
             e.preventDefault();
 
-            const messageBox = document.getElementById("personalInfoFormMessage");
+            const messageBox =
+                document.getElementById("personalInfoFormMessage");
+
             messageBox.innerHTML = "";
 
-            const profilePayload = {
-                dateOfBirth: document.getElementById("dobField").value || null,
-                gender: document.getElementById("genderField").value,
-                maritalStatus: document.getElementById("maritalStatusField").value,
-                bloodGroup: document.getElementById("bloodGroupField").value,
-                occupation: document.getElementById("occupationField").value.trim(),
-                nationality: document.getElementById("nationalityField").value.trim(),
-                bio: document.getElementById("bioField").value.trim()
+            const payload = {
+
+                dateOfBirth:
+                    document.getElementById("dobField").value || null,
+
+                gender:
+                    document.getElementById("genderField").value || null,
+
+                heightCm:
+                    document.getElementById("heightField")?.value
+                        ? Number(document.getElementById("heightField").value)
+                        : null,
+
+                weightKg:
+                    document.getElementById("weightField")?.value
+                        ? Number(document.getElementById("weightField").value)
+                        : null,
+
+                bloodGroup:
+                    document.getElementById("bloodGroupField").value || null,
+
+                maritalStatus:
+                    document.getElementById("maritalStatusField").value || null,
+
+                religion:
+                    document.getElementById("religionField")?.value.trim() || null,
+
+                nationality:
+                    document.getElementById("nationalityField").value.trim() || null,
+
+                aadhaarNumber:
+                    document.getElementById("aadhaarNumberField")?.value.trim() || null,
+
+                panNumber:
+                    document.getElementById("panNumberField")?.value.trim() || null,
+
+                passportNumber:
+                    document.getElementById("passportNumberField")?.value.trim() || null,
+
+                drivingLicenseNumber:
+                    document.getElementById("drivingLicenseNumberField")?.value.trim() || null
             };
 
-            const addressPayload = {
-                type: (currentAddressInfo && currentAddressInfo.type) || "HOME",
-                line1: document.getElementById("addressLine1Field").value.trim(),
-                line2: document.getElementById("addressLine2Field").value.trim(),
-                city: document.getElementById("addressCityField").value.trim(),
-                state: document.getElementById("addressStateField").value.trim(),
-                country: document.getElementById("addressCountryField").value.trim(),
-                postalCode: document.getElementById("addressPostalCodeField").value.trim(),
-                primary: true
-            };
+            console.log("Personal Info PUT Payload:", payload);
 
-            const addressApiCall = (currentAddressInfo && currentAddressInfo.id)
-                ? updateMyAddress(currentAddressInfo.id, addressPayload)
-                : addMyAddress(addressPayload);
+            updatePersonalInfo(payload)
 
-            Promise.all([
-                updateMyExtendedProfile(profilePayload),
-                addressApiCall
-            ]).then(function (res) {
-                const modal = bootstrap.Modal.getInstance(document.getElementById("personalInfoModal"));
-                if (modal) modal.hide();
+                .then(function (res) {
 
-                Swal.fire({
-                    icon: "success",
-                    title: "Profile updated successfully.",
-                    confirmButtonColor: "#17a2b8"
+                    console.log("Personal Info Updated:", res);
+
+                    const modal =
+                        bootstrap.Modal.getInstance(
+                            document.getElementById("personalInfoModal")
+                        );
+
+                    if (modal) {
+                        modal.hide();
+                    }
+
+                    Swal.fire({
+                        icon: "success",
+                        title: "Personal information updated successfully.",
+                        confirmButtonColor: "#17a2b8"
+                    });
+
+                    // Updated data dobara load karo
+                    loadPersonalInformation();
+                })
+
+                .catch(function (error) {
+
+                    console.error(
+                        "Personal Info update failed:",
+                        error
+                    );
+
+                    messageBox.innerHTML = `
+                    <div class="custom-alert error">
+                        ${escapeHtml(
+                        error.message ||
+                        "Failed to update personal information."
+                    )}
+                    </div>
+                `;
                 });
-
-                loadPersonalInformation();
-            }).catch(function (error) {
-                messageBox.innerHTML = `<div class="custom-alert error">${escapeHtml(error.message || "Something went wrong.")}</div>`;
-            });
         });
+    }
+
+
+    const editPersonalInfoButton =
+        document.getElementById("editPersonalInfoButton");
+
+    if (editPersonalInfoButton) {
+        editPersonalInfoButton.addEventListener(
+            "click",
+            openPersonalInfoModal
+        );
     }
 
     // ==============================================================================================

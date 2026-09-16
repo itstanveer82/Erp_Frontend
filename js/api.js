@@ -5,45 +5,37 @@ const AUTH_ENDPOINTS_NO_REFRESH = [
 
 async function apiRequest(endpoint, options = {}, _isRetry = false) {
     try {
-        // Get current auth data
         let authData = null;
 
         if (typeof getAuthData === "function") {
             authData = getAuthData();
         }
 
-        const token = authData ? authData.token : null;
+        const token = authData ? authData.accessToken : null;
         const skipAuthHandling = AUTH_ENDPOINTS_NO_REFRESH.includes(endpoint);
         const headers = {
             "Content-Type": "application/json",
             ...(options.headers || {})
         };
 
-        // Add JWT only when a token exists
-        // and this is NOT the login/refresh request
-
         if (token && !skipAuthHandling) {
             headers["Authorization"] = `Bearer ${token}`;
         }
 
-        // IMPORTANT:
-        // fetch must NOT be inside `if (token)`.
-        // Login and unauthenticated requests must also be sent.
         const response = await fetch(
             API_BASE_URL + endpoint,
             {
                 ...options,
-                headers
+                headers,
+                credentials: "include"
             }
         );
 
-        // Parse response
         let data = {};
 
         try {
             data = await response.json();
         } catch (error) {
-            // Response may have no JSON body
             data = {};
         }
 
@@ -65,18 +57,10 @@ async function apiRequest(endpoint, options = {}, _isRetry = false) {
             try {
                 await refreshAccessToken();
 
-                // Retry the original request exactly once
-                return await apiRequest(
-                    endpoint,
-                    options,
-                    true
-                );
+                return await apiRequest(endpoint, options, true);
 
             } catch (refreshError) {
-                console.error(
-                    "Token refresh failed:",
-                    refreshError
-                );
+                console.error("Token refresh failed:", refreshError);
 
                 if (typeof logout === "function" && !options.skipAutoLogoutOn401) {
                     logout();
@@ -85,15 +69,6 @@ async function apiRequest(endpoint, options = {}, _isRetry = false) {
             }
         }
 
-        // if (!response.ok) {
-        //     throw new Error(
-        //         data.message ||
-        //         `Request failed with status ${response.status}`
-        //     );
-        // }
-
-        // Edit by Araj
-
         if (!response.ok) {
             const apiError = new Error(
                 data?.message ||
@@ -101,16 +76,12 @@ async function apiRequest(endpoint, options = {}, _isRetry = false) {
                 `Request failed with status ${response.status}`
             );
 
-            // Keep the complete API response available
             apiError.responseData = data;
             apiError.status = response.status;
 
             throw apiError;
         }
 
-        // =========================================================
-        // SUCCESS
-        // =========================================================
         return data;
 
     } catch (error) {
