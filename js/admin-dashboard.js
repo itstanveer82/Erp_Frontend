@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // login page immediately.
     // =========================================================
     const authData = getAuthData();
-    if (!authData || !authData.accessToken) {   // "token" → "accessToken"
+    if (!authData || !authData.token) {   // "token" → "accessToken"
         window.location.href = "../auth/login.html";
         return;
     }

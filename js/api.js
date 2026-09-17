@@ -11,7 +11,7 @@ async function apiRequest(endpoint, options = {}, _isRetry = false) {
             authData = getAuthData();
         }
 
-        const token = authData ? authData.accessToken : null;
+        const token = authData ? authData.token  : null;
         const skipAuthHandling = AUTH_ENDPOINTS_NO_REFRESH.includes(endpoint);
         const headers = {
             "Content-Type": "application/json",
