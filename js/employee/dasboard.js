@@ -271,23 +271,41 @@ document.addEventListener("DOMContentLoaded", function () {
     const systemOutButton = document.getElementById("systemOutButton");
 
     systemInButton.addEventListener("click", function () {
-        alert("Demo: System In successful");
+        systemInButton.disabled = true;
 
-        systemInButton.classList.add("d-none");
-        systemOutButton.classList.remove("d-none");
+        checkInAttendance()   // agar shiftId bhejna hai to: checkInAttendance(1)
+            .then(function (res) {
+                console.log("Check-in success:", res);
+
+                systemInButton.classList.add("d-none");
+                systemOutButton.classList.remove("d-none");
+            })
+            .catch(function (error) {
+                console.error("Check-in failed:", error);
+                alert(error?.message || "Check-in failed. Please try again.");
+            })
+            .finally(function () {
+                systemInButton.disabled = false;
+            });
     });
 
     systemOutButton.addEventListener("click", function () {
-        alert("Demo: System Out successful");
+        systemOutButton.disabled = true;
 
-        systemOutButton.classList.add("d-none");
-        systemInButton.classList.remove("d-none");
-    });
+        checkOutAttendance()
+            .then(function (res) {
+                console.log("Check-out success:", res);
 
-    document.querySelectorAll("[data-view]").forEach(function (el) {
-        el.addEventListener("click", function () {
-            showView(this.dataset.view);
-        });
+                systemOutButton.classList.add("d-none");
+                systemInButton.classList.remove("d-none");
+            })
+            .catch(function (error) {
+                console.error("Check-out failed:", error);
+                alert(error?.message || "Check-out failed. Please try again.");
+            })
+            .finally(function () {
+                systemOutButton.disabled = false;
+            });
     });
 
     // ==============================================================================================
@@ -2482,6 +2500,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(function (res) {
 
                 console.log("Personal Info API Response:", res);
+                console.log("Personal Info DATA:", res?.data);
 
                 currentPersonalInfo = res.data || {};
 
@@ -2574,85 +2593,195 @@ document.addEventListener("DOMContentLoaded", function () {
     // ==============================================================================================
     //                  Profile Infomation model Open
     // ==============================================================================================
-    function openPersonalInfoModal() {
+    async function openPersonalInfoModal() {
 
-        if (!currentPersonalInfo) {
-            console.warn("Personal information is not loaded yet.");
-            return;
+        try {
+
+            // Always get latest data from API before opening modal
+            const res = await fetchPersonalInfo();
+
+            console.log("Personal Info Modal API Data:", res);
+
+            const d = res?.data || {};
+
+            // Update global data also
+            currentPersonalInfo = d;
+
+            // =========================================
+            // DATE OF BIRTH
+            // =========================================
+            const dobField = document.getElementById("dobField");
+
+            if (dobField) {
+                dobField.value = d.dateOfBirth || "";
+            }
+
+            // =========================================
+            // GENDER
+            // =========================================
+            const genderField = document.getElementById("genderField");
+
+            if (genderField) {
+                genderField.value = d.gender || "";
+            }
+
+            // =========================================
+            // HEIGHT
+            // =========================================
+            const heightField = document.getElementById("heightField");
+
+            if (heightField) {
+                heightField.value =
+                    d.heightCm !== null &&
+                        d.heightCm !== undefined
+                        ? d.heightCm
+                        : "";
+            }
+
+            // =========================================
+            // WEIGHT
+            // =========================================
+            const weightField = document.getElementById("weightField");
+
+            if (weightField) {
+                weightField.value =
+                    d.weightKg !== null &&
+                        d.weightKg !== undefined
+                        ? d.weightKg
+                        : "";
+            }
+
+            // =========================================
+            // BLOOD GROUP
+            // =========================================
+            const bloodGroupField =
+                document.getElementById("bloodGroupField");
+
+            if (bloodGroupField) {
+                bloodGroupField.value = d.bloodGroup || "";
+            }
+
+            // =========================================
+            // MARITAL STATUS
+            // =========================================
+            const maritalStatusField =
+                document.getElementById("maritalStatusField");
+
+            if (maritalStatusField) {
+                maritalStatusField.value =
+                    d.maritalStatus || "";
+            }
+
+            // =========================================
+            // RELIGION
+            // =========================================
+            const religionField =
+                document.getElementById("religionField");
+
+            if (religionField) {
+                religionField.value =
+                    d.religion || "";
+            }
+
+            // =========================================
+            // NATIONALITY
+            // =========================================
+            const nationalityField =
+                document.getElementById("nationalityField");
+
+            if (nationalityField) {
+                nationalityField.value =
+                    d.nationality || "";
+            }
+
+            // =========================================
+            // AADHAAR
+            // =========================================
+            const aadhaarField =
+                document.getElementById("aadhaarNumberField");
+
+            if (aadhaarField) {
+                aadhaarField.value =
+                    d.aadhaarNumber || "";
+            }
+
+            // =========================================
+            // PAN
+            // =========================================
+            const panField =
+                document.getElementById("panNumberField");
+
+            if (panField) {
+                panField.value =
+                    d.panNumber || "";
+            }
+
+            // =========================================
+            // PASSPORT
+            // =========================================
+            const passportField =
+                document.getElementById("passportNumberField");
+
+            if (passportField) {
+                passportField.value =
+                    d.passportNumber || "";
+            }
+
+            // =========================================
+            // DRIVING LICENSE
+            // =========================================
+            const drivingLicenseField =
+                document.getElementById(
+                    "drivingLicenseNumberField"
+                );
+
+            if (drivingLicenseField) {
+                drivingLicenseField.value =
+                    d.drivingLicenseNumber || "";
+            }
+
+            // =========================================
+            // CLEAR OLD MESSAGE
+            // =========================================
+            const messageBox =
+                document.getElementById(
+                    "personalInfoFormMessage"
+                );
+
+            if (messageBox) {
+                messageBox.innerHTML = "";
+            }
+
+            // =========================================
+            // OPEN MODAL
+            // =========================================
+            const modalElement =
+                document.getElementById(
+                    "personalInfoModal"
+                );
+
+            if (!modalElement) {
+                console.error(
+                    "personalInfoModal not found in HTML."
+                );
+                return;
+            }
+
+            const modal =
+                bootstrap.Modal.getOrCreateInstance(
+                    modalElement
+                );
+
+            modal.show();
+
+        } catch (error) {
+
+            console.error(
+                "Failed to load Personal Information for modal:",
+                error
+            );
+
         }
-
-        const d = currentPersonalInfo;
-
-        document.getElementById("dobField").value =
-            d.dateOfBirth || "";
-
-        document.getElementById("genderField").value =
-            d.gender || "";
-
-        document.getElementById("bloodGroupField").value =
-            d.bloodGroup || "";
-
-        document.getElementById("maritalStatusField").value =
-            d.maritalStatus || "";
-
-        document.getElementById("nationalityField").value =
-            d.nationality || "";
-
-        // Optional fields — agar modal me exist karte hain
-        const heightField = document.getElementById("heightField");
-        if (heightField) {
-            heightField.value = d.heightCm ?? "";
-        }
-
-        const weightField = document.getElementById("weightField");
-        if (weightField) {
-            weightField.value = d.weightKg ?? "";
-        }
-
-        const religionField = document.getElementById("religionField");
-        if (religionField) {
-            religionField.value = d.religion || "";
-        }
-
-        const aadhaarField = document.getElementById("aadhaarNumberField");
-        if (aadhaarField) {
-            aadhaarField.value = d.aadhaarNumber || "";
-        }
-
-        const panField = document.getElementById("panNumberField");
-        if (panField) {
-            panField.value = d.panNumber || "";
-        }
-
-        const passportField = document.getElementById("passportNumberField");
-        if (passportField) {
-            passportField.value = d.passportNumber || "";
-        }
-
-        const drivingLicenseField =
-            document.getElementById("drivingLicenseNumberField");
-
-        if (drivingLicenseField) {
-            drivingLicenseField.value = d.drivingLicenseNumber || "";
-        }
-
-        const messageBox =
-            document.getElementById("personalInfoFormMessage");
-
-        if (messageBox) {
-            messageBox.innerHTML = "";
-        }
-
-        const modalElement =
-            document.getElementById("personalInfoModal");
-
-        if (!modalElement) {
-            console.error("personalInfoModal not found in HTML.");
-            return;
-        }
-
-        const modal = new bootstrap.Modal(modalElement);
-        modal.show();
     }
 
     const personalInfoForm =
@@ -2660,7 +2789,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (personalInfoForm) {
 
-        personalInfoForm.addEventListener("submit", function (e) {
+        personalInfoForm.addEventListener("submit", async function (e) {
 
             e.preventDefault();
 
@@ -2678,12 +2807,12 @@ document.addEventListener("DOMContentLoaded", function () {
                     document.getElementById("genderField").value || null,
 
                 heightCm:
-                    document.getElementById("heightField")?.value
+                    document.getElementById("heightField").value
                         ? Number(document.getElementById("heightField").value)
                         : null,
 
                 weightKg:
-                    document.getElementById("weightField")?.value
+                    document.getElementById("weightField").value
                         ? Number(document.getElementById("weightField").value)
                         : null,
 
@@ -2694,70 +2823,70 @@ document.addEventListener("DOMContentLoaded", function () {
                     document.getElementById("maritalStatusField").value || null,
 
                 religion:
-                    document.getElementById("religionField")?.value.trim() || null,
+                    document.getElementById("religionField").value.trim() || null,
 
                 nationality:
                     document.getElementById("nationalityField").value.trim() || null,
 
                 aadhaarNumber:
-                    document.getElementById("aadhaarNumberField")?.value.trim() || null,
+                    document.getElementById("aadhaarNumberField").value.trim() || null,
 
                 panNumber:
-                    document.getElementById("panNumberField")?.value.trim() || null,
+                    document.getElementById("panNumberField").value.trim() || null,
 
                 passportNumber:
-                    document.getElementById("passportNumberField")?.value.trim() || null,
+                    document.getElementById("passportNumberField").value.trim() || null,
 
                 drivingLicenseNumber:
-                    document.getElementById("drivingLicenseNumberField")?.value.trim() || null
+                    document.getElementById("drivingLicenseNumberField").value.trim() || null
             };
 
-            console.log("Personal Info PUT Payload:", payload);
+            try {
 
-            updatePersonalInfo(payload)
+                const res = await updatePersonalInfo(payload);
 
-                .then(function (res) {
+                console.log("Personal Info Updated:", res);
 
-                    console.log("Personal Info Updated:", res);
+                const modalElement =
+                    document.getElementById("personalInfoModal");
 
-                    const modal =
-                        bootstrap.Modal.getInstance(
-                            document.getElementById("personalInfoModal")
-                        );
+                const modal =
+                    bootstrap.Modal.getInstance(modalElement);
 
-                    if (modal) {
-                        modal.hide();
-                    }
+                if (modal) {
+                    modal.hide();
+                }
 
-                    Swal.fire({
-                        icon: "success",
-                        title: "Personal information updated successfully.",
-                        confirmButtonColor: "#17a2b8"
-                    });
-
-                    // Updated data dobara load karo
-                    loadPersonalInformation();
-                })
-
-                .catch(function (error) {
-
-                    console.error(
-                        "Personal Info update failed:",
-                        error
-                    );
-
-                    messageBox.innerHTML = `
-                    <div class="custom-alert error">
-                        ${escapeHtml(
-                        error.message ||
-                        "Failed to update personal information."
-                    )}
-                    </div>
-                `;
+                Swal.fire({
+                    icon: "success",
+                    title: "Personal information updated successfully.",
+                    confirmButtonColor: "#17a2b8"
                 });
+
+                // Reload Personal Information
+                const updatedInfo = await fetchPersonalInfo();
+
+                if (updatedInfo && updatedInfo.success) {
+                    currentPersonalInfo = updatedInfo.data || {};
+                }
+
+                loadPersonalInformation();
+
+            } catch (error) {
+
+                console.error("Personal Info update failed:", error);
+
+                messageBox.innerHTML = `
+                <div class="custom-alert error">
+                    ${escapeHtml(
+                    error.message ||
+                    "Failed to update personal information."
+                )}
+                </div>
+            `;
+            }
         });
     }
-
 
     const editPersonalInfoButton =
         document.getElementById("editPersonalInfoButton");
@@ -3317,94 +3446,239 @@ document.addEventListener("DOMContentLoaded", function () {
 
     let familyMembersData = [];
     function loadFamilyInformation() {
-        const container = document.getElementById("familyMembersCardsList");
-        container.innerHTML = `<p class="text-muted">Loading...</p>`;
 
-        fetchMyFamilyMembers().then(function (res) {
-            familyMembersData = res.data;
-            renderFamilyTable();
-        }).catch(function (error) {
-            container.innerHTML = `<p class="text-danger">${escapeHtml(error.message || "Failed to load family members.")}</p>`;
-        });
+        const container =
+            document.getElementById("familyMembersCardsList");
+
+        if (!container) {
+            return;
+        }
+
+        container.innerHTML = `
+        <p class="text-muted">Loading...</p>
+    `;
+
+        fetchMyFamilyMembers()
+            .then(function (res) {
+
+                familyMembersData =
+                    Array.isArray(res.data)
+                        ? res.data
+                        : [];
+
+                renderFamilyTable();
+
+            })
+            .catch(function (error) {
+
+                container.innerHTML = `
+                <p class="text-danger">
+                    ${escapeHtml(
+                    error.message ||
+                    "Failed to load family members."
+                )}
+                </p>
+            `;
+            });
     }
 
     // ==============================================================================================
     //               Open Family Model form
     // ==============================================================================================
     function renderFamilyTable() {
-        const container = document.getElementById("familyMembersCardsList");
 
-        if (familyMembersData.length === 0) {
-            container.innerHTML = `<p class="text-muted">No family members added yet.</p>`;
+        const container =
+            document.getElementById("familyMembersCardsList");
+
+        if (!container) {
             return;
         }
+
+        if (familyMembersData.length === 0) {
+
+            container.innerHTML = `
+            <p class="text-muted">
+                No family members added yet.
+            </p>
+        `;
+
+            return;
+        }
+
         container.innerHTML = familyMembersData.map(function (m) {
+
             return `
             <div class="education-card">
 
                 <div class="education-card-actions">
-                    <button type="button" class="education-edit-btn" data-edit-family="${m.id}" title="Edit">✎</button>
-                    <button type="button" class="education-delete-btn" data-delete-family="${m.id}" title="Delete">🗑</button>
+
+                    <button
+                        type="button"
+                        class="education-edit-btn"
+                        data-edit-family="${m.id}"
+                        title="Edit">
+                        ✎
+                    </button>
+
+                    <button
+                        type="button"
+                        class="education-delete-btn"
+                        data-deactivate-family="${m.id}"
+                        title="Deactivate">
+                        🗑
+                    </button>
+
                 </div>
 
                 <div class="education-card-header">
-                    <div class="education-card-icon">👪</div>
-                    <div class="education-card-title">
-                        <h5>${escapeHtml(m.name)}</h5>
-                        <p>${escapeHtml(m.relationship)}</p>
+
+                    <div class="education-card-icon">
+                        👪
                     </div>
+
+                    <div class="education-card-title">
+
+                        <h5>
+                            ${escapeHtml(m.memberName || "--")}
+                        </h5>
+
+                        <p>
+                            ${escapeHtml(m.relationship || "--")}
+                        </p>
+
+                    </div>
+
                 </div>
 
                 <div class="education-card-details">
+
                     <div class="education-detail-item">
                         <span>Date of Birth</span>
-                        <strong>${escapeHtml(m.dateOfBirth) || "--"}</strong>
+                        <strong>
+                            ${escapeHtml(m.dateOfBirth || "--")}
+                        </strong>
                     </div>
+
+                    <div class="education-detail-item">
+                        <span>Gender</span>
+                        <strong>
+                            ${escapeHtml(m.gender || "--")}
+                        </strong>
+                    </div>
+
+                    <div class="education-detail-item">
+                        <span>Mobile Number</span>
+                        <strong>
+                            ${escapeHtml(m.mobileNumber || "--")}
+                        </strong>
+                    </div>
+
+                    <div class="education-detail-item">
+                        <span>Occupation</span>
+                        <strong>
+                            ${escapeHtml(m.occupation || "--")}
+                        </strong>
+                    </div>
+
                     <div class="education-detail-item">
                         <span>Dependent</span>
-                        <strong>${m.dependent ? "Yes" : "No"}</strong>
+                        <strong>
+                            ${m.dependent ? "Yes" : "No"}
+                        </strong>
                     </div>
+
+                    <div class="education-detail-item">
+                        <span>Nominee</span>
+                        <strong>
+                            ${m.nominee ? "Yes" : "No"}
+                        </strong>
+                    </div>
+
                 </div>
 
             </div>
         `;
+
         }).join("");
 
-        container.querySelectorAll("[data-edit-family]").forEach(function (btn) {
-            btn.addEventListener("click", function () {
-                openFamilyMemberModal(this.dataset.editFamily);
-            });
-        });
+        // EDIT
+        container
+            .querySelectorAll("[data-edit-family]")
+            .forEach(function (btn) {
 
-        container.querySelectorAll("[data-delete-family]").forEach(function (btn) {
-            btn.addEventListener("click", function () {
-                const id = this.dataset.deleteFamily;
+                btn.addEventListener("click", function () {
 
-                Swal.fire({
-                    icon: "warning",
-                    title: "Remove this family member?",
-                    showCancelButton: true,
-                    confirmButtonText: "Yes, remove",
-                    confirmButtonColor: "#b3261e"
-                }).then(function (result) {
-                    if (result.isConfirmed) {
-                        deleteMyFamilyMember(id).then(function () {
-                            familyMembersData = familyMembersData.filter(function (m) {
-                                return String(m.id) !== String(id);
-                            });
-                            renderFamilyTable();
-                        }).catch(function (error) {
-                            Swal.fire({
-                                icon: "error",
-                                title: "Could not remove member",
-                                text: error.message,
-                                confirmButtonColor: "#17a2b8"
-                            });
-                        });
-                    }
+                    openFamilyMemberModal(
+                        this.dataset.editFamily
+                    );
+
                 });
+
             });
-        });
+
+        // DEACTIVATE
+        container
+            .querySelectorAll("[data-deactivate-family]")
+            .forEach(function (btn) {
+
+                btn.addEventListener("click", function () {
+
+                    const id =
+                        this.dataset.deactivateFamily;
+
+                    Swal.fire({
+
+                        icon: "warning",
+
+                        title: "Deactivate this family member?",
+
+                        showCancelButton: true,
+
+                        confirmButtonText: "Yes, deactivate",
+
+                        confirmButtonColor: "#b3261e"
+
+                    }).then(function (result) {
+
+                        if (!result.isConfirmed) {
+                            return;
+                        }
+
+                        deactivateMyFamilyMember(id)
+
+                            .then(function (res) {
+
+                                Swal.fire({
+                                    icon: "success",
+                                    title:
+                                        res.message ||
+                                        "Family member deactivated.",
+                                    confirmButtonColor: "#17a2b8"
+                                });
+
+                                loadFamilyInformation();
+
+                            })
+
+                            .catch(function (error) {
+
+                                Swal.fire({
+                                    icon: "error",
+                                    title:
+                                        "Could not deactivate member",
+                                    text:
+                                        error.message ||
+                                        "Something went wrong.",
+                                    confirmButtonColor: "#17a2b8"
+                                });
+
+                            });
+
+                    });
+
+                });
+
+            });
     }
 
 
@@ -3413,27 +3687,72 @@ document.addEventListener("DOMContentLoaded", function () {
     // ==============================================================================================
 
     function openFamilyMemberModal(id) {
-        const modalTitle = document.getElementById("familyMemberModalTitle");
-        document.getElementById("familyMemberFormMessage").innerHTML = "";
+
+        const modalTitle =
+            document.getElementById("familyMemberModalTitle");
+
+        document.getElementById(
+            "familyMemberFormMessage"
+        ).innerHTML = "";
 
         if (id) {
-            const member = familyMembersData.find(function (m) {
-                return String(m.id) === String(id);
-            });
+
+            const member =
+                familyMembersData.find(function (m) {
+                    return String(m.id) === String(id);
+                });
+
+            if (!member) {
+                return;
+            }
 
             modalTitle.textContent = "Edit Family Member";
-            document.getElementById("familyMemberId").value = member.id;
-            document.getElementById("familyMemberName").value = member.name;
-            document.getElementById("familyMemberRelationship").value = member.relationship;
-            document.getElementById("familyMemberDob").value = member.dateOfBirth || "";
-            document.getElementById("familyMemberDependent").value = String(member.dependent);
+
+            document.getElementById("familyMemberId").value =
+                member.id;
+
+            document.getElementById("familyMemberName").value =
+                member.memberName || "";
+
+            document.getElementById("familyMemberRelationship").value =
+                member.relationship || "";
+
+            document.getElementById("familyMemberDob").value =
+                member.dateOfBirth || "";
+
+            document.getElementById("familyMemberGender").value =
+                member.gender || "";
+
+            document.getElementById("familyMemberMobile").value =
+                member.mobileNumber || "";
+
+            document.getElementById("familyMemberOccupation").value =
+                member.occupation || "";
+
+            document.getElementById("familyMemberDependent").value =
+                String(!!member.dependent);
+
+            document.getElementById("familyMemberNominee").value =
+                String(!!member.nominee);
+
         } else {
+
             modalTitle.textContent = "Add Family Member";
-            document.getElementById("familyMemberForm").reset();
-            document.getElementById("familyMemberId").value = "";
+
+            document.getElementById(
+                "familyMemberForm"
+            ).reset();
+
+            document.getElementById(
+                "familyMemberId"
+            ).value = "";
         }
 
-        const modal = new bootstrap.Modal(document.getElementById("familyMemberModal"));
+        const modal =
+            new bootstrap.Modal(
+                document.getElementById("familyMemberModal")
+            );
+
         modal.show();
     }
 
@@ -3457,10 +3776,30 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
             const payload = {
-                name: document.getElementById("familyMemberName").value.trim(),
-                relationship: document.getElementById("familyMemberRelationship").value.trim(),
-                dateOfBirth: document.getElementById("familyMemberDob").value || null,
-                dependent: document.getElementById("familyMemberDependent").value === "true"
+
+                memberName:
+                    document.getElementById("familyMemberName").value.trim(),
+
+                relationship:
+                    document.getElementById("familyMemberRelationship").value,
+
+                dateOfBirth:
+                    document.getElementById("familyMemberDob").value || null,
+
+                gender:
+                    document.getElementById("familyMemberGender").value || null,
+
+                mobileNumber:
+                    document.getElementById("familyMemberMobile").value.trim() || null,
+
+                occupation:
+                    document.getElementById("familyMemberOccupation").value.trim() || null,
+
+                dependent:
+                    document.getElementById("familyMemberDependent").value === "true",
+
+                nominee:
+                    document.getElementById("familyMemberNominee").value === "true"
             };
 
             const apiCall = id
@@ -3488,50 +3827,149 @@ document.addEventListener("DOMContentLoaded", function () {
     //                     Get Bank Detail
     // ==============================================================================================
     function loadBankInformation() {
+
         const card = document.getElementById("bankInfoCard");
         const messageBox = document.getElementById("bankInfoMessage");
-        if (messageBox) messageBox.innerHTML = "";
 
-        card.innerHTML = `<p class="text-muted">Loading...</p>`;
+        if (!card) {
+            return;
+        }
 
-        fetchMyBankInformation().then(function (res) {
-            const d = res.data;
+        if (messageBox) {
+            messageBox.innerHTML = "";
+        }
 
-            if (!d) {
-                card.innerHTML = `<p class="text-muted">No bank information added yet.</p>`;
-                return;
-            }
-            // ----------------------------------------------------------------------------------------------
-            //      Mask the account number and show only the last 4 digits.
-            // ----------------------------------------------------------------------------------------------
-            const maskedAccount = d.accountNumber;
+        card.innerHTML = `
+        <p class="text-muted">Loading...</p>
+    `;
 
+        fetchMyBankInformation()
+            .then(function (res) {
 
-            card.innerHTML = `
-            <div class="profile-info-grid">
-                <div class="profile-info-item">
-                    <span class="profile-label">Account Holder Name</span>
-                    <strong>${escapeHtml(d.accountHolderName) || "--"}</strong>
+                const d = res && res.data ? res.data : null;
+
+                if (!d) {
+                    card.innerHTML = `
+                    <p class="text-muted">
+                        No bank information added yet.
+                    </p>
+                `;
+                    return;
+                }
+
+                /*
+                 * Mask account number.
+                 * Example:
+                 * 123456789012 → ********9012
+                 */
+                let maskedAccount = "--";
+
+                if (d.accountNumber) {
+                    const accountNumber = String(d.accountNumber);
+
+                    if (accountNumber.length > 4) {
+                        maskedAccount =
+                            "********" +
+                            accountNumber.slice(-4);
+                    } else {
+                        maskedAccount = accountNumber;
+                    }
+                }
+
+                card.innerHTML = `
+                <div class="profile-info-grid">
+
+                    <!-- Account Holder Name -->
+                    <div class="profile-info-item">
+                        <span class="profile-label">
+                            Account Holder Name
+                        </span>
+                        <strong>
+                            ${escapeHtml(d.accountHolderName || "--")}
+                        </strong>
+                    </div>
+
+                    <!-- Bank Name -->
+                    <div class="profile-info-item">
+                        <span class="profile-label">
+                            Bank Name
+                        </span>
+                        <strong>
+                            ${escapeHtml(d.bankName || "--")}
+                        </strong>
+                    </div>
+
+                    <!-- Account Number -->
+                    <div class="profile-info-item">
+                        <span class="profile-label">
+                            Account Number
+                        </span>
+                        <strong>
+                            ${escapeHtml(maskedAccount)}
+                        </strong>
+                    </div>
+
+                    <!-- IFSC Code -->
+                    <div class="profile-info-item">
+                        <span class="profile-label">
+                            IFSC Code
+                        </span>
+                        <strong>
+                            ${escapeHtml(d.ifscCode || "--")}
+                        </strong>
+                    </div>
+
+                    <!-- Branch Name -->
+                    <div class="profile-info-item">
+                        <span class="profile-label">
+                            Branch Name
+                        </span>
+                        <strong>
+                            ${escapeHtml(d.branchName || "--")}
+                        </strong>
+                    </div>
+
+                    <!-- Account Type -->
+                    <div class="profile-info-item">
+                        <span class="profile-label">
+                            Account Type
+                        </span>
+                        <strong>
+                            ${escapeHtml(d.accountType || "--")}
+                        </strong>
+                    </div>
+
+                    <!-- Account Status -->
+                    <div class="profile-info-item">
+                        <span class="profile-label">
+                            Account Status
+                        </span>
+                        <strong>
+                            ${escapeHtml(d.accountStatus || "--")}
+                        </strong>
+                    </div>
+
                 </div>
-                <div class="profile-info-item">
-                    <span class="profile-label">Bank Name</span>
-                    <strong>${escapeHtml(d.bankName) || "--"}</strong>
+            `;
+
+            })
+            .catch(function (error) {
+
+                console.error(
+                    "Bank Information API failed:",
+                    error
+                );
+
+                card.innerHTML = `
+                <div class="custom-alert error">
+                    ${escapeHtml(
+                    error.message ||
+                    "Failed to load bank information."
+                )}
                 </div>
-                <div class="profile-info-item">
-                    <span class="profile-label">Account Number</span>
-                    <strong>${escapeHtml(maskedAccount)}</strong>
-                </div>
-                <div class="profile-info-item">
-                    <span class="profile-label">IFSC Code</span>
-                    <strong>${escapeHtml(d.ifscCode) || "--"}</strong>
-                </div>
-            </div>
-        `;
-        }).catch(function (error) {
-            card.innerHTML = `<div class="custom-alert error">${escapeHtml(error.message || "Failed to load bank information.")}</div>`;
-        });
+            `;
+            });
     }
-
     // ==============================================================================================
     //               Formats session dates for display
     // ==============================================================================================
