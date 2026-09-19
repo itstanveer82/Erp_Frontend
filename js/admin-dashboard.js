@@ -222,6 +222,37 @@ document.addEventListener("DOMContentLoaded", function () {
         headerAdminRole.textContent = displayRole;
     }
 
+    // =========================================================
+    // REAL PROFILE FROM API (overwrites the email-fallback above
+    // with the actual name + role once /api/employees/me responds)
+    // =========================================================
+    async function loadMyProfile() {
+        try {
+            const result = await apiRequest("/api/employees/me", { method: "GET" });
+            const emp = result.data || {};
+
+            const apiFullName =
+                `${emp.firstName || ""} ${emp.lastName || ""}`.trim() || fullName;
+
+            const apiRole = emp.roleName || displayRole;
+
+            if (headerAdminName) headerAdminName.textContent = apiFullName;
+            if (headerAdminRole) headerAdminRole.textContent = apiRole;
+            if (dropdownAdminName) dropdownAdminName.textContent = apiFullName;
+            if (dropdownAdminRole) dropdownAdminRole.textContent = apiRole;
+
+            const dashboardWelcomeEl = document.getElementById("dashboardWelcome");
+            if (dashboardWelcomeEl) {
+                dashboardWelcomeEl.textContent =
+                    `Welcome back, ${emp.firstName || apiFullName || "User"}`;
+            }
+
+        } catch (error) {
+            console.error("Failed to load profile:", error);
+        }
+    }
+    loadMyProfile();
+
     // Dropdown profile data
     // Fills the matching fields inside the dropdown panel that
     // opens when the header button is clicked.
@@ -834,10 +865,6 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById(
                 "employeesView"
             ),
-        users:
-            document.getElementById(
-                "usersView"
-            ),
         attendance:
             document.getElementById(
                 "attendanceView"
@@ -866,7 +893,7 @@ document.addEventListener("DOMContentLoaded", function () {
      * which sidebar item is marked "active", auto-closes the
      * mobile sidebar, scrolls back to the top, and — for views
      * backed by an API — triggers that view's data load
-     * (loadRoles/loadPermissions/loadUsers/loadEmployees).
+     * (loadRoles/loadPermissions/loadEmployees).
      *
      * @param {string} viewName - key into the `views` object above
      */
@@ -931,9 +958,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         if (viewName === "permissions") {
             loadPermissions();
-        }
-        if (viewName === "users") {
-            loadUsers();
         }
         if (viewName === "employees" && typeof loadEmployees === "function") {
             loadEmployees(0);
@@ -1789,431 +1813,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     }
-
-    // for roles modal
-    // Bootstrap modal instance for assigning roles to a single
-    // user (used by the Users view, see loadUsers() below).
-    const userRolesModalElement =
-        document.getElementById(
-            "userRolesModal"
-        );
-    const userRolesList =
-        document.getElementById(
-            "userRolesList"
-        );
-    let userRolesModal = null;
-    if (userRolesModalElement) {
-        userRolesModal =
-            new bootstrap.Modal(
-                userRolesModalElement
-            );
-    }
-
-    // ==============================
-    // LOAD USERS
-    // GET /api/users
-    // ==============================
-    // Cache of the last-fetched user list, so the "Roles" button
-    // click handler further down can look up a user by id without
-    // re-fetching.
-    let loadedUsers = [];
-
-    /**
-     * loadUsers()
-     * Fetches the paginated user list (`response.data.content`)
-     * and renders one table row per user into #usersTableBody,
-     * with role tags, an Active/Inactive status label, and
-     * Roles / Enable / Disable action buttons.
-     */
-    async function loadUsers() {
-        const usersTableBody =
-            document.getElementById(
-                "usersTableBody"
-            );
-        if (!usersTableBody) {
-            console.error(
-                "usersTableBody not found"
-            );
-            return;
-        }
-        usersTableBody.innerHTML = `
-        <tr>
-            <td colspan="5"
-                class="text-center py-4">
-                Loading users...
-            </td>
-        </tr>
-    `;
-        try {
-            const response =
-                await apiRequest(
-                    "/api/users"
-                );
-            console.log(
-                "Users API Response:",
-                response
-            );
-            const users =
-                Array.isArray(
-                    response.data?.content
-                )
-                    ? response.data.content
-                    : [];
-            loadedUsers = users;
-            if (users.length === 0) {
-                usersTableBody.innerHTML = `
-                <tr>
-                    <td colspan="5"
-                        class="text-center py-4 text-muted">
-                        No users found
-                    </td>
-                </tr>
-            `;
-                return;
-            }
-            usersTableBody.innerHTML = "";
-            users.forEach(
-                function (user) {
-                    const fullName =
-                        `${user.firstName || ""} ${user.lastName || ""}`
-                            .trim() || "--";
-                    const roles =
-                        Array.isArray(user.roles)
-                            ? user.roles
-                            : [];
-                    const rolesHtml =
-                        roles.length > 0
-                            ? roles.map(
-                                function (role) {
-                                    return `
-                                    <span class="small-permission-tag">
-                                        ${escapeHtml(role)}
-                                    </span>
-                                `;
-                                }
-                            ).join("")
-                            : `<span class="text-muted">No roles</span>`;
-                    const status =
-                        user.enabled
-                            ? "Active"
-                            : "Inactive";
-                    const row =
-                        document.createElement("tr");
-                    // Row shows either a "Disable" or an "Enable"
-                    // button depending on the user's current
-                    // `enabled` state.
-                    row.innerHTML = `
-                    <td class="table-role-name">
-                        ${escapeHtml(fullName)}
-                    </td>
-                    <td>
-                        ${escapeHtml(
-                        user.email || "--"
-                    )}
-                    </td>
-                    <td class="table-permissions">
-                        ${rolesHtml}
-                    </td>
-                    <td>
-                        <span class="${user.enabled
-                            ? "text-success"
-                            : "text-danger"
-                        }">
-                            ${status}
-                        </span>
-                    </td>
-                   <td class="text-end">
-    <div class="d-flex justify-content-end gap-2">
-        <button
-            type="button"
-            class="secondary-action-btn user-roles-btn"
-            data-user-id="${escapeHtml(user.id)}">
-            Roles
-        </button>
-        ${user.enabled
-                            ? `
-                <button
-                    type="button"
-                    class="secondary-action-btn user-disable-btn"
-                    data-user-id="${escapeHtml(user.id)}">
-                    Disable
-                </button>
-            `
-                            : `
-                <button
-                    type="button"
-                    class="secondary-action-btn user-enable-btn"
-                    data-user-id="${escapeHtml(user.id)}">
-                    Enable
-                </button>
-            `
-                        }
-    </div>
-</td>
-                `;
-                    usersTableBody.appendChild(
-                        row
-                    );
-                }
-            );
-        } catch (error) {
-            console.error(
-                "Failed to fetch users:",
-                error
-            );
-            usersTableBody.innerHTML = `
-            <tr>
-                <td colspan="5"
-                    class="text-center py-4 text-danger">
-                    ${escapeHtml(
-                error.message ||
-                "Failed to load users"
-            )}
-                </td>
-            </tr>
-        `;
-        }
-    }
-
-    /**
-     * Delegated click handler for the per-user "Roles" button.
-     * Looks the user up in the cached `loadedUsers` list, opens
-     * the roles modal, and fetches the full role list to build a
-     * checkbox for each one (checking the ones the user already
-     * has).
-     */
-    document.addEventListener(
-        "click",
-        async function (event) {
-            const button =
-                event.target.closest(
-                    ".user-roles-btn"
-                );
-            if (!button) {
-                return;
-            }
-            const userId =
-                button.dataset.userId;
-            // Stashed on `window` so the separate Save handler
-            // (bound to #saveUserRolesButton, below) can read it.
-            window.selectedUserId =
-                userId;
-            const user =
-                loadedUsers.find(
-                    function (item) {
-                        return String(item.id) ===
-                            String(userId);
-                    }
-                );
-            if (!user) {
-                return;
-            }
-            if (!userRolesModal) {
-                return;
-            }
-            // Modal title
-            const fullName =
-                `${user.firstName || ""} ${user.lastName || ""}`
-                    .trim() || "User";
-            document.getElementById(
-                "userRolesModalLabel"
-            ).textContent =
-                `Roles for ${fullName}`;
-            // Open modal
-            userRolesModal.show();
-            // Loading
-            userRolesList.innerHTML =
-                `Loading roles...`;
-            try {
-                const response =
-                    await apiRequest(
-                        "/api/roles"
-                    );
-                console.log(
-                    "Roles API Response:",
-                    response
-                );
-                const roles =
-                    Array.isArray(response.data)
-                        ? response.data
-                        : [];
-                const userRoles =
-                    Array.isArray(user.roles)
-                        ? user.roles
-                        : [];
-                if (roles.length === 0) {
-                    userRolesList.innerHTML = `
-                    <div class="text-muted">
-                        No roles found
-                    </div>
-                `;
-                    return;
-                }
-                userRolesList.innerHTML = "";
-                roles.forEach(
-                    function (role) {
-                        const roleName =
-                            role.name || role;
-                        const isChecked =
-                            userRoles.includes(
-                                roleName
-                            );
-                        const roleItem =
-                            document.createElement(
-                                "div"
-                            );
-                        roleItem.className =
-                            "form-check mb-3";
-                        roleItem.innerHTML = `
-                        <input
-                            class="form-check-input user-role-checkbox"
-                            type="checkbox"
-                            value="${escapeHtml(roleName)}"
-                            id="userRole_${escapeHtml(roleName)}"
-                            ${isChecked ? "checked" : ""}>
-                        <label
-                            class="form-check-label"
-                            for="userRole_${escapeHtml(roleName)}">
-                            ${escapeHtml(roleName)}
-                        </label>
-                    `;
-                        userRolesList.appendChild(
-                            roleItem
-                        );
-                    }
-                );
-            } catch (error) {
-                console.error(
-                    "Failed to load roles:",
-                    error
-                );
-                userRolesList.innerHTML = `
-                <div class="text-danger">
-                    Failed to load roles
-                </div>
-            `;
-            }
-        }
-    );
-
-    /**
-     * Delegated click handler for the per-user "Disable" button.
-     * Confirms via native dialog, then calls DELETE on the user
-     * (a soft-delete/disable, based on the endpoint being reused
-     * for what the UI calls "Disable"), and reloads the user
-     * table. Re-enables the button and restores its label if the
-     * call fails.
-     */
-    document.addEventListener(
-        "click",
-        async function (event) {
-            const disableButton =
-                event.target.closest(
-                    ".user-disable-btn"
-                );
-            if (!disableButton) {
-                return;
-            }
-            const userId =
-                disableButton.dataset.userId;
-            const confirmed =
-                confirm(
-                    "Are you sure you want to disable this user?"
-                );
-            if (!confirmed) {
-                return;
-            }
-            try {
-                disableButton.disabled = true;
-                disableButton.textContent =
-                    "Disabling...";
-                const response =
-                    await apiRequest(
-                        `/api/users/${userId}`,
-                        {
-                            method: "DELETE"
-                        }
-                    );
-                console.log(
-                    "Disable User Response:",
-                    response
-                );
-                await loadUsers();
-            } catch (error) {
-                console.error(
-                    "Failed to disable user:",
-                    error
-                );
-                alert(
-                    error.message ||
-                    "Failed to disable user"
-                );
-                disableButton.disabled = false;
-                disableButton.textContent =
-                    "Disable";
-            }
-        }
-    );
-
-    // NOTE: there is no matching delegated handler here for
-    // ".user-enable-btn" — the "Enable" button rendered in
-    // loadUsers() for disabled users has no click listener wired
-    // to it anywhere in this file, so it currently does nothing.
-
-    // Save button for the user-roles modal: collects checked
-    // role checkboxes and POSTs them as the user's new role set,
-    // then closes the modal and reloads the user table.
-    document
-        .getElementById(
-            "saveUserRolesButton"
-        )
-        .addEventListener(
-            "click",
-            async function () {
-                const checkedRoles =
-                    Array.from(
-                        document.querySelectorAll(
-                            ".user-role-checkbox:checked"
-                        )
-                    )
-                        .map(
-                            function (checkbox) {
-                                return checkbox.value;
-                            }
-                        );
-                if (
-                    !window.selectedUserId
-                ) {
-                    console.error(
-                        "Selected user not found"
-                    );
-                    return;
-                }
-                try {
-                    const response =
-                        await apiRequest(
-                            `/api/users/${window.selectedUserId}/roles`,
-                            {
-                                method: "POST",
-                                body: JSON.stringify({
-                                    roleNames: checkedRoles
-                                })
-                            }
-                        );
-                    console.log(
-                        "Save Roles Response:",
-                        response
-                    );
-                    userRolesModal.hide();
-                    await loadUsers();
-                } catch (error) {
-                    console.error(
-                        "Failed to save roles:",
-                        error
-                    );
-                }
-            }
-        );
 
     // =========================================================
     // SESSION MANAGEMENT

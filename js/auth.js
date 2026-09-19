@@ -424,21 +424,27 @@ function saveAuthData(data, remember) {
 
 
     // Remember me checked:
-    // persistent cookie for 7 days.
+    // persistent storage (survives browser close).
     //
     // Remember me unchecked:
-    // session cookie.
+    // sessionStorage (cleared when tab/browser closes).
+    //
+    // NOTE: cookies have a ~4KB size limit — a user object with
+    // roles/permissions/department data can silently exceed that,
+    // so the cookie never actually gets saved and the person gets
+    // bounced straight back to login after a "successful" login.
+    // localStorage/sessionStorage have no such limit.
 
-    setCookie(
-        "authData",
-        JSON.stringify(authData),
-        remember ? 7 : null
-    );
+    if (remember) {
+        localStorage.setItem("authData", JSON.stringify(authData));
+        sessionStorage.removeItem("authData");
+    } else {
+        sessionStorage.setItem("authData", JSON.stringify(authData));
+        localStorage.removeItem("authData");
+    }
 
-
-    // Remove old storage-based auth data
-    localStorage.removeItem("authData");
-    sessionStorage.removeItem("authData");
+    // Remove old cookie-based auth data
+    deleteCookie("authData");
 }
 
 
@@ -448,28 +454,30 @@ function saveAuthData(data, remember) {
 
 function getAuthData() {
 
-    const cookieData =
-        getCookie("authData");
+    const raw =
+        localStorage.getItem("authData") ||
+        sessionStorage.getItem("authData");
 
 
-    if (!cookieData) {
+    if (!raw) {
         return null;
     }
 
 
     try {
 
-        return JSON.parse(cookieData);
+        return JSON.parse(raw);
 
     } catch (error) {
 
         console.error(
-            "Invalid authData cookie:",
+            "Invalid authData:",
             error
         );
 
-        // Remove corrupted cookie
-        deleteCookie("authData");
+        // Remove corrupted data
+        localStorage.removeItem("authData");
+        sessionStorage.removeItem("authData");
 
         return null;
     }
@@ -643,25 +651,26 @@ if (logoutButton) {
     );
 }
 
+
 // ============================================================
 // LOGOUT FUNCTION
 // ============================================================
-    async function logout() {
+async function logout() {
 
-        try {
-            // Call backend so the session/token is invalidated server-side too
-            await apiRequest("/api/auth/logout", { method: "POST" });
-        } catch (error) {
-            console.error("Logout API failed (proceeding with local logout):", error);
-        }
-
-        // Delete authentication cookie
-        deleteCookie("authData");
-
-        // Clean up any old storage data
-        localStorage.removeItem("authData");
-        sessionStorage.removeItem("authData");
-
-        // Go back to login page
-        window.location.href = "../auth/login.html";
+    try {
+        // Call backend so the session/token is invalidated server-side too
+        await apiRequest("/api/auth/logout", { method: "POST" });
+    } catch (error) {
+        console.error("Logout API failed (proceeding with local logout):", error);
     }
+
+    // Delete authentication cookie
+    deleteCookie("authData");
+
+    // Clean up any old storage data
+    localStorage.removeItem("authData");
+    sessionStorage.removeItem("authData");
+
+    // Go back to login page
+    window.location.href = "../auth/login.html";
+}

@@ -1,560 +1,470 @@
-    // ============================================================
-    // EMPLOYEES MODULE
-    // Backend APIs
-    //
-    // GET    /api/employees
-    // GET    /api/employees/inactive
-    // GET    /api/employees/{id}
-    // POST   /api/employees
-    // PUT    /api/employees/{id}
-    // DELETE /api/employees/{id}
-    // PUT    /api/employees/{id}/restore
-    // GET    /api/departments
-    // ============================================================
+// ============================================================
+// EMPLOYEES MODULE
+// Backend APIs
+//
+// GET    /api/employees
+// GET    /api/employees/inactive
+// GET    /api/employees/{id}
+// POST   /api/employees
+// PUT    /api/employees/{id}
+// DELETE /api/employees/{id}
+// PUT    /api/employees/{id}/restore
+// GET    /api/departments
+// ============================================================
 
-    const EMP_PAGE_SIZE = 10;
+const EMP_PAGE_SIZE = 10;
 
-    let empCurrentPage = 0;
-    let empSearchQuery = "";
-    let empIncludeInactive = false;
-    let empMasterDataCache = {};
-    let empSelectedId = null;
-    let empAllRows = [];
+let empCurrentPage = 0;
+let empSearchQuery = "";
+let empIncludeInactive = false;
+let empMasterDataCache = {};
+let empSelectedId = null;
+let empPersonalInfoTargetId = null;
+let empAllRows = [];
 
 
-    // ============================================================
-    // HELPERS
-    // ============================================================
+// ============================================================
+// HELPERS
+// ============================================================
 
-    function escapeHtmlEmp(value) {
-        if (value === null || value === undefined) {
-            return "";
-        }
-
-        const div = document.createElement("div");
-        div.textContent = String(value);
-        return div.innerHTML;
+function escapeHtmlEmp(value) {
+    if (value === null || value === undefined) {
+        return "";
     }
 
+    const div = document.createElement("div");
+    div.textContent = String(value);
+    return div.innerHTML;
+}
 
-    function getErrorMessage(error, fallback) {
-        return (
-            error?.responseData?.message ||
-            error?.response?.data?.message ||
-            error?.message ||
-            fallback
+
+function getErrorMessage(error, fallback) {
+    return (
+        error?.responseData?.message ||
+        error?.response?.data?.message ||
+        error?.message ||
+        fallback
+    );
+}
+
+
+// Selects a <select> option whose visible text matches `text`
+// (used for Edit pre-fill, since the GET response gives names
+// like "IT" / "ADMIN", not the numeric IDs the <select> uses).
+function selectOptionByText(selectId, text) {
+    const select = document.getElementById(selectId);
+    if (!select || !text) {
+        return;
+    }
+    const target = String(text).trim().toLowerCase();
+    for (let i = 0; i < select.options.length; i++) {
+        if (select.options[i].textContent.trim().toLowerCase() === target) {
+            select.selectedIndex = i;
+            return;
+        }
+    }
+}
+
+
+
+// ============================================================
+// ROLE DROPDOWN
+// GET /api/roles
+// ============================================================
+async function loadEmployeeRoleDropdown(selectId = "addEmpRole") {
+
+    const roleSelect =
+        document.getElementById(selectId);
+
+    if (!roleSelect) {
+
+        console.error(
+            "addEmpRole dropdown not found"
         );
+
+        return;
     }
 
 
-    // ============================================================
-    // MASTER DATA
-    // ============================================================
+    // Loading state
+    roleSelect.innerHTML =
+        `<option value="">Loading roles...</option>`;
 
-    async function fetchDepartments() {
 
-        if (empMasterDataCache.DEPARTMENT) {
-            return empMasterDataCache.DEPARTMENT;
-        }
+    try {
 
-        try {
-            const response = await apiRequest("/api/departments");
+        const response =
+            await apiRequest("/api/roles");
 
-            const list = Array.isArray(response.data)
+
+        console.log(
+            "Roles API Response:",
+            response
+        );
+
+
+        const roles =
+            Array.isArray(response.data)
                 ? response.data
                 : [];
 
-            empMasterDataCache.DEPARTMENT = list;
 
-            return list;
+        // Reset dropdown
+        roleSelect.innerHTML =
+            `<option value="">Select Role</option>`;
 
-        } catch (error) {
 
-            console.error("Failed to load departments:", error);
+        // Add roles
+        roles.forEach(function (role) {
 
-            return [];
+            const option =
+                document.createElement("option");
+
+
+            option.value =
+                role.id;
+
+
+            option.textContent =
+                role.name ||
+                role.roleName ||
+                role.code ||
+                `Role ${role.id}`;
+
+
+            roleSelect.appendChild(option);
+
+        });
+
+
+        // No roles
+        if (roles.length === 0) {
+
+            roleSelect.innerHTML =
+                `<option value="">
+                    No roles found
+                </option>`;
+
         }
+
+    } catch (error) {
+
+        console.error(
+            "Failed to load roles:",
+            error
+        );
+
+
+        roleSelect.innerHTML =
+            `<option value="">
+                Failed to load roles
+            </option>`;
+
     }
 
+}
 
-    async function fetchShifts() {
 
-        if (empMasterDataCache.SHIFT) {
-            return empMasterDataCache.SHIFT;
-        }
 
-        try {
-            const response = await apiRequest("/api/shifts");
+// ============================================================
+// MANAGER DROPDOWN
+// GET /api/employees/managers
+// ============================================================
+async function loadEmployeeManagerDropdown(selectId = "addEmpManagerId") {
 
-            const list = Array.isArray(response.data)
+    const managerSelect =
+        document.getElementById(selectId);
+    if (!managerSelect) {
+        console.warn("Manager dropdown #addEmpManagerId not found");
+        return;
+    }
+
+    managerSelect.innerHTML =
+        `<option value="">Loading managers...</option>`;
+
+    try {
+        const response =
+            await apiRequest("/api/employees/managers");
+
+        console.log("Managers API response:", response);
+
+        const managers = Array.isArray(response.data)
+            ? response.data
+            : [];
+
+        managerSelect.innerHTML =
+            `<option value="">Select Manager</option>`;
+
+        managers.forEach(function (manager) {
+            const option = document.createElement("option");
+
+            option.value = manager.employeeId;
+
+            option.textContent =
+                manager.fullName ||
+                `Manager ${manager.employeeId}`;
+
+            managerSelect.appendChild(option);
+        });
+
+    } catch (error) {
+        console.error("Failed to load managers:", error);
+
+        managerSelect.innerHTML =
+            `<option value="">Failed to load managers</option>`;
+    }
+}
+
+async function loadEmployeeDepartmentDropdown(selectId = "addEmpDepartment") {
+
+    const departmentSelect =
+        document.getElementById(selectId);
+
+    if (!departmentSelect) {
+        console.warn(
+            "Department dropdown #addEmpDepartment not found"
+        );
+        return;
+    }
+
+    departmentSelect.innerHTML =
+        `<option value="">Loading departments...</option>`;
+
+    try {
+
+        const response =
+            await apiRequest("/api/departments");
+
+        console.log(
+            "Departments API response:",
+            response
+        );
+
+        const departments =
+            Array.isArray(response.data)
                 ? response.data
                 : [];
 
-            empMasterDataCache.SHIFT = list;
+        departmentSelect.innerHTML =
+            `<option value="">Select Department</option>`;
 
-            return list;
+        departments.forEach(function (department) {
 
-        } catch (error) {
+            const option =
+                document.createElement("option");
 
-            console.error("Failed to load shifts:", error);
+            option.value = department.id;
 
-            return [];
-        }
+            option.textContent = department.name;
+
+            departmentSelect.appendChild(option);
+        });
+
+        console.log(
+            "Departments loaded:",
+            departments
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Failed to load departments:",
+            error
+        );
+
+        departmentSelect.innerHTML =
+            `<option value="">Failed to load departments</option>`;
     }
+}
 
 
-    // Backend request mein roleId INTEGER hai.
-    // Isliye yahan numeric IDs use kar rahe hain.
-    const EMP_ROLE_OPTIONS = [
-        { id: 1, name: "ADMIN" },
-        { id: 2, name: "HR" },
-        { id: 3, name: "EMPLOYEE" }
-    ];
+// ============================================================
+// LOCALLY-HIDDEN EMPLOYEES
+// "Delete" (jab employee inactive ho) sirf UI se hata deta hai —
+// backend/database untouched rahta hai. IDs localStorage mein
+// save hote hain taaki refresh ke baad bhi hidden rahein.
+// ============================================================
 
-
-    function populateSelect(selectEl, list, placeholder, selectedId) {
-
-        if (!selectEl) {
-            return;
-        }
-
-        selectEl.innerHTML =
-            `<option value="">${escapeHtmlEmp(placeholder)}</option>` +
-            list.map(function (item) {
-
-                const isSelected =
-                    selectedId != null &&
-                    String(item.id) === String(selectedId);
-
-                return `
-                    <option value="${escapeHtmlEmp(item.id)}"
-                        ${isSelected ? "selected" : ""}>
-                        ${escapeHtmlEmp(item.name)}
-                    </option>
-                `;
-
-            }).join("");
+function getHiddenEmployeeIds() {
+    try {
+        return JSON.parse(
+            localStorage.getItem("hiddenEmployeeIds") || "[]"
+        );
+    } catch (error) {
+        return [];
     }
+}
 
+function hideEmployeeLocally(empId) {
+    const hidden = getHiddenEmployeeIds();
+    const idStr = String(empId);
 
-    async function loadMasterDataDropdowns() {
-
-        const [departments, shifts] = await Promise.all([
-            fetchDepartments(),
-            fetchShifts()
-        ]);
-
-        populateSelect(
-            document.getElementById("addEmpDepartment"),
-            departments,
-            "Select department"
-        );
-
-        populateSelect(
-            document.getElementById("addEmpRole"),
-            EMP_ROLE_OPTIONS,
-            "Select role"
-        );
-
-        populateSelect(
-            document.getElementById("addEmpShift"),
-            shifts,
-            "Select shift"
-        );
-
-        populateSelect(
-            document.getElementById("editEmpDepartment"),
-            departments,
-            "Select department"
-        );
-
-        populateSelect(
-            document.getElementById("editEmpRole"),
-            EMP_ROLE_OPTIONS,
-            "Select role"
+    if (!hidden.includes(idStr)) {
+        hidden.push(idStr);
+        localStorage.setItem(
+            "hiddenEmployeeIds",
+            JSON.stringify(hidden)
         );
     }
+}
 
 
-    // ============================================================
-    // LOAD EMPLOYEES
-    // ============================================================
+// ============================================================
+// LOAD EMPLOYEES
+// ============================================================
 
-    async function loadEmployees(page = 0) {
+async function loadEmployees(page = 0) {
 
-        const tableBody =
-            document.getElementById("employeesTableBody");
+    const tableBody =
+        document.getElementById("employeesTableBody");
 
-        if (!tableBody) {
-            return;
-        }
+    if (!tableBody) {
+        return;
+    }
 
-        empCurrentPage = page;
+    empCurrentPage = page;
+
+    tableBody.innerHTML = `
+        <tr>
+            <td colspan="8" class="text-center py-4">
+                Loading employees...
+            </td>
+        </tr>
+    `;
+
+    try {
+
+        const endpoint =
+            empIncludeInactive
+                ? "/api/employees/inactive"
+                : "/api/employees";
+
+        const response = await apiRequest(endpoint);
+
+        const employees =
+            Array.isArray(response.data)
+                ? response.data
+                : [];
+
+        // Ye row jis endpoint se aayi hai wahi uska active/inactive
+        // sach hai (status text field pe bharosa nahi kar sakte).
+        employees.forEach(function (emp) {
+            emp.__isActiveRow = !empIncludeInactive;
+        });
+
+        const query =
+            empSearchQuery.trim().toLowerCase();
+
+        empAllRows = query
+            ? employees.filter(function (emp) {
+
+                const haystack = [
+                    emp.employeeCode,
+                    emp.empCode,
+                    emp.firstName,
+                    emp.lastName,
+                    emp.email,
+                    emp.empEmail
+                ]
+                    .filter(Boolean)
+                    .join(" ")
+                    .toLowerCase();
+
+                return haystack.includes(query);
+
+            })
+            : employees;
+
+        // Locally-"deleted" rows (soft-hide only, DB untouched)
+        const hiddenIds = getHiddenEmployeeIds();
+
+        empAllRows = empAllRows.filter(function (emp) {
+            const id = emp.id ?? emp.empId;
+            return !hiddenIds.includes(String(id));
+        });
+
+        const start =
+            empCurrentPage * EMP_PAGE_SIZE;
+
+        const pageRows =
+            empAllRows.slice(
+                start,
+                start + EMP_PAGE_SIZE
+            );
+
+        renderEmployeesTable(pageRows);
+
+        renderEmployeesPagination();
+
+    } catch (error) {
+
+        console.error(
+            "Failed to load employees:",
+            error
+        );
 
         tableBody.innerHTML = `
             <tr>
-                <td colspan="8" class="text-center py-4">
-                    Loading employees...
+                <td colspan="8"
+                    class="text-center py-4 text-danger">
+                    ${escapeHtmlEmp(
+            getErrorMessage(
+                error,
+                "Failed to load employees"
+            )
+        )}
                 </td>
             </tr>
         `;
+    }
+}
 
-        try {
 
-            const endpoint =
-                empIncludeInactive
-                    ? "/api/employees/inactive"
-                    : "/api/employees";
+// ============================================================
+// RENDER EMPLOYEE TABLE
+// ============================================================
 
-            const response = await apiRequest(endpoint);
+function renderEmployeesTable(employees) {
 
-            const employees =
-                Array.isArray(response.data)
-                    ? response.data
-                    : [];
+    const tableBody =
+        document.getElementById("employeesTableBody");
 
-            // Ye row jis endpoint se aayi hai wahi uska active/inactive
-            // sach hai (status text field pe bharosa nahi kar sakte).
-            employees.forEach(function (emp) {
-                emp.__isActiveRow = !empIncludeInactive;
-            });
-
-            const query =
-                empSearchQuery.trim().toLowerCase();
-
-            empAllRows = query
-                ? employees.filter(function (emp) {
-
-                    const haystack = [
-                        emp.employeeCode,
-                        emp.empCode,
-                        emp.firstName,
-                        emp.lastName,
-                        emp.email,
-                        emp.empEmail
-                    ]
-                        .filter(Boolean)
-                        .join(" ")
-                        .toLowerCase();
-
-                    return haystack.includes(query);
-
-                })
-                : employees;
-
-            const start =
-                empCurrentPage * EMP_PAGE_SIZE;
-
-            const pageRows =
-                empAllRows.slice(
-                    start,
-                    start + EMP_PAGE_SIZE
-                );
-
-            renderEmployeesTable(pageRows);
-
-            renderEmployeesPagination();
-
-        } catch (error) {
-
-            console.error(
-                "Failed to load employees:",
-                error
-            );
-
-            tableBody.innerHTML = `
-                <tr>
-                    <td colspan="8"
-                        class="text-center py-4 text-danger">
-                        ${escapeHtmlEmp(
-                getErrorMessage(
-                    error,
-                    "Failed to load employees"
-                )
-            )}
-                    </td>
-                </tr>
-            `;
-        }
+    if (!tableBody) {
+        return;
     }
 
+    if (!employees.length) {
 
-    // ============================================================
-    // RENDER EMPLOYEE TABLE
-    // ============================================================
-
-    function renderEmployeesTable(employees) {
-
-        const tableBody =
-            document.getElementById("employeesTableBody");
-
-        if (!tableBody) {
-            return;
-        }
-
-        if (!employees.length) {
-
-            tableBody.innerHTML = `
-                <tr>
-                    <td colspan="8"
-                        class="text-center py-4 text-muted">
-                        No employees found
-                    </td>
-                </tr>
-            `;
-
-            return;
-        }
-
-        tableBody.innerHTML = "";
-
-        employees.forEach(function (emp) {
-
-            const empId =
-                emp.id ?? emp.empId;
-
-            const empCode =
-                emp.employeeCode ?? emp.empCode;
-
-            const email =
-                emp.email ?? emp.empEmail;
-
-            const roleLabel =
-                emp.role ??
-                emp.roleName ??
-                (emp.roleId != null
-                    ? `Role #${emp.roleId}`
-                    : "--");
-
-              const isActive =
-            emp.__isActiveRow !== undefined
-                ? emp.__isActiveRow
-                : (emp.status !== undefined
-                    ? String(emp.status).toUpperCase() === "ACTIVE"
-                    : (emp.active !== undefined ? emp.active : !emp.deleted));
-                        
-            const fullName =
-                `${emp.firstName || ""} ${emp.lastName || ""}`
-                    .trim() || "--";
-
-            const statusBadge = isActive
-                ? `<span class="text-success">Active</span>`
-                : `<span class="text-danger">Inactive</span>`;
-
-            const row = document.createElement("tr");
-
-            row.innerHTML = `
-                <td>${escapeHtmlEmp(empCode || "--")}</td>
-
-                <td>${escapeHtmlEmp(fullName)}</td>
-
-                <td>${escapeHtmlEmp(email || "--")}</td>
-
-                <td>${escapeHtmlEmp(emp.phone || "--")}</td>
-
-                <td>${escapeHtmlEmp(roleLabel)}</td>
-
-                <td>
-                    ${accountStatusBadge(emp.accountStatus)}
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="8"
+                    class="text-center py-4 text-muted">
+                    No employees found
                 </td>
+            </tr>
+         `;
 
-                <td>
-                    ${statusBadge}
-                </td>
-
-                <td class="text-end">
-
-                    <div class="d-flex
-                                justify-content-end
-                                gap-2
-                                flex-wrap">
-
-                        <button
-                            type="button"
-                            class="secondary-action-btn emp-view-btn"
-                            data-emp-id="${escapeHtmlEmp(empId)}">
-                            View
-                        </button>
-
-                        <button
-                            type="button"
-                            class="secondary-action-btn emp-edit-btn"
-                            data-emp-id="${escapeHtmlEmp(empId)}">
-                            Edit
-                        </button>
-
-                        ${isActive
-
-                    ? `
-                                <button
-                                    type="button"
-                                    class="btn btn-outline-danger btn-sm emp-deactivate-btn"
-                                    data-emp-id="${escapeHtmlEmp(empId)}">
-                                    Deactivate
-                                </button>
-                            `
-
-                    : `
-                                <button
-                                    type="button"
-                                    class="btn btn-outline-success btn-sm emp-reactivate-btn"
-                                    data-emp-id="${escapeHtmlEmp(empId)}">
-                                    Reactivate
-                                </button>
-                                <button
-                                    type="button"
-                                    class="btn btn-outline-danger btn-sm emp-delete-btn"
-                                    data-emp-id="${escapeHtmlEmp(empId)}">
-                                    Delete
-                                </button>
-                            `
-                }
-
-                    </div>
-
-                </td>
-            `;
-
-            tableBody.appendChild(row);
-        });
+        return;
     }
 
+    tableBody.innerHTML = "";
 
-    // ============================================================
-    // ACCOUNT STATUS
-    // ============================================================
+    employees.forEach(function (emp) {
 
-    function accountStatusBadge(status) {
-
-        if (status === "CREATED") {
-
-            return `
-                <span class="text-success">
-                    Login Active
-                </span>
-            `;
-        }
-
-        if (status === "FAILED") {
-
-            return `
-                <span class="text-danger">
-                    Login Failed
-                </span>
-            `;
-        }
-
-        return `
-            <span class="text-muted">
-                Pending
-            </span>
-        `;
-    }
-
-
-    // ============================================================
-    // PAGINATION
-    // ============================================================
-
-    function renderEmployeesPagination() {
-
-        const container =
-            document.getElementById(
-                "employeesPagination"
-            );
-
-        if (!container) {
-            return;
-        }
-
-        const totalPages =
-            Math.ceil(
-                empAllRows.length /
-                EMP_PAGE_SIZE
-            );
-
-        if (totalPages <= 1) {
-
-            container.innerHTML = "";
-
-            return;
-        }
-
-        let html =
-            `<ul class="pagination pagination-sm mb-0">`;
-
-        for (
-            let i = 0;
-            i < totalPages;
-            i++
-        ) {
-
-            html += `
-                <li class="page-item
-                    ${i === empCurrentPage ? "active" : ""}">
-
-                    <button
-                        type="button"
-                        class="page-link emp-page-btn"
-                        data-page="${i}">
-                        ${i + 1}
-                    </button>
-
-                </li>
-            `;
-        }
-
-        html += `</ul>`;
-
-        container.innerHTML = html;
-    }
-
-
-    // ============================================================
-    // VIEW EMPLOYEE DETAILS
-    // ============================================================
-
-    function renderEmployeeDetails(emp) {
-
-        const body =
-            document.getElementById(
-                "viewEmployeeBody"
-            );
-
-        if (!body) {
-            return;
-        }
-
-        if (!emp) {
-
-            body.innerHTML =
-                `<div class="text-muted">No data.</div>`;
-
-            return;
-        }
-
-        const fullName =
-            `${emp.firstName || ""} ${emp.lastName || ""}`
-                .trim() || "--";
-
-        const email =
-            emp.email ?? emp.empEmail;
+        const empId =
+            emp.id ?? emp.empId;
 
         const empCode =
             emp.employeeCode ?? emp.empCode;
+
+        const email =
+            emp.email ?? emp.empEmail;
 
         const roleLabel =
             emp.role ??
             emp.roleName ??
             (emp.roleId != null
                 ? `Role #${emp.roleId}`
-                : "--");
-
-        const deptLabel =
-            emp.department?.name ??
-            emp.departmentName ??
-            (emp.departmentId != null
-                ? `Dept #${emp.departmentId}`
                 : "--");
 
         const isActive =
@@ -564,241 +474,461 @@
                     ? String(emp.status).toUpperCase() === "ACTIVE"
                     : (emp.active !== undefined ? emp.active : !emp.deleted));
 
-        body.innerHTML = `
+        const fullName =
+            `${emp.firstName || ""} ${emp.lastName || ""}`
+                .trim() || "--";
 
-            <div class="profile-info-grid">
+        const statusBadge = isActive
+            ? `<span class="text-success">Active</span>`
+            : `<span class="text-danger">Inactive</span>`;
 
-                <div class="profile-info-item">
-                    <span class="profile-label">
-                        Employee Code
-                    </span>
+        const row = document.createElement("tr");
 
-                    <strong>
-                        ${escapeHtmlEmp(empCode || "--")}
-                    </strong>
-                </div>
+        row.innerHTML = `
+            <td>${escapeHtmlEmp(empCode || "--")}</td>
 
+            <td>${escapeHtmlEmp(fullName)}</td>
 
-                <div class="profile-info-item">
-                    <span class="profile-label">
-                        Full Name
-                    </span>
+            <td>${escapeHtmlEmp(email || "--")}</td>
 
-                    <strong>
-                        ${escapeHtmlEmp(fullName)}
-                    </strong>
-                </div>
+            <td>${escapeHtmlEmp(emp.phone || "--")}</td>
 
+            <td>${escapeHtmlEmp(roleLabel)}</td>
 
-                <div class="profile-info-item">
-                    <span class="profile-label">
-                        Work Email
-                    </span>
+            <td>
+                ${accountStatusBadge(emp.accountStatus)}
+            </td>
 
-                    <strong>
-                        ${escapeHtmlEmp(email || "--")}
-                    </strong>
-                </div>
+            <td>
+                ${statusBadge}
+            </td>
 
+            <td class="text-end">
 
-                <div class="profile-info-item">
-                    <span class="profile-label">
-                        Phone
-                    </span>
+                <div class="d-flex
+                            justify-content-end
+                            gap-2
+                            flex-wrap">
 
-                    <strong>
-                        ${escapeHtmlEmp(emp.phone || "--")}
-                    </strong>
-                </div>
+                    <button
+                        type="button"
+                        class="secondary-action-btn emp-view-btn"
+                        data-emp-id="${escapeHtmlEmp(empId)}">
+                        View
+                    </button>
 
+                    <button
+                        type="button"
+                        class="secondary-action-btn emp-edit-btn"
+                        data-emp-id="${escapeHtmlEmp(empId)}">
+                        Edit
+                    </button>
 
-                <div class="profile-info-item">
-                    <span class="profile-label">
-                        Designation
-                    </span>
+                    ${isActive
 
-                    <strong>
-                        ${escapeHtmlEmp(
-            emp.designation || "--"
-        )}
-                    </strong>
-                </div>
+                ? `
+                            <button
+                                type="button"
+                                class="btn btn-outline-danger btn-sm emp-deactivate-btn"
+                                data-emp-id="${escapeHtmlEmp(empId)}">
+                                Deactivate
+                            </button>
+                        `
 
-
-                <div class="profile-info-item">
-                    <span class="profile-label">
-                        Department
-                    </span>
-
-                    <strong>
-                        ${escapeHtmlEmp(deptLabel)}
-                    </strong>
-                </div>
-
-
-                <div class="profile-info-item">
-                    <span class="profile-label">
-                        Role
-                    </span>
-
-                    <strong>
-                        ${escapeHtmlEmp(roleLabel)}
-                    </strong>
-                </div>
-
-
-                <div class="profile-info-item">
-                    <span class="profile-label">
-                        Joining Date
-                    </span>
-
-                    <strong>
-                        ${escapeHtmlEmp(
-            emp.joiningDate || "--"
-        )}
-                    </strong>
-                </div>
-
-
-                <div class="profile-info-item">
-                    <span class="profile-label">
-                        Manager ID
-                    </span>
-
-                    <strong>
-                        ${emp.managerId != null
-                ? escapeHtmlEmp(
-                    emp.managerId
-                )
-                : "--"
+                : `
+                            <button
+                                type="button"
+                                class="btn btn-outline-success btn-sm emp-reactivate-btn"
+                                data-emp-id="${escapeHtmlEmp(empId)}">
+                                Reactivate
+                            </button>
+                            <button
+                                type="button"
+                                class="btn btn-outline-danger btn-sm emp-delete-btn"
+                                data-emp-id="${escapeHtmlEmp(empId)}">
+                                Delete
+                            </button>
+                        `
             }
-                    </strong>
+
                 </div>
 
+            </td>
+        `;
 
-                <div class="profile-info-item">
-                    <span class="profile-label">
-                        Status
-                    </span>
+        tableBody.appendChild(row);
+    });
+}
 
-                    <strong>
-                        ${isActive
-                ? "Active"
-                : "Inactive"}
-                    </strong>
-                </div>
 
-            </div>
+// ============================================================
+// ACCOUNT STATUS
+// ============================================================
+
+function accountStatusBadge(status) {
+
+    if (status === "CREATED") {
+
+        return `
+            <span class="text-success">
+                Login Active
+            </span>
         `;
     }
 
+    if (status === "FAILED") {
 
-    // ============================================================
-    // DOM READY
-    // ============================================================
+        return `
+            <span class="text-danger">
+                Login Failed
+            </span>
+        `;
+    }
 
-    document.addEventListener(
-        "DOMContentLoaded",
-        function () {
-
-            // ====================================================
-            // SEARCH
-            // ====================================================
-
-            const searchInput =
-                document.getElementById(
-                    "employeeSearchInput"
-                );
-
-            const includeInactiveToggle =
-                document.getElementById(
-                    "employeeIncludeInactive"
-                );
-
-            let searchDebounce;
+    return `
+        <span class="text-muted">
+            Pending
+        </span>
+    `;
+}
 
 
-            if (searchInput) {
+// ============================================================
+// PAGINATION
+// ============================================================
 
-                searchInput.addEventListener(
-                    "input",
-                    function () {
+function renderEmployeesPagination() {
 
-                        clearTimeout(
-                            searchDebounce
+    const container =
+        document.getElementById(
+            "employeesPagination"
+        );
+
+    if (!container) {
+        return;
+    }
+
+    const totalPages =
+        Math.ceil(
+            empAllRows.length /
+            EMP_PAGE_SIZE
+        );
+
+    if (totalPages <= 1) {
+
+        container.innerHTML = "";
+
+        return;
+    }
+
+    let html =
+        `<ul class="pagination pagination-sm mb-0">`;
+
+    for (
+        let i = 0;
+        i < totalPages;
+        i++
+    ) {
+
+        html += `
+            <li class="page-item
+                ${i === empCurrentPage ? "active" : ""}">
+
+                <button
+                    type="button"
+                    class="page-link emp-page-btn"
+                    data-page="${i}">
+                    ${i + 1}
+                </button>
+
+            </li>
+        `;
+    }
+
+    html += `</ul>`;
+
+    container.innerHTML = html;
+}
+
+
+// ============================================================
+// VIEW EMPLOYEE DETAILS
+// ============================================================
+
+function renderEmployeeDetails(emp) {
+
+    const body =
+        document.getElementById(
+            "viewEmployeeBody"
+        );
+
+    if (!body) {
+        return;
+    }
+
+    if (!emp) {
+
+        body.innerHTML =
+            `<div class="text-muted">No data.</div>`;
+
+        return;
+    }
+
+    const fullName =
+        `${emp.firstName || ""} ${emp.lastName || ""}`
+            .trim() || "--";
+
+    const email =
+        emp.email ?? emp.empEmail;
+
+    const empCode =
+        emp.employeeCode ?? emp.empCode;
+
+    const roleLabel =
+        emp.role ??
+        emp.roleName ??
+        (emp.roleId != null
+            ? `Role #${emp.roleId}`
+            : "--");
+
+    const deptLabel =
+        emp.department?.name ??
+        emp.departmentName ??
+        (emp.departmentId != null
+            ? `Dept #${emp.departmentId}`
+            : "--");
+
+    const isActive =
+        emp.__isActiveRow !== undefined
+            ? emp.__isActiveRow
+            : (emp.status !== undefined
+                ? String(emp.status).toUpperCase() === "ACTIVE"
+                : (emp.active !== undefined ? emp.active : !emp.deleted));
+
+    body.innerHTML = `
+
+        <div class="profile-info-grid">
+
+            <div class="profile-info-item">
+                <span class="profile-label">
+                    Employee Code
+                </span>
+
+                <strong>
+                    ${escapeHtmlEmp(empCode || "--")}
+                </strong>
+            </div>
+
+
+            <div class="profile-info-item">
+                <span class="profile-label">
+                    Full Name
+                </span>
+
+                <strong>
+                    ${escapeHtmlEmp(fullName)}
+                </strong>
+            </div>
+
+
+            <div class="profile-info-item">
+                <span class="profile-label">
+                    Work Email
+                </span>
+
+                <strong>
+                    ${escapeHtmlEmp(email || "--")}
+                </strong>
+            </div>
+
+
+            <div class="profile-info-item">
+                <span class="profile-label">
+                    Phone
+                </span>
+
+                <strong>
+                    ${escapeHtmlEmp(emp.phone || "--")}
+                </strong>
+            </div>
+
+
+            <div class="profile-info-item">
+                <span class="profile-label">
+                    Designation
+                </span>
+
+                <strong>
+                    ${escapeHtmlEmp(
+        emp.designation || "--"
+    )}
+                </strong>
+            </div>
+
+
+            <div class="profile-info-item">
+                <span class="profile-label">
+                    Department
+                </span>
+
+                <strong>
+                    ${escapeHtmlEmp(deptLabel)}
+                </strong>
+            </div>
+
+
+            <div class="profile-info-item">
+                <span class="profile-label">
+                    Role
+                </span>
+
+                <strong>
+                    ${escapeHtmlEmp(roleLabel)}
+                </strong>
+            </div>
+
+
+            <div class="profile-info-item">
+                <span class="profile-label">
+                    Joining Date
+                </span>
+
+                <strong>
+                    ${escapeHtmlEmp(
+        emp.joiningDate || "--"
+    )}
+                </strong>
+            </div>
+
+
+            <div class="profile-info-item">
+                <span class="profile-label">
+                    Manager ID
+                </span>
+
+                <strong>
+                    ${emp.managerId != null
+            ? escapeHtmlEmp(
+                emp.managerId
+            )
+            : "--"
+        }
+                </strong>
+            </div>
+
+
+            <div class="profile-info-item">
+                <span class="profile-label">
+                    Status
+                </span>
+
+                <strong>
+                    ${isActive
+            ? "Active"
+            : "Inactive"}
+                </strong>
+            </div>
+
+        </div>
+    `;
+}
+
+
+// ============================================================
+// DOM READY
+// ============================================================
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        // ====================================================
+        // SEARCH
+        // ====================================================
+
+        const searchInput =
+            document.getElementById(
+                "employeeSearchInput"
+            );
+
+        const includeInactiveToggle =
+            document.getElementById(
+                "employeeIncludeInactive"
+            );
+
+        let searchDebounce;
+
+
+        if (searchInput) {
+
+            searchInput.addEventListener(
+                "input",
+                function () {
+
+                    clearTimeout(
+                        searchDebounce
+                    );
+
+                    searchDebounce =
+                        setTimeout(
+                            function () {
+
+                                empSearchQuery =
+                                    searchInput
+                                        .value
+                                        .trim();
+
+                                loadEmployees(0);
+
+                            },
+                            350
                         );
-
-                        searchDebounce =
-                            setTimeout(
-                                function () {
-
-                                    empSearchQuery =
-                                        searchInput
-                                            .value
-                                            .trim();
-
-                                    loadEmployees(0);
-
-                                },
-                                350
-                            );
-                    }
-                );
-            }
+                }
+            );
+        }
 
 
-            if (includeInactiveToggle) {
+        if (includeInactiveToggle) {
 
-                includeInactiveToggle.addEventListener(
-                    "change",
-                    function () {
+            includeInactiveToggle.addEventListener(
+                "change",
+                function () {
 
-                        empIncludeInactive =
-                            includeInactiveToggle.checked;
+                    empIncludeInactive =
+                        includeInactiveToggle.checked;
 
-                        loadEmployees(0);
-                    }
-                );
-            }
+                    loadEmployees(0);
+                }
+            );
+        }
 
+        // ============================================================
+        // ADD EMPLOYEE MODAL
+        // ============================================================
 
-            // ====================================================
-            // ADD EMPLOYEE MODAL
-            // ====================================================
+        const addEmployeeModalEl =
+            document.getElementById("addEmployeeModal");
 
-            const addEmployeeModalEl =
-                document.getElementById(
-                    "addEmployeeModal"
-                );
+        if (addEmployeeModalEl) {
 
             const addEmployeeModal =
-                addEmployeeModalEl
-                    ? new bootstrap.Modal(
-                        addEmployeeModalEl
-                    )
-                    : null;
+                new bootstrap.Modal(addEmployeeModalEl);
 
             const addEmployeeButton =
-                document.getElementById(
-                    "addEmployeeButton"
-                );
+                document.getElementById("addEmployeeButton");
 
             const addEmployeeForm =
-                document.getElementById(
-                    "addEmployeeForm"
-                );
+                document.getElementById("addEmployeeForm");
 
             const addEmployeeMessage =
-                document.getElementById(
-                    "addEmployeeMessage"
-                );
+                document.getElementById("addEmployeeMessage");
 
 
-            // OPEN ADD MODAL
-            if (
-                addEmployeeButton &&
-                addEmployeeModal
-            ) {
+            // ========================================================
+            // OPEN ADD EMPLOYEE MODAL
+            // ========================================================
+
+            if (addEmployeeButton) {
 
                 addEmployeeButton.addEventListener(
                     "click",
@@ -814,16 +944,20 @@
 
                         addEmployeeModal.show();
 
-                        await loadMasterDataDropdowns();
+                        await loadEmployeeRoleDropdown();
+                        await loadEmployeeManagerDropdown();
+                        await loadEmployeeDepartmentDropdown();
+
                     }
                 );
+
             }
 
 
-            // ====================================================
+            // ========================================================
             // CREATE EMPLOYEE
             // POST /api/employees
-            // ====================================================
+            // ========================================================
 
             if (addEmployeeForm) {
 
@@ -833,155 +967,56 @@
 
                         event.preventDefault();
 
-
                         if (addEmployeeMessage) {
                             addEmployeeMessage.innerHTML = "";
                         }
 
-
-                        // ----------------------------------------
-                        // GET ELEMENTS
-                        // ----------------------------------------
-
-                        const employeeCodeEl =
-                            document.getElementById(
-                                "addEmpCode"
-                            );
-
                         const firstNameEl =
-                            document.getElementById(
-                                "addEmpFirstName"
-                            );
+                            document.getElementById("addEmpFirstName");
 
                         const lastNameEl =
-                            document.getElementById(
-                                "addEmpLastName"
-                            );
+                            document.getElementById("addEmpLastName");
 
                         const emailEl =
-                            document.getElementById(
-                                "addEmpEmail"
-                            );
+                            document.getElementById("addEmpEmail");
 
                         const phoneEl =
-                            document.getElementById(
-                                "addEmpPhone"
-                            );
+                            document.getElementById("addEmpPhone");
 
                         const genderEl =
-                            document.getElementById(
-                                "addEmpGender"
-                            );
+                            document.getElementById("addEmpGender");
 
                         const designationEl =
-                            document.getElementById(
-                                "addEmpDesignation"
-                            );
+                            document.getElementById("addEmpDesignation");
 
                         const joiningDateEl =
-                            document.getElementById(
-                                "addEmpJoiningDate"
-                            );
+                            document.getElementById("addEmpJoiningDate");
 
                         const departmentEl =
-                            document.getElementById(
-                                "addEmpDepartment"
-                            );
+                            document.getElementById("addEmpDepartment");
 
                         const roleEl =
-                            document.getElementById(
-                                "addEmpRole"
-                            );
+                            document.getElementById("addEmpRole");
 
                         const passwordEl =
-                            document.getElementById(
-                                "addEmpPassword"
-                            );
+                            document.getElementById("addEmpPassword");
 
                         const managerEl =
-                            document.getElementById(
-                                "addEmpManagerId"
-                            );
-
-
-                        // ----------------------------------------
-                        // CHECK REQUIRED ELEMENTS
-                        // ----------------------------------------
+                            document.getElementById("addEmpManagerId");
 
                         const missingFields = [];
 
-                        if (!employeeCodeEl) {
-                            missingFields.push(
-                                "addEmpCode"
-                            );
-                        }
-
-                        if (!firstNameEl) {
-                            missingFields.push(
-                                "addEmpFirstName"
-                            );
-                        }
-
-                        if (!lastNameEl) {
-                            missingFields.push(
-                                "addEmpLastName"
-                            );
-                        }
-
-                        if (!emailEl) {
-                            missingFields.push(
-                                "addEmpEmail"
-                            );
-                        }
-
-                        if (!phoneEl) {
-                            missingFields.push(
-                                "addEmpPhone"
-                            );
-                        }
-
-                        if (!genderEl) {
-                            missingFields.push(
-                                "addEmpGender"
-                            );
-                        }
-
-                        if (!designationEl) {
-                            missingFields.push(
-                                "addEmpDesignation"
-                            );
-                        }
-
-                        if (!joiningDateEl) {
-                            missingFields.push(
-                                "addEmpJoiningDate"
-                            );
-                        }
-
-                        if (!departmentEl) {
-                            missingFields.push(
-                                "addEmpDepartment"
-                            );
-                        }
-
-                        if (!roleEl) {
-                            missingFields.push(
-                                "addEmpRole"
-                            );
-                        }
-
-                        if (!passwordEl) {
-                            missingFields.push(
-                                "addEmpPassword"
-                            );
-                        }
-
-                        if (!managerEl) {
-                            missingFields.push(
-                                "addEmpManagerId"
-                            );
-                        }
-
+                        if (!firstNameEl) missingFields.push("addEmpFirstName");
+                        if (!lastNameEl) missingFields.push("addEmpLastName");
+                        if (!emailEl) missingFields.push("addEmpEmail");
+                        if (!phoneEl) missingFields.push("addEmpPhone");
+                        if (!genderEl) missingFields.push("addEmpGender");
+                        if (!designationEl) missingFields.push("addEmpDesignation");
+                        if (!joiningDateEl) missingFields.push("addEmpJoiningDate");
+                        if (!departmentEl) missingFields.push("addEmpDepartment");
+                        if (!roleEl) missingFields.push("addEmpRole");
+                        if (!passwordEl) missingFields.push("addEmpPassword");
+                        if (!managerEl) missingFields.push("addEmpManagerId");
 
                         if (missingFields.length > 0) {
 
@@ -1006,178 +1041,96 @@
                             return;
                         }
 
-
-                        // ----------------------------------------
-                        // VALUES
-                        // ----------------------------------------
-
-                        const employeeCode =
-                            employeeCodeEl.value.trim();
-
-                        const firstName =
-                            firstNameEl.value.trim();
-
-                        const lastName =
-                            lastNameEl.value.trim();
-
-                        const email =
-                            emailEl.value.trim();
-
-                        const phone =
-                            phoneEl.value.trim();
-
-                        const gender =
-                            genderEl.value || null;
-
-                        const designation =
-                            designationEl.value.trim();
-
-                        const joiningDate =
-                            joiningDateEl.value;
-
-                        const departmentId =
-                            departmentEl.value;
-
-                        const roleId =
-                            roleEl.value;
-
-                        const password =
-                            passwordEl.value;
-
-                        const managerId =
-                            managerEl.value;
-
-
-                        // ----------------------------------------
-                        // BASIC VALIDATION
-                        // ----------------------------------------
-
-                        if (!employeeCode) {
-                            alert(
-                                "Employee Code is required."
-                            );
-                            employeeCodeEl.focus();
-                            return;
-                        }
+                        const firstName = firstNameEl.value.trim();
+                        const lastName = lastNameEl.value.trim();
+                        const email = emailEl.value.trim();
+                        const phone = phoneEl.value.trim();
+                        const gender = genderEl.value || null;
+                        const designation = designationEl.value.trim();
+                        const joiningDate = joiningDateEl.value;
+                        const departmentId = departmentEl.value;
+                        const roleId = roleEl.value;
+                        const password = passwordEl.value;
+                        const managerId = managerEl.value;
 
                         if (!firstName) {
-                            alert(
-                                "First Name is required."
-                            );
+                            alert("First Name is required.");
                             firstNameEl.focus();
                             return;
                         }
 
                         if (!email) {
-                            alert(
-                                "Work Email is required."
-                            );
+                            alert("Work Email is required.");
                             emailEl.focus();
                             return;
                         }
 
+                        if (!gender) {
+                            alert("Please select Gender.");
+                            genderEl.focus();
+                            return;
+                        }
+
                         if (!designation) {
-                            alert(
-                                "Designation is required."
-                            );
+                            alert("Designation is required.");
                             designationEl.focus();
                             return;
                         }
 
                         if (!joiningDate) {
-                            alert(
-                                "Joining Date is required."
-                            );
+                            alert("Joining Date is required.");
                             joiningDateEl.focus();
                             return;
                         }
 
                         if (!departmentId) {
-                            alert(
-                                "Please select Department."
-                            );
+                            alert("Please select Department.");
                             departmentEl.focus();
                             return;
                         }
 
                         if (!roleId) {
-                            alert(
-                                "Please select Role."
-                            );
+                            alert("Please select Role.");
                             roleEl.focus();
                             return;
                         }
 
                         if (!password) {
-                            alert(
-                                "Password is required."
-                            );
+                            alert("Password is required.");
+                            passwordEl.focus();
+                            return;
+                        }
+
+                        if (password.length < 6) {
+                            alert("Password must be at least 6 characters.");
                             passwordEl.focus();
                             return;
                         }
 
                         if (!managerId) {
-                            alert(
-                                "Manager ID is required."
-                            );
+                            alert("Please select Manager.");
                             managerEl.focus();
                             return;
                         }
 
-
-                        // ----------------------------------------
-                        // EXACT BACKEND REQUEST BODY
-                        // ----------------------------------------
-
                         const request = {
-
-                            employeeCode:
-                                employeeCode,
-
-                            firstName:
-                                firstName,
-
-                            lastName:
-                                lastName,
-
-                            email:
-                                email,
-
-                            phone:
-                                phone,
-
-                            gender:
-                                gender,
-
-                            designation:
-                                designation,
-
-                            joiningDate:
-                                joiningDate,
-
-                            departmentId:
-                                Number(departmentId),
-
-                            roleId:
-                                Number(roleId),
-
-                            password:
-                                password,
-
-                            managerId:
-                                Number(managerId)
+                            firstName: firstName,
+                            lastName: lastName,
+                            email: email,
+                            phone: phone,
+                            gender: gender,
+                            designation: designation,
+                            joiningDate: joiningDate,
+                            departmentId: Number(departmentId),
+                            roleId: Number(roleId),
+                            password: password,
+                            managerId: Number(managerId)
                         };
-
 
                         console.log(
                             "POST /api/employees Request:",
                             request
                         );
-
-
-                        // ----------------------------------------
-                        // SUBMIT
-                        // ----------------------------------------
 
                         const submitButton =
                             addEmployeeForm.querySelector(
@@ -1189,38 +1142,26 @@
                                 ? submitButton.textContent
                                 : "";
 
-
                         try {
 
                             if (submitButton) {
-
-                                submitButton.disabled =
-                                    true;
-
-                                submitButton.textContent =
-                                    "Creating...";
+                                submitButton.disabled = true;
+                                submitButton.textContent = "Creating...";
                             }
-
 
                             const response =
                                 await apiRequest(
                                     "/api/employees",
                                     {
                                         method: "POST",
-
-                                        body:
-                                            JSON.stringify(
-                                                request
-                                            )
+                                        body: JSON.stringify(request)
                                     }
                                 );
-
 
                             console.log(
                                 "Employee created:",
                                 response
                             );
-
 
                             if (addEmployeeMessage) {
 
@@ -1229,24 +1170,17 @@
                                         ${escapeHtmlEmp(
                                     response.message ||
                                     "Employee created successfully."
-                                )
-                                    }
+                                )}
                                     </div>
                                 `;
                             }
 
-
-                            // Refresh employee list
                             await loadEmployees(0);
 
-
-                            // Close modal
                             setTimeout(
                                 function () {
 
-                                    if (addEmployeeModal) {
-                                        addEmployeeModal.hide();
-                                    }
+                                    addEmployeeModal.hide();
 
                                     if (addEmployeeMessage) {
                                         addEmployeeMessage.innerHTML = "";
@@ -1257,7 +1191,6 @@
                                 },
                                 1200
                             );
-
 
                         } catch (error) {
 
@@ -1271,7 +1204,6 @@
                                 error?.responseData ||
                                 error?.response?.data
                             );
-
 
                             if (addEmployeeMessage) {
 
@@ -1287,236 +1219,244 @@
                                 `;
                             }
 
-
                         } finally {
 
                             if (submitButton) {
-
-                                submitButton.disabled =
-                                    false;
-
-                                submitButton.textContent =
-                                    originalText;
+                                submitButton.disabled = false;
+                                submitButton.textContent = originalText;
                             }
+
                         }
+
                     }
                 );
+
             }
 
+        }
 
-            // ====================================================
-            // CLICK ACTIONS
-            // ====================================================
 
-            document.addEventListener(
-                "click",
-                async function (event) {
+        // ====================================================
+        // CLICK ACTIONS
+        // ====================================================
 
-                    const pageBtn =
-                        event.target.closest(
-                            ".emp-page-btn"
+        document.addEventListener(
+            "click",
+            async function (event) {
+
+                const pageBtn =
+                    event.target.closest(".emp-page-btn");
+
+                const viewBtn =
+                    event.target.closest(".emp-view-btn");
+
+                const editBtn =
+                    event.target.closest(".emp-edit-btn");
+
+                const deactivateBtn =
+                    event.target.closest(".emp-deactivate-btn");
+
+                const reactivateBtn =
+                    event.target.closest(".emp-reactivate-btn");
+
+                const deleteBtn =
+                    event.target.closest(".emp-delete-btn");
+
+
+                // --------------------------------------------
+                // PAGINATION
+                // --------------------------------------------
+
+                if (pageBtn) {
+
+                    await loadEmployees(
+                        Number(pageBtn.dataset.page)
+                    );
+
+                    return;
+                }
+
+
+                // --------------------------------------------
+                // VIEW
+                // --------------------------------------------
+
+                if (viewBtn) {
+
+                    const empId =
+                        viewBtn.dataset.empId;
+
+                        empPersonalInfoTargetId = empId;
+                    const modalEl =
+                        document.getElementById("viewEmployeeModal");
+
+                    const modal =
+                        modalEl
+                            ? new bootstrap.Modal(modalEl)
+                            : null;
+
+                    const body =
+                        document.getElementById("viewEmployeeBody");
+
+                    if (body) {
+                        body.innerHTML = "Loading...";
+                    }
+
+                    if (modal) {
+                        modal.show();
+                    }
+
+                    try {
+
+                        const response =
+                            await apiRequest(`/api/employees/${empId}`);
+
+                        renderEmployeeDetails(response.data);
+
+                    } catch (error) {
+
+                        if (body) {
+
+                            body.innerHTML = `
+                                <div class="custom-alert error">
+                                    ${escapeHtmlEmp(
+                                getErrorMessage(
+                                    error,
+                                    "Failed to load employee."
+                                )
+                            )}
+                                </div>
+                            `;
+                        }
+                    }
+
+                    return;
+                }
+
+
+                // --------------------------------------------
+                // EDIT (opens modal pre-filled with employee data)
+                // GET /api/employees/{id}
+                // --------------------------------------------
+
+                if (editBtn) {
+                    const empId = editBtn.dataset.empId;
+                    const editForm = document.getElementById("editEmployeeForm");
+                    const editMsg = document.getElementById("editEmployeeMessage");
+                    const modalEl = document.getElementById("editEmployeeModal");
+
+                    if (editForm) editForm.reset();
+                    if (editMsg) editMsg.innerHTML = `<div class="text-muted">Loading employee...</div>`;
+                    if (modalEl) new bootstrap.Modal(modalEl).show();
+
+                    try {
+                        const response = await apiRequest(`/api/employees/${empId}`);
+                        const emp = response.data || {};
+
+                        document.getElementById("editEmpId").value = emp.id ?? empId;
+                        document.getElementById("editEmpFirstName").value = emp.firstName || "";
+                        document.getElementById("editEmpLastName").value = emp.lastName || "";
+                        document.getElementById("editEmpEmail").value = emp.email || "";
+                        document.getElementById("editEmpPhone").value = emp.phone || "";
+                        document.getElementById("editEmpGender").value = (emp.gender || "").toUpperCase();
+                        document.getElementById("editEmpDesignation").value = emp.designation || "";
+                        document.getElementById("editEmpJoiningDate").value = emp.joiningDate || "";
+
+                        await Promise.all([
+                            loadEmployeeDepartmentDropdown("editEmpDepartment"),
+                            loadEmployeeRoleDropdown("editEmpRole"),
+                            loadEmployeeManagerDropdown("editEmpManagerId")
+                        ]);
+
+                        selectOptionByText("editEmpDepartment", emp.departmentName);
+                        selectOptionByText("editEmpRole", emp.roleName);
+                        selectOptionByText("editEmpManagerId", emp.managerName);
+
+                        if (editMsg) editMsg.innerHTML = "";
+                    } catch (error) {
+                        if (editMsg) {
+                            editMsg.innerHTML = `<div class="custom-alert error">${escapeHtmlEmp(getErrorMessage(error, "Failed to load employee."))}</div>`;
+                        }
+                    }
+                    return;
+                }
+
+                // --------------------------------------------
+                // DEACTIVATE (opens modal to collect exit details)
+                // --------------------------------------------
+
+                if (deactivateBtn) {
+
+                    const empId =
+                        deactivateBtn.dataset.empId;
+
+                    const deactivateForm =
+                        document.getElementById("deactivateEmployeeForm");
+
+                    const deactivateMsg =
+                        document.getElementById("deactivateEmployeeMessage");
+
+                    const modalEl =
+                        document.getElementById("deactivateEmployeeModal");
+
+                    if (deactivateForm) {
+                        deactivateForm.reset();
+                    }
+
+                    if (deactivateMsg) {
+                        deactivateMsg.innerHTML = "";
+                    }
+
+                    document.getElementById("deactivateEmpId").value = empId;
+
+                    if (modalEl) {
+                        new bootstrap.Modal(modalEl).show();
+                    }
+
+                    return;
+                }
+
+
+                // --------------------------------------------
+                // REACTIVATE
+                // --------------------------------------------
+
+                if (reactivateBtn) {
+
+                    const empId =
+                        reactivateBtn.dataset.empId;
+
+                    try {
+
+                        reactivateBtn.disabled = true;
+
+                        await apiRequest(
+                            `/api/employees/${empId}/reactivate`,
+                            { method: "PUT" }
                         );
 
-                    const viewBtn =
-                        event.target.closest(
-                            ".emp-view-btn"
-                        );
+                        await loadEmployees(empCurrentPage);
 
-                    const editBtn =
-                        event.target.closest(
-                            ".emp-edit-btn"
-                        );
+                    } catch (error) {
 
-                    const deactivateBtn =
-                        event.target.closest(
-                            ".emp-deactivate-btn"
-                        );
-
-                    const reactivateBtn =
-                        event.target.closest(
-                            ".emp-reactivate-btn"
-                        );
-
-                    const deleteBtn =
-                        event.target.closest(
-                            ".emp-delete-btn"
-                        );
-
-                    // --------------------------------------------
-                    // PAGINATION
-                    // --------------------------------------------
-
-                    if (pageBtn) {
-
-                        await loadEmployees(
-                            Number(
-                                pageBtn.dataset.page
+                        alert(
+                            getErrorMessage(
+                                error,
+                                "Failed to reactivate employee."
                             )
                         );
 
-                        return;
+                        reactivateBtn.disabled = false;
                     }
 
-
-                    // --------------------------------------------
-                    // VIEW
-                    // --------------------------------------------
-
-                    if (viewBtn) {
-
-                        const empId =
-                            viewBtn.dataset.empId;
-
-                        const modalEl =
-                            document.getElementById(
-                                "viewEmployeeModal"
-                            );
-
-                        const modal =
-                            modalEl
-                                ? new bootstrap.Modal(
-                                    modalEl
-                                )
-                                : null;
-
-                        const body =
-                            document.getElementById(
-                                "viewEmployeeBody"
-                            );
+                    return;
+                }
 
 
-                        if (body) {
-                            body.innerHTML =
-                                "Loading...";
-                        }
-
-
-                        if (modal) {
-                            modal.show();
-                        }
-
-
-                        try {
-
-                            const response =
-                                await apiRequest(
-                                    `/api/employees/${empId}`
-                                );
-
-                            renderEmployeeDetails(
-                                response.data
-                            );
-
-                        } catch (error) {
-
-                            if (body) {
-
-                                body.innerHTML = `
-                                    <div class="custom-alert error">
-                                        ${escapeHtmlEmp(
-                                    getErrorMessage(
-                                        error,
-                                        "Failed to load employee."
-                                    )
-                                )}
-                                    </div>
-                                `;
-                            }
-                        }
-
-                        return;
-                    }
-
-
-                    // --------------------------------------------
-                    // DEACTIVATE (opens modal to collect exit details)
-                    // --------------------------------------------
-
-                    if (deactivateBtn) {
-
-                        const empId =
-                            deactivateBtn.dataset.empId;
-
-                        const deactivateForm =
-                            document.getElementById(
-                                "deactivateEmployeeForm"
-                            );
-
-                        const deactivateMsg =
-                            document.getElementById(
-                                "deactivateEmployeeMessage"
-                            );
-
-                        const modalEl =
-                            document.getElementById(
-                                "deactivateEmployeeModal"
-                            );
-
-                        if (deactivateForm) {
-                            deactivateForm.reset();
-                        }
-
-                        if (deactivateMsg) {
-                            deactivateMsg.innerHTML = "";
-                        }
-
-                        document.getElementById(
-                            "deactivateEmpId"
-                        ).value = empId;
-
-                        if (modalEl) {
-                            new bootstrap.Modal(modalEl).show();
-                        }
-
-                        return;
-                    }
-
-
-                    // --------------------------------------------
-                    // REACTIVATE
-                    // --------------------------------------------
-
-                    if (reactivateBtn) {
-
-                        const empId =
-                            reactivateBtn.dataset.empId;
-
-                        try {
-
-                            reactivateBtn.disabled =
-                                true;
-
-                            await apiRequest(
-                                `/api/employees/${empId}/reactivate`,
-                                {
-                                    method: "PUT"
-                                }
-                            );
-
-                            await loadEmployees(
-                                empCurrentPage
-                            );
-
-                        } catch (error) {
-
-                            alert(
-                                getErrorMessage(
-                                    error,
-                                    "Failed to reactivate employee."
-                                )
-                            );
-
-                            reactivateBtn.disabled =
-                                false;
-                        }
-
-                        return;
-                    }
-
-
-                                    // --------------------------------------------
+                // --------------------------------------------
                 // DELETE (only allowed once employee is inactive)
-                // DELETE /api/employees/{id}
+                // NOTE: UI-only "soft hide" — no backend call,
+                // database data stays untouched.
                 // --------------------------------------------
 
                 if (deleteBtn) {
@@ -1527,10 +1467,10 @@
                     const confirmResult =
                         await Swal.fire({
                             icon: "warning",
-                            title: "Delete this employee?",
-                            text: "This action cannot be undone.",
+                            title: "Remove this employee from the list?",
+                            text: "This only hides it from the UI. The record stays in the database.",
                             showCancelButton: true,
-                            confirmButtonText: "Yes, delete",
+                            confirmButtonText: "Yes, remove",
                             cancelButtonText: "Cancel",
                             confirmButtonColor: "#dc3545"
                         });
@@ -1539,162 +1479,495 @@
                         return;
                     }
 
-                    try {
+                    hideEmployeeLocally(empId);
 
-                        deleteBtn.disabled =
-                            true;
+                    await loadEmployees(empCurrentPage);
 
-                        await apiRequest(
-                            `/api/employees/${empId}`,
-                            {
-                                method: "DELETE"
-                            }
-                        );
-
-                        await loadEmployees(
-                            empCurrentPage
-                        );
-
-                        Swal.fire({
-                            icon: "success",
-                            title: "Employee deleted",
-                            timer: 1500,
-                            showConfirmButton: false
-                        });
-
-                    } catch (error) {
-
-                        Swal.fire({
-                            icon: "error",
-                            title: "Failed to delete employee",
-                            text: getErrorMessage(
-                                error,
-                                "Something went wrong."
-                            )
-                        });
-
-                        deleteBtn.disabled =
-                            false;
-                    }
+                    Swal.fire({
+                        icon: "success",
+                        title: "Removed from list",
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
 
                     return;
                 }
             }
         );
 
+             // ====================================================
+        // PERSONAL INFO — OPEN (pre-fill) + SUBMIT
+        // GET/PUT /api/employees/{employeeId}/personal-info
+        // ====================================================
 
-            // ====================================================
-            // DEACTIVATE EMPLOYEE SUBMIT
-            // PUT /api/employees/{id}/exit
-            // ====================================================
+        const openPersonalInfoBtn =
+            document.getElementById("openPersonalInfoBtn");
 
-            const deactivateEmployeeForm =
-                document.getElementById(
-                    "deactivateEmployeeForm"
-                );
+        if (openPersonalInfoBtn) {
 
-            if (deactivateEmployeeForm) {
+            openPersonalInfoBtn.addEventListener(
+                "click",
+                async function () {
 
-                deactivateEmployeeForm.addEventListener(
-                    "submit",
-                    async function (event) {
+                    const empId = empPersonalInfoTargetId;
 
-                        event.preventDefault();
+                    if (!empId) {
+                        return;
+                    }
 
-                        const deactivateMsg =
-                            document.getElementById(
-                                "deactivateEmployeeMessage"
-                            );
+                    const piForm =
+                        document.getElementById("personalInfoForm");
 
-                        const empId =
-                            document.getElementById(
-                                "deactivateEmpId"
-                            ).value;
+                    const piMsg =
+                        document.getElementById("personalInfoMessage");
 
-                        const request = {
-                            exitDate:
-                                document.getElementById(
-                                    "deactivateExitDate"
-                                ).value,
-                            reason:
-                                document.getElementById(
-                                    "deactivateReason"
-                                ).value.trim(),
-                            separationMode:
-                                document.getElementById(
-                                    "deactivateSeparationMode"
-                                ).value,
-                            exitType:
-                                document.getElementById(
-                                    "deactivateExitType"
-                                ).value,
-                            exitStatus: "INITIATED"
-                        };
+                    const modalEl =
+                        document.getElementById("personalInfoModal");
 
-                        const submitButton =
-                            deactivateEmployeeForm.querySelector(
-                                'button[type="submit"]'
-                            );
+                    if (piForm) {
+                        piForm.reset();
+                    }
 
-                        try {
+                    document.getElementById("personalInfoEmpId").value =
+                        empId;
 
-                            if (submitButton) {
-                                submitButton.disabled = true;
-                            }
+                    if (piMsg) {
+                        piMsg.innerHTML =
+                            `<div class="text-muted">Loading...</div>`;
+                    }
 
+                    if (modalEl) {
+                        new bootstrap.Modal(modalEl).show();
+                    }
+
+                    try {
+
+                        const response =
                             await apiRequest(
-                                `/api/employees/${empId}/exit`,
-                                {
-                                    method: "PUT",
-                                    body: JSON.stringify(request)
-                                }
+                                `/api/employees/${empId}/personal-info`
                             );
 
-                            const modalEl =
-                                document.getElementById(
-                                    "deactivateEmployeeModal"
-                                );
+                        const info = response.data || {};
 
-                            const modal =
-                                modalEl &&
-                                bootstrap.Modal.getInstance(modalEl);
+                        document.getElementById("piDateOfBirth").value =
+                            info.dateOfBirth || "";
 
-                            if (modal) {
-                                modal.hide();
-                            }
+                        document.getElementById("piGender").value =
+                            (info.gender || "").toUpperCase();
 
-                            await loadEmployees(empCurrentPage);
+                        document.getElementById("piHeightCm").value =
+                            info.heightCm ?? "";
 
-                        } catch (error) {
+                        document.getElementById("piWeightKg").value =
+                            info.weightKg ?? "";
 
-                            if (deactivateMsg) {
+                        document.getElementById("piBloodGroup").value =
+                            (info.bloodGroup || "").toUpperCase();
 
-                                deactivateMsg.innerHTML = `
-                                    <div class="custom-alert error">
-                                        ${escapeHtmlEmp(
-                                    getErrorMessage(
-                                        error,
-                                        "Failed to deactivate employee."
-                                    )
-                                )}
-                                    </div>
-                                `;
-                            }
+                        document.getElementById("piMaritalStatus").value =
+                            (info.maritalStatus || "").toUpperCase();
 
-                        } finally {
+                        document.getElementById("piReligion").value =
+                            info.religion || "";
 
-                            if (submitButton) {
-                                submitButton.disabled = false;
-                            }
+                        document.getElementById("piNationality").value =
+                            info.nationality || "";
+
+                        document.getElementById("piAadhaarNumber").value =
+                            info.aadhaarNumber || "";
+
+                        document.getElementById("piPanNumber").value =
+                            info.panNumber || "";
+
+                        document.getElementById("piPassportNumber").value =
+                            info.passportNumber || "";
+
+                        document.getElementById("piDrivingLicenseNumber").value =
+                            info.drivingLicenseNumber || "";
+
+                        if (piMsg) {
+                            piMsg.innerHTML = "";
+                        }
+
+                    } catch (error) {
+
+                        if (piMsg) {
+
+                            piMsg.innerHTML = `
+                                <div class="custom-alert error">
+                                    ${escapeHtmlEmp(
+                                getErrorMessage(
+                                    error,
+                                    "Failed to load personal info."
+                                )
+                            )}
+                                </div>
+                            `;
                         }
                     }
-                );
-            }
-
-            // ====================================================
-            // INITIAL LOAD
-            // ====================================================
-
-            loadEmployees(0);
+                }
+            );
         }
-    );
+
+        const personalInfoForm =
+            document.getElementById("personalInfoForm");
+
+        if (personalInfoForm) {
+
+            personalInfoForm.addEventListener(
+                "submit",
+                async function (event) {
+
+                    event.preventDefault();
+
+                    const piMsg =
+                        document.getElementById("personalInfoMessage");
+
+                    if (piMsg) {
+                        piMsg.innerHTML = "";
+                    }
+
+                    const empId =
+                        document.getElementById("personalInfoEmpId").value;
+
+                    const heightVal =
+                        document.getElementById("piHeightCm").value;
+
+                    const weightVal =
+                        document.getElementById("piWeightKg").value;
+
+                    const request = {
+                        dateOfBirth:
+                            document.getElementById("piDateOfBirth").value || null,
+                        gender:
+                            document.getElementById("piGender").value || null,
+                        heightCm:
+                            heightVal ? Number(heightVal) : null,
+                        weightKg:
+                            weightVal ? Number(weightVal) : null,
+                        bloodGroup:
+                            document.getElementById("piBloodGroup").value || null,
+                        maritalStatus:
+                            document.getElementById("piMaritalStatus").value || null,
+                        religion:
+                            document.getElementById("piReligion").value.trim(),
+                        nationality:
+                            document.getElementById("piNationality").value.trim(),
+                        aadhaarNumber:
+                            document.getElementById("piAadhaarNumber").value.trim(),
+                        panNumber:
+                            document.getElementById("piPanNumber").value.trim(),
+                        passportNumber:
+                            document.getElementById("piPassportNumber").value.trim(),
+                        drivingLicenseNumber:
+                            document.getElementById("piDrivingLicenseNumber").value.trim()
+                    };
+
+                    const submitButton =
+                        personalInfoForm.querySelector(
+                            'button[type="submit"]'
+                        );
+
+                    const originalText =
+                        submitButton ? submitButton.textContent : "";
+
+                    try {
+
+                        if (submitButton) {
+                            submitButton.disabled = true;
+                            submitButton.textContent = "Saving...";
+                        }
+
+                        await apiRequest(
+                            `/api/employees/${empId}/personal-info`,
+                            {
+                                method: "PUT",
+                                body: JSON.stringify(request)
+                            }
+                        );
+
+                        const modalEl =
+                            document.getElementById("personalInfoModal");
+
+                        const modal =
+                            modalEl &&
+                            bootstrap.Modal.getInstance(modalEl);
+
+                        if (modal) {
+                            modal.hide();
+                        }
+
+                        Swal.fire({
+                            icon: "success",
+                            title: "Personal information updated",
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+
+                    } catch (error) {
+
+                        if (piMsg) {
+
+                            piMsg.innerHTML = `
+                                <div class="custom-alert error">
+                                    ${escapeHtmlEmp(
+                                getErrorMessage(
+                                    error,
+                                    "Failed to update personal info."
+                                )
+                            )}
+                                </div>
+                            `;
+                        }
+
+                    } finally {
+
+                        if (submitButton) {
+                            submitButton.disabled = false;
+                            submitButton.textContent = originalText;
+                        }
+                    }
+                }
+            );
+        }
+
+        // ====================================================
+        // EDIT EMPLOYEE SUBMIT
+        // PUT /api/employees/{id}
+        // ====================================================
+
+        const editEmployeeForm =
+            document.getElementById("editEmployeeForm");
+
+        if (editEmployeeForm) {
+
+            editEmployeeForm.addEventListener(
+                "submit",
+                async function (event) {
+
+                    event.preventDefault();
+
+                    const editMsg =
+                        document.getElementById("editEmployeeMessage");
+
+                    if (editMsg) {
+                        editMsg.innerHTML = "";
+                    }
+
+                    const empId =
+                        document.getElementById("editEmpId").value;
+
+                    const departmentId =
+                        document.getElementById("editEmpDepartment").value;
+
+                    const roleId =
+                        document.getElementById("editEmpRole").value;
+
+                    const managerId =
+                        document.getElementById("editEmpManagerId").value;
+
+                    const newPassword =
+                        document.getElementById("editEmpPassword").value;
+
+                    const request = {
+                        firstName:
+                            document.getElementById("editEmpFirstName").value.trim(),
+                        lastName:
+                            document.getElementById("editEmpLastName").value.trim(),
+                        email:
+                            document.getElementById("editEmpEmail").value.trim(),
+                        phone:
+                            document.getElementById("editEmpPhone").value.trim(),
+                        gender:
+                            document.getElementById("editEmpGender").value,
+                        designation:
+                            document.getElementById("editEmpDesignation").value.trim(),
+                        joiningDate:
+                            document.getElementById("editEmpJoiningDate").value,
+                        departmentId:
+                            departmentId ? Number(departmentId) : null,
+                        roleId:
+                            roleId ? Number(roleId) : null,
+                        managerId:
+                            managerId ? Number(managerId) : null
+                    };
+
+                    // Password sirf tabhi bhejo jab admin ne naya
+                    // password type kiya ho — warna backend agar
+                    // isse "password change" maan leta hai to khaali
+                    // value bhejna khatarnaak hoga.
+                    if (newPassword) {
+                        request.password = newPassword;
+                    }
+
+                    const submitButton =
+                        editEmployeeForm.querySelector(
+                            'button[type="submit"]'
+                        );
+
+                    const originalText =
+                        submitButton ? submitButton.textContent : "";
+
+                    try {
+
+                        if (submitButton) {
+                            submitButton.disabled = true;
+                            submitButton.textContent = "Saving...";
+                        }
+
+                        await apiRequest(
+                            `/api/employees/${empId}`,
+                            {
+                                method: "PUT",
+                                body: JSON.stringify(request)
+                            }
+                        );
+
+                        const modalEl =
+                            document.getElementById("editEmployeeModal");
+
+                        const modal =
+                            modalEl &&
+                            bootstrap.Modal.getInstance(modalEl);
+
+                        if (modal) {
+                            modal.hide();
+                        }
+
+                        await loadEmployees(empCurrentPage);
+
+                        Swal.fire({
+                            icon: "success",
+                            title: "Employee updated",
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+
+                    } catch (error) {
+
+                        if (editMsg) {
+
+                            editMsg.innerHTML = `
+                                <div class="custom-alert error">
+                                    ${escapeHtmlEmp(
+                                getErrorMessage(
+                                    error,
+                                    "Failed to update employee."
+                                )
+                            )}
+                                </div>
+                            `;
+                        }
+
+                    } finally {
+
+                        if (submitButton) {
+                            submitButton.disabled = false;
+                            submitButton.textContent = originalText;
+                        }
+                    }
+                }
+            );
+        }
+
+
+        // ====================================================
+        // DEACTIVATE EMPLOYEE SUBMIT
+        // PUT /api/employees/{id}/exit
+        // ====================================================
+
+        const deactivateEmployeeForm =
+            document.getElementById("deactivateEmployeeForm");
+
+        if (deactivateEmployeeForm) {
+
+            deactivateEmployeeForm.addEventListener(
+                "submit",
+                async function (event) {
+
+                    event.preventDefault();
+
+                    const deactivateMsg =
+                        document.getElementById("deactivateEmployeeMessage");
+
+                    const empId =
+                        document.getElementById("deactivateEmpId").value;
+
+                    const request = {
+                        exitDate:
+                            document.getElementById("deactivateExitDate").value,
+                        reason:
+                            document.getElementById("deactivateReason").value.trim(),
+                        separationMode:
+                            document.getElementById("deactivateSeparationMode").value,
+                        exitType:
+                            document.getElementById("deactivateExitType").value,
+                        exitStatus: "INITIATED"
+                    };
+
+                    const submitButton =
+                        deactivateEmployeeForm.querySelector(
+                            'button[type="submit"]'
+                        );
+
+                    try {
+
+                        if (submitButton) {
+                            submitButton.disabled = true;
+                        }
+
+                        await apiRequest(
+                            `/api/employees/${empId}/exit`,
+                            {
+                                method: "PUT",
+                                body: JSON.stringify(request)
+                            }
+                        );
+
+                        const modalEl =
+                            document.getElementById("deactivateEmployeeModal");
+
+                        const modal =
+                            modalEl &&
+                            bootstrap.Modal.getInstance(modalEl);
+
+                        if (modal) {
+                            modal.hide();
+                        }
+
+                        await loadEmployees(empCurrentPage);
+
+                    } catch (error) {
+
+                        if (deactivateMsg) {
+
+                            deactivateMsg.innerHTML = `
+                                <div class="custom-alert error">
+                                    ${escapeHtmlEmp(
+                                getErrorMessage(
+                                    error,
+                                    "Failed to deactivate employee."
+                                )
+                            )}
+                                </div>
+                            `;
+                        }
+
+                    } finally {
+
+                        if (submitButton) {
+                            submitButton.disabled = false;
+                        }
+                    }
+                }
+            );
+        }
+
+
+        // ====================================================
+        // INITIAL LOAD
+        // ====================================================
+
+        loadEmployees(0);
+    }
+);

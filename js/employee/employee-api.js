@@ -4,54 +4,156 @@
 //      GET /api/profiles/me → Fetches employee profile details and profile photo.
 //      Used to display the current employee's profile information.
 // ==========================================================================================
+// function fetchCurrentUserProfile() {
+//     return Promise.all([
+//         apiRequest("/api/employees/me"),
+//         apiRequest("/api/employees/me/profile-image").catch(function (error) {
+//             if (error.message && error.message.includes("No profile found")) {
+//                 return { data: {} };
+//             }
+//             return { data: {} };
+//         }),
+//         demoGetProfile(),
+//         getRealProfilePhotoUrl()
+//     ]).then(function (results) {
+
+//         const u = results[0].data || {};
+//         const ext = results[1].data || {};
+//         const d = results[2].data || {};
+//         const realPhotoUrl = results[3];
+
+//         return {
+//             success: true,
+//             data: {
+//                 employeeCode: u.employeeCode || d.employeeCode || "--",
+//                 firstName: u.firstName || d.firstName || "",
+//                 lastName: u.lastName || d.lastName || "",
+//                 email: u.email || d.email || "--",
+//                 phone: u.phone || d.phone || "--",
+
+//                 departmentName: u.departmentName || d.departmentName || "Not available",
+//                 designation: u.designation || d.designation || "Not available",
+//                 joiningDate: u.joiningDate || d.joiningDate || "Not available",
+//                 reportingManager: u.reportingManager || d.reportingManager || "Not available",
+
+//                 roles: u.roleName ? [u.roleName] : (u.roles || []),
+//                 permissions: u.permissions || [],
+
+//                 profileImage:
+//                     overriddenProfileImage ||
+//                     realPhotoUrl ||
+//                     u.profileImage ||
+//                     d.profileImage ||
+//                     null,
+
+//                 dateOfBirth: ext.dateOfBirth || u.dateOfBirth || d.dateOfBirth || "Not available",
+//                 gender: ext.gender || u.gender || d.gender || "Not available"
+//             }
+//         };
+//     })
+//         .catch(function (error) {
+//             return demoGetProfile();
+//         });
+// }
+
 function fetchCurrentUserProfile() {
-    return Promise.all([
-        apiRequest("/api/employees/me"),
-        apiRequest("/api/employees/me/profile-image").catch(function (error) {
-            if (error.message && error.message.includes("No profile found")) {
-                return { data: {} };
-            }
-            return { data: {} };
-        }),
-        demoGetProfile(),
-        getRealProfilePhotoUrl()
-    ]).then(function (results) {
 
-        const u = results[0].data || {};
-        const ext = results[1].data || {};
-        const d = results[2].data || {};
-        const realPhotoUrl = results[3];
+    return apiRequest("/api/employees/me")
+        .then(function (res) {
 
-        return {
-            success: true,
-            data: {
-                employeeCode: u.employeeCode || d.employeeCode || "--",
-                firstName: u.firstName || d.firstName || "",
-                lastName: u.lastName || d.lastName || "",
-                email: u.email || d.email || "--",
-                phone: u.phone || d.phone || "--",
+            const u = res.data || {};
 
-                departmentName: u.departmentName || d.departmentName || "Not available",
-                designation: u.designation || d.designation || "Not available",
-                joiningDate: u.joiningDate || d.joiningDate || "Not available",
-                reportingManager: u.reportingManager || d.reportingManager || "Not available",
+            return {
+                success: true,
 
-                roles: u.roleName ? [u.roleName] : (u.roles || []),
-                permissions: u.permissions || [],
+                data: {
 
-                profileImage:
-                    overriddenProfileImage ||
-                    realPhotoUrl ||
-                    u.profileImage ||
-                    d.profileImage ||
-                    null,
+                    // =========================
+                    // BASIC EMPLOYEE INFORMATION
+                    // =========================
 
-                dateOfBirth: ext.dateOfBirth || u.dateOfBirth || d.dateOfBirth || "Not available",
-                gender: ext.gender || u.gender || d.gender || "Not available"
-            }
-        };
-    })
+                    employeeCode: u.employeeCode || "--",
+
+                    firstName: u.firstName || "",
+
+                    lastName: u.lastName || "",
+
+                    email: u.email || "--",
+
+                    phone: u.phone || "--",
+
+
+                    // =========================
+                    // WORK INFORMATION
+                    // =========================
+
+                    designation:
+                        u.designation || "Not available",
+
+                    joiningDate:
+                        u.joiningDate || "Not available",
+
+                    departmentName:
+                        u.departmentName || "Not available",
+
+                    roleName:
+                        u.roleName || "Not available",
+
+                    status:
+                        u.status || "Not available",
+
+
+                    // =========================
+                    // ROLE / PERMISSION
+                    // =========================
+
+                    roles:
+                        u.roleName
+                            ? [u.roleName]
+                            : [],
+
+                    permissions:
+                        u.permissions || [],
+
+
+                    // =========================
+                    // PROFILE IMAGE FLAGS
+                    // =========================
+
+                    hasProfileImage:
+                        !!u.hasProfileImage,
+
+                    hasCoverImage:
+                        !!u.hasCoverImage,
+
+                    profileImage:
+                        overriddenProfileImage || null,
+
+
+                    // =========================
+                    // OTHER PROFILE DATA
+                    // =========================
+
+                    dateOfBirth:
+                        u.dateOfBirth || "Not available",
+
+                    gender:
+                        u.gender || "Not available",
+
+                    reportingManager:
+                        u.reportingManager || "Not available"
+                }
+            };
+        })
+
         .catch(function (error) {
+
+            console.error(
+                "Employee profile API failed:",
+                error
+            );
+
+            // Demo data only if real API fails
             return demoGetProfile();
         });
 }
@@ -527,11 +629,40 @@ function updateMyExtendedProfile(payload) {
 // ---------------------------------------------------------------------------------------
 //  GET /api/addresses/me
 // ---------------------------------------------------------------------------------------
-function fetchMyAddress() {
-    return apiRequest("/api/addresses/me")
+// ==========================================================================================
+//                  Get Logged-in Employee Personal Information
+//                  GET /api/employees/me/personal-info
+// ==========================================================================================
+function fetchPersonalInfo() {
+
+    return apiRequest("/api/employees/me/personal-info")
+        .then(function (res) {
+            return {
+                success: true,
+                data: res.data || {}
+            };
+        })
         .catch(function (error) {
-            return { success: false, data: null };
+            console.error(
+                "Personal information API failed:",
+                error
+            );
+            return {
+                success: false,
+                data: {}
+            };
         });
+}
+
+function updatePersonalInfo(payload) {
+
+    return apiRequest("/employees/me/personal-info", {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+    });
 }
 // ---------------------------------------------------------------------------------------
 //  POST /api/addresses/me
