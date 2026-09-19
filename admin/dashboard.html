@@ -1,98 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Admin Dashboard - Attendance & Payroll ERP</title>
-        <!-- Bootstrap -->
-        <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
-        <!-- CSS -->
-        <link rel="stylesheet" href="../css/admin-dashboard.css">
-        <link rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    </head>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Attendance & Payroll ERP</title>
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+    <!-- CSS -->
+    <link rel="stylesheet" href="../css/admin-dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
 
-    <body>
-        <!-- TOP NAVBAR: fixed header — brand logo/name on the left, admin profile dropdown on the right -->
-        <nav class="navbar admin-navbar">
-            <div class="container-fluid">
-                <!-- Brand: clicking logo/name reloads the dashboard -->
-                <a class="navbar-brand admin-brand" href="dashboard.html"
-                    id="brandToggle">
-                    <span class="brand-logo">
-                        AP
-                    </span>
-                    <span class="brand-text">
-                        <strong>
-                            Attendance & Payroll
-                        </strong>
-                        <small>
-                            ERP Management System
-                        </small>
-                    </span>
-                </a>
+<body>
+    <!-- TOP NAVBAR: fixed header — brand logo/name on the left, admin profile dropdown on the right -->
+    <nav class="navbar admin-navbar">
+        <div class="container-fluid">
+            <!-- Brand: clicking logo/name reloads the dashboard -->
+            <a class="navbar-brand admin-brand" href="dashboard.html" id="brandToggle">
+                <span class="brand-logo">
+                    AP
+                </span>
+                <span class="brand-text">
+                    <strong>
+                        Attendance & Payroll
+                    </strong>
+                    <small>
+                        ERP Management System
+                    </small>
+                </span>
+            </a>
 
-                <!-- ADMIN PROFILE: avatar + name/role button that opens the dropdown menu below -->
-                <div class="admin-profile-wrapper">
-                    <button type="button" id="adminProfileButton"
-                        class="admin-profile-button">
-                        <div class="admin-profile-avatar">
-                            <img id="headerAdminAvatarImg"
-                                class="admin-avatar-img d-none" src alt="Admin">
-                            <span id="headerAdminInitials"></span>
+            <!-- ADMIN PROFILE: avatar + name/role button that opens the dropdown menu below -->
+            <div class="admin-profile-wrapper">
+                <button type="button" id="adminProfileButton" class="admin-profile-button">
+                    <div class="admin-profile-avatar">
+                        <img id="headerAdminAvatarImg" class="admin-avatar-img d-none" src="" alt="Admin">
+                        <span id="headerAdminInitials"></span>
+                    </div>
+                    <div class="admin-profile-info">
+                        <strong id="headerAdminName"></strong>
+                        <small id="headerAdminRole"></small>
+                    </div>
+                </button>
+
+                <!-- Profile dropdown: quick links to My Profile / Session Management / Logout -->
+                <div id="adminProfileDropdown" class="admin-profile-dropdown">
+                    <div class="admin-dropdown-header">
+                        <div class="admin-dropdown-avatar">
+                            <img id="dropdownAdminAvatarImg" class="admin-avatar-img d-none" src="" alt="Admin">
+                            <span id="dropdownAdminInitials"></span>
                         </div>
-                        <div class="admin-profile-info">
-                            <strong id="headerAdminName"></strong>
-                            <small id="headerAdminRole"></small>
+                        <div>
+                            <strong id="dropdownAdminName">
+
+                            </strong>
+                            <span id="dropdownAdminRole">
+
+                            </span>
                         </div>
+                    </div>
+
+
+                    <!-- Opens the Profile view (#profileView) -->
+                    <button type="button" id="profileViewButton" class="admin-profile-menu-btn">
+                        <i class="fa-solid fa-user"></i>
+                        <span>My Profile</span>
                     </button>
 
-                    <!-- Profile dropdown: quick links to My Profile / Session Management / Logout -->
-                    <div id="adminProfileDropdown"
-                        class="admin-profile-dropdown">
-                        <div class="admin-dropdown-header">
-                            <div class="admin-dropdown-avatar">
-                                <img id="dropdownAdminAvatarImg"
-                                    class="admin-avatar-img d-none" src
-                                    alt="Admin">
-                                <span id="dropdownAdminInitials"></span>
-                            </div>
-                            <div>
-                                <strong id="dropdownAdminName">
+                    <!-- Opens the Session Management modal (#sessionsModal) -->
+                    <button type="button" id="sessionsButton" class="admin-profile-menu-btn">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                        <span>Session Management</span>
+                    </button>
 
-                                </strong>
-                                <span id="dropdownAdminRole">
-
-                                </span>
-                            </div>
-                        </div>
-
-                        <!-- Opens the Profile view (#profileView) -->
-                        <button type="button" id="profileViewButton"
-                            class="admin-profile-menu-btn">
-                            <i class="fa-solid fa-user"></i>
-                            <span>My Profile</span>
-                        </button>
-
-                        <!-- Opens the Session Management modal (#sessionsModal) -->
-                        <button type="button" id="sessionsButton"
-                            class="admin-profile-menu-btn">
-                            <i class="fa-solid fa-clock-rotate-left"></i>
-                            <span>Session Management</span>
-                        </button>
-
-                        <!-- Logs the admin out -->
-                        <button type="button" id="dropdownLogoutButton"
-                            class="admin-profile-menu-btn admin-logout-menu-btn">
-                            <i class="fa-solid fa-right-from-bracket"></i>
-                            <span>Logout</span>
-                        </button>
-                    </div>
+                    <!-- Logs the admin out -->
+                    <button type="button" id="dropdownLogoutButton"
+                        class="admin-profile-menu-btn admin-logout-menu-btn">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        <span>Logout</span>
+                    </button>
                 </div>
             </div>
         </div>
+        </div>
     </nav>
+
 
     <!-- DASHBOARD LAYOUT: two-column shell — sidebar nav on the left, main content on the right -->
     <div class="dashboard-layout">
@@ -100,8 +93,7 @@
 
         <!-- SIDEBAR: view-switcher nav — each button's data-view maps to a <section id="...View"> below-->
         <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
-        <aside class="dashboard-sidebar collapse d-md-block"
-            id="dashboardSidebar">
+        <aside class="dashboard-sidebar collapse d-md-block" id="dashboardSidebar">
             <div class="sidebar-header">
                 <span>
                     ADMIN PANEL
@@ -109,24 +101,21 @@
             </div>
             <div class="sidebar-menu">
                 <!-- Dashboard: shows #dashboardView (default active view) -->
-                <button class="sidebar-item active" type="button"
-                    data-view="dashboard">
+                <button class="sidebar-item active" type="button" data-view="dashboard">
                     <span class="menu-icon">
                         <i class="fa-solid fa-table-columns"></i>
                     </span>
                     Dashboard
                 </button>
                 <!-- Employees: shows #employeesView -->
-                <button class="sidebar-item" type="button"
-                    data-view="employees">
+                <button class="sidebar-item" type="button" data-view="employees">
                     <span class="menu-icon">
                         <i class="fa-solid fa-users"></i>
                     </span>
                     Employees
                 </button>
                 <!-- Attendance: shows #attendanceView -->
-                <button class="sidebar-item" type="button"
-                    data-view="attendance">
+                <button class="sidebar-item" type="button" data-view="attendance">
                     <span class="menu-icon">
                         <i class="fa-solid fa-clock"></i>
                     </span>
@@ -151,24 +140,21 @@
                     ADMINISTRATION
                 </div>
                 <!-- Users: shows #usersView, id used by JS to gate visibility by permission -->
-                <button class="sidebar-item administration-item"
-                    id="usersMenuButton" type="button" data-view="users">
+                <button class="sidebar-item administration-item" id="usersMenuButton" type="button" data-view="users">
                     <span class="menu-icon">
                         <i class="fa-solid fa-user"></i>
                     </span>
                     Users
                 </button>
                 <!-- Roles: shows #rolesView, id used by JS to gate visibility by permission -->
-                <button class="sidebar-item administration-item"
-                    id="rolesMenuButton" type="button" data-view="roles">
+                <button class="sidebar-item administration-item" id="rolesMenuButton" type="button" data-view="roles">
                     <span class="menu-icon">
                         <i class="fa-solid fa-user-tag"></i>
                     </span>
                     Roles
                 </button>
                 <!-- Permissions: shows #permissionsView, id used by JS to gate visibility by permission -->
-                <button class="sidebar-item administration-item"
-                    id="permissionsMenuButton" type="button"
+                <button class="sidebar-item administration-item" id="permissionsMenuButton" type="button"
                     data-view="permissions">
                     <span class="menu-icon">
                         <i class="fa-solid fa-lock"></i>
@@ -179,1800 +165,1624 @@
                 <!-- Sidebar User: bottom-of-sidebar logout button -->
                 <div class="sidebar-user">
                     <div>
-                        <button type="button" id="logoutButton"
-                            class="logout-btn">
+                        <button type="button" id="logoutButton" class="logout-btn">
                             Logout
                         </button>
                     </div>
                 </div>
-            </aside>
+        </aside>
 
-            <!-- ----------------MAIN -------------------------------------->
 
-            <!-- MAIN CONTENT: holds every content-view <section> — JS toggles which one is visible -->
-            <main class="dashboard-main">
-                <!-- DASHBOARD VIEW: landing view — welcome banner, 4 KPI stat cards, quick actions, "your access" summary -->
-                <section id="dashboardView" class="content-view">
-                    <!-- Welcome: greeting text + a badge showing the admin's current role -->
-                    <div class="dashboard-welcome">
-                        <div>
-                            <p class="page-label">
-                                ADMINISTRATION
-                            </p>
-                            <h1 id="dashboardWelcome">
-                                Welcome back!
-                            </h1>
-                            <p>
-                                Manage your employees, roles, permissions and
-                                organization from one place.
-                            </p>
-                        </div>
-                        <div class="current-role-card">
-                            <span>
-                                Current Role
-                            </span>
-                            <strong id="currentRole">
-                                ROLE_ADMIN
-                            </strong>
-                        </div>
+        <!-- ----------------MAIN -------------------------------------->
+
+        <!-- MAIN CONTENT: holds every content-view <section> — JS toggles which one is visible -->
+        <main class="dashboard-main">
+            <!-- DASHBOARD VIEW: landing view — welcome banner, 4 KPI stat cards, quick actions, "your access" summary -->
+            <section id="dashboardView" class="content-view">
+                <!-- Welcome: greeting text + a badge showing the admin's current role -->
+                <div class="dashboard-welcome">
+                    <div>
+                        <p class="page-label">
+                            ADMINISTRATION
+                        </p>
+                        <h1 id="dashboardWelcome">
+                            Welcome back!
+                        </h1>
+                        <p>
+                            Manage your employees, roles, permissions and
+                            organization from one place.
+                        </p>
                     </div>
-
-                    <!-- Dashboard Cards: 4 KPI stat cards (Total Employees / Present / Absent / Late Today) filled by JS -->
-                    <div class="row g-3 stats-row">
-                        <div class="col-12 col-sm-6 col-xl-3">
-                            <div class="dashboard-card">
-                                <div class="stat-icon">
-                                    E
-                                </div>
-                                <div>
-                                    <span>
-                                        Total Employees
-                                    </span>
-                                    <h2 id="totalEmployees">
-                                        2.5K
-                                    </h2>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-sm-6 col-xl-3">
-                            <div class="dashboard-card">
-                                <div class="stat-icon">
-                                    P
-                                </div>
-                                <div>
-                                    <span>
-                                        Present Today
-                                    </span>
-                                    <h2 id="presentToday">
-                                        --
-                                    </h2>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-sm-6 col-xl-3">
-                            <div class="dashboard-card">
-                                <div class="stat-icon">
-                                    A
-                                </div>
-                                <div>
-                                    <span>
-                                        Absent Today
-                                    </span>
-                                    <h2 id="absentToday">
-                                        --
-                                    </h2>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-sm-6 col-xl-3">
-                            <div class="dashboard-card">
-                                <div class="stat-icon">
-                                    L
-                                </div>
-                                <div>
-                                    <span>
-                                        Late Today
-                                    </span>
-                                    <h2 id="lateToday">
-                                        --
-                                    </h2>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="current-role-card">
+                        <span>
+                            Current Role
+                        </span>
+                        <strong id="currentRole">
+                            ROLE_ADMIN
+                        </strong>
                     </div>
+                </div>
 
-                    <!-- Quick Actions: 4 shortcut buttons that jump straight to Employees/Roles/Permissions/Reports views -->
-                    <section class="dashboard-section">
-                        <div class="section-heading">
+
+                <!-- Dashboard Cards: 4 KPI stat cards (Total Employees / Present / Absent / Late Today) filled by JS -->
+                <div class="row g-3 stats-row">
+                    <div class="col-12 col-sm-6 col-xl-3">
+                        <div class="dashboard-card">
+                            <div class="stat-icon">
+                                E
+                            </div>
                             <div>
-                                <h3>
-                                    Quick Actions
-                                </h3>
-                                <p>
-                                    Quickly access important management modules.
-                                </p>
+                                <span>
+                                    Total Employees
+                                </span>
+                                <h2 id="totalEmployees">
+                                    2.5K
+                                </h2>
                             </div>
                         </div>
-                        <div class="row g-3">
-                            <!-- Employees: shortcut to #employeesView -->
-                            <div class="col-12 col-sm-6 col-xl-3">
-                                <button
-                                    class="quick-action-card quick-action-button"
-                                    type="button" data-view="employees">
-                                    <strong>
-                                        Employees
-                                    </strong>
-                                    <span>
-                                        Manage employee information
-                                    </span>
-                                </button>
+                    </div>
+                    <div class="col-12 col-sm-6 col-xl-3">
+                        <div class="dashboard-card">
+                            <div class="stat-icon">
+                                P
                             </div>
-
-                            <!-- Roles: shortcut to #rolesView -->
-                            <div class="col-12 col-sm-6 col-xl-3">
-                                <button
-                                    class="quick-action-card quick-action-button"
-                                    type="button" data-view="roles">
-                                    <strong>
-                                        Roles
-                                    </strong>
-                                    <span>
-                                        Manage system roles
-                                    </span>
-                                </button>
-                            </div>
-
-                            <!-- Permissions: shortcut to #permissionsView -->
-                            <div class="col-12 col-sm-6 col-xl-3">
-                                <button
-                                    class="quick-action-card quick-action-button"
-                                    type="button" data-view="permissions">
-                                    <strong>
-                                        Permissions
-                                    </strong>
-                                    <span>
-                                        View system permissions
-                                    </span>
-                                </button>
-                            </div>
-
-                            <!-- Reports: shortcut to #reportsView -->
-                            <div class="col-12 col-sm-6 col-xl-3">
-                                <button
-                                    class="quick-action-card quick-action-button"
-                                    type="button" data-view="reports">
-                                    <strong>
-                                        Reports
-                                    </strong>
-                                    <span>
-                                        View organization reports
-                                    </span>
-                                </button>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- Logged In Access: shows the logged-in admin's own roles + permission tags, filled by JS -->
-                    <section class="dashboard-section access-section">
-                        <div class="section-heading">
                             <div>
-                                <h3>
-                                    Your Access
-                                </h3>
-                                <p>
-                                    Roles and permissions assigned to your
-                                    account.
-                                </p>
-                            </div>
-                        </div>
-                        <div class="access-card">
-                            <div class="access-card-header">
-                                <div>
-                                    <span class="access-title">
-                                        Assigned Roles
-                                    </span>
-                                    <!-- Role badges injected here by JS (renderDashboardRoles) -->
-                                    <div id="dashboardRoles"
-                                        class="role-badges">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="permissions-preview">
-                                <div class="permissions-preview-header">
-                                    <span>
-                                        Permissions
-                                    </span>
-                                    <span id="permissionCount"
-                                        class="permission-count">
-                                        0
-                                    </span>
-                                </div>
-                                <!-- Permission tags injected here by JS (renderDashboardPermissions) -->
-                                <div id="dashboardPermissions"
-                                    class="permission-tags">
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-                </section>
-
-                <!-- // PROFILE VIEW: admin's own profile — basic info, contact, roles, permissions, password reset -->
-                <section id="profileView" class="content-view d-none">
-                    <div class>
-
-                    </div>
-
-                    <!-- ADMIN PROFILE CARD: wraps every profile sub-section below -->
-                    <div class="admin-profile-page-card">
-                        <!-- PROFILE COVER WRAP: cover image fills the whole banner; the header (avatar+name)
-                         is overlaid directly on top of it instead of sitting in a separate white strip -->
-                        <div class="admin-profile-cover-wrap">
-                            <div class="admin-profile-cover">
-                                <img src="../assets/image/cover-earth-image.jpg"
-                                    alt="Cover"
-                                    class="admin-profile-cover-image">
-                            </div>
-
-                            <!-- PROFILE HEADER: large avatar + name + role badge, overlaid on the cover -->
-                            <div class="profile-header">
-
-                                <div class="profile-avatar"
-                                    id="profileAvatarClickable">
-
-                                    <img id="profileAvatarImg"
-                                        class="admin-avatar-img d-none" src
-                                        alt="Admin profile photo">
-
-                                    <span id="profileInitials"></span>
-
-                                    <button type="button"
-                                        id="profileAvatarEditBtn"
-                                        class="admin-avatar-edit-btn"
-                                        title="Change photo"
-                                        aria-label="Change profile photo">
-
-                                        <i class="fa-solid fa-camera"></i>
-
-                                    </button>
-
-                                </div>
-
-                                <div class="profile-main-info">
-
-                                    <h2 id="profileName">
-                                        Loading...
-                                    </h2>
-
-                                    <p id="profileRole"></p>
-
-                                    <span class="profile-status">
-                                        <span class="status-dot"></span>
-                                        Active Administrator
-                                    </span>
-
-                                </div>
-
-                            </div>
-                        </div>
-
-                        <!-- BASIC INFORMATION: read-only full name + primary role -->
-                        <div class="profile-section">
-                            <div class="profile-section-title">
-                                <span class="profile-section-icon">
-                                    <i class="fa-solid fa-user"></i>
+                                <span>
+                                    Present Today
                                 </span>
-                                <div>
-                                    <h4>Basic Information</h4>
-                                    <p>Administrator account details</p>
-                                </div>
-                            </div>
-                            <div class="profile-info-grid">
-                                <div class="profile-info-item">
-                                    <span class="profile-label">Full Name</span>
-                                    <strong
-                                        id="profileFullName">Loading...</strong>
-                                </div>
-                                <div class="profile-info-item">
-                                    <span class="profile-label">Primary
-                                        Role</span>
-                                    <strong id="profilePrimaryRole"></strong>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- CONTACT INFORMATION: email display + button that opens the reset-password modal -->
-                        <div class="profile-section">
-                            <div class="profile-section-title">
-                                <span class="profile-section-icon">
-                                    <i class="fa-solid fa-envelope"></i>
-                                </span>
-                                <div>
-                                    <h4>Contact Information</h4>
-                                    <p>Your registered account details</p>
-                                </div>
-                            </div>
-                            <div class="profile-info-grid">
-                                <div class="profile-info-item">
-                                    <span class="profile-label">Email
-                                        Address</span>
-                                    <strong id="profileEmail">--</strong>
-                                </div>
-                                <div
-                                    class="profile-info-item profile-password-card">
-                                    <span class="profile-label">Password</span>
-                                    <!-- Opens #resetPasswordModal -->
-                                    <button type="button"
-                                        id="resetPasswordToggleButton"
-                                        class="btn-reset-password">
-                                        Reset Password
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- ROLE INFORMATION: role tags for this admin account, injected by JS (renderProfileRoles) -->
-                        <div class="profile-section">
-                            <div class="profile-section-title">
-                                <span class="profile-section-icon">
-                                    <i class="fa-solid fa-user-tag"></i>
-                                </span>
-                                <div>
-                                    <h4>Assigned Roles</h4>
-                                    <p>Roles assigned to your account</p>
-                                </div>
-                            </div>
-                            <div id="profileRoles" class="profile-access-tags">
-                            </div>
-                        </div>
-
-                        <!-- PERMISSIONS: permission tags for this admin account, injected by JS (renderProfilePermissions) -->
-                        <div class="profile-section">
-                            <div class="profile-section-title">
-                                <span class="profile-section-icon">
-                                    <i class="fa-solid fa-lock"></i>
-                                </span>
-                                <div>
-                                    <h4>Assigned Permissions</h4>
-                                    <p>Access permissions available to your
-                                        account</p>
-                                </div>
-                            </div>
-                            <div class="profile-permission-heading">
-                                <span>Permissions</span>
-                                <span id="profilePermissionCount"
-                                    class="profile-permission-count">0</span>
-                            </div>
-                            <div id="profilePermissions"
-                                class="profile-access-tags">
+                                <h2 id="presentToday">
+                                    --
+                                </h2>
                             </div>
                         </div>
                     </div>
-                </section>
-
-                <!-- RESET PASSWORD MODAL -->
-                <div class="modal fade" id="resetPasswordModal" tabindex="-1"
-                    aria-labelledby="resetPasswordModalLabel"
-                    aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <div>
-                                    <h5 class="modal-title"
-                                        id="resetPasswordModalLabel">Reset
-                                        Password</h5>
-                                    <small class="text-muted">Update your
-                                        account password securely.</small>
-                                </div>
-                                <button type="button" class="btn-close"
-                                    data-bs-dismiss="modal"
-                                    aria-label="Close"></button>
+                    <div class="col-12 col-sm-6 col-xl-3">
+                        <div class="dashboard-card">
+                            <div class="stat-icon">
+                                A
                             </div>
-                            <div class="modal-body">
-                                <div id="resetPasswordMessage"></div>
-                                <form id="resetPasswordForm">
-                                    <div class="row g-3">
-                                        <div class="col-md-6">
-                                            <label class="form-label">Current
-                                                Password <span
-                                                    class="required-star">*</span></label>
-                                            <input type="password"
-                                                id="currentPasswordField"
-                                                class="form-control" required>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">New
-                                                Password <span
-                                                    class="required-star">*</span></label>
-                                            <input type="password"
-                                                id="newPasswordField"
-                                                class="form-control"
-                                                minlength="6"
-                                                required>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Confirm
-                                                New Password <span
-                                                    class="required-star">*</span></label>
-                                            <input type="password"
-                                                id="confirmPasswordField"
-                                                class="form-control"
-                                                minlength="6" required>
-                                        </div>
-                                    </div>
-                                    <div class="admin-password-action-row">
-                                        <button type="submit"
-                                            class="primary-action-btn">Update
-                                            Password</button>
-                                    </div>
-                                </form>
+                            <div>
+                                <span>
+                                    Absent Today
+                                </span>
+                                <h2 id="absentToday">
+                                    --
+                                </h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-6 col-xl-3">
+                        <div class="dashboard-card">
+                            <div class="stat-icon">
+                                L
+                            </div>
+                            <div>
+                                <span>
+                                    Late Today
+                                </span>
+                                <h2 id="lateToday">
+                                    --
+                                </h2>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- SESSION MANAGEMENT MODAL: lists active login sessions/devices for this account, with revoke actions -->
-                <div class="modal fade" id="sessionsModal" tabindex="-1"
-                    aria-labelledby="sessionsModalLabel"
-                    aria-hidden="true">
-                    <div class="modal-dialog modal-xl modal-dialog-scrollable">
-                        <div class="modal-content">
-                            <!-- HEADER: modal title + close button -->
-                            <div class="modal-header">
-                                <div>
-                                    <p class="page-label mb-1">
-                                        SECURITY
-                                    </p>
-                                    <h5 class="modal-title"
-                                        id="sessionsModalLabel">
-                                        Session Management
-                                    </h5>
-                                    <small class="text-muted">
-                                        View and manage devices where your
-                                        account is logged in.
-                                    </small>
-                                </div>
-                                <button type="button" class="btn-close"
-                                    data-bs-dismiss="modal" aria-label="Close">
-                                </button>
-                            </div>
-                            <!-- BODY: status message + the session list, both filled/populated by JS (loadSessions) -->
-                            <div class="modal-body">
-                                <!-- MESSAGE: success/error banner for session actions -->
-                                <div id="sessionsMessage" class="mb-3">
-                                </div>
-                                <!-- SESSION LIST: one card per active session, injected by JS -->
-                                <div id="sessionsList" class="sessions-list">
-                                    <div class="text-center py-4">
-                                        <span class="text-muted">
-                                            Loading sessions...
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- VIEW PHOTO MODAL: shows the admin's current profile photo full-size, with an edit shortcut -->
-                <div class="modal fade" id="adminViewPhotoModal" tabindex="-1"
-                    aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered modal-sm">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Profile Photo</h5>
-                                <button type="button" class="btn-close"
-                                    data-bs-dismiss="modal"
-                                    aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body admin-view-photo-body">
-                                <div class="admin-view-photo-wrapper">
-                                    <img id="viewAdminPhotoImage" src
-                                        alt="Profile Photo"
-                                        class="admin-view-photo-image d-none">
-                                    <span id="viewAdminPhotoFallback"
-                                        class="admin-view-photo-fallback"></span>
-                                    <button type="button"
-                                        id="openUploadAdminPhotoButton"
-                                        class="admin-avatar-edit-btn admin-view-photo-edit-btn"
-                                        title="Change Photo"><i
-                                            class="fa-solid fa-camera"></i></button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- UPLOAD PHOTO MODAL: pick a file, preview it, then POST it to /api/profile-photos/me -->
-                <div class="modal fade" id="adminUploadPhotoModal" tabindex="-1"
-                    aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Update Profile
-                                    Photo</h5>
-                                <button type="button" class="btn-close"
-                                    data-bs-dismiss="modal"
-                                    aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <div id="uploadAdminPhotoMessage"></div>
-
-                                <div class="admin-upload-photo-preview-wrapper">
-                                    <img id="uploadAdminPhotoPreview" src
-                                        alt="Preview"
-                                        class="admin-upload-photo-preview d-none">
-                                    <span id="uploadAdminPhotoPreviewFallback"
-                                        class="admin-upload-photo-preview-fallback"></span>
-                                </div>
-
-                                <div class="mb-0 mt-3">
-                                    <label class="form-label">Choose
-                                        Image</label>
-                                    <input type="file"
-                                        id="uploadAdminPhotoInput"
-                                        class="form-control" accept="image/*">
-                                    <small class="text-muted">JPG or PNG, max
-                                        2MB recommended.</small>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button"
-                                    class="secondary-action-btn"
-                                    data-bs-dismiss="modal">Cancel</button>
-                                <button type="button" id="saveAdminPhotoButton"
-                                    class="primary-action-btn" disabled>Save
-                                    Photo</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- using api/auth/employee  -->
-                <!-- EMPLOYEES VIEW: employee list with search/filter, "Add Employee" entry point, table filled by JS -->
-                <section id="employeesView" class="content-view d-none">
-                    <div
-                        class="page-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <!-- Quick Actions: 4 shortcut buttons that jump straight to Employees/Roles/Permissions/Reports views -->
+                <section class="dashboard-section">
+                    <div class="section-heading">
                         <div>
-                            <p class="page-label">
-                                EMPLOYEE MANAGEMENT
-                            </p>
-                            <h1>
-                                Employees
-                            </h1>
+                            <h3>
+                                Quick Actions
+                            </h3>
                             <p>
-                                Manage employee records and employee information
-                                from the admin panel.
+                                Quickly access important management modules.
                             </p>
                         </div>
-                        <div class="page-header-action">
-                            <!-- Opens #addEmployeeModal -->
-                            <button type="button" id="addEmployeeButton"
-                                class="primary-action-btn">
-                                + Add Employee
+                    </div>
+                    <div class="row g-3">
+                        <!-- Employees: shortcut to #employeesView -->
+                        <div class="col-12 col-sm-6 col-xl-3">
+                            <button class="quick-action-card quick-action-button" type="button" data-view="employees">
+                                <strong>
+                                    Employees
+                                </strong>
+                                <span>
+                                    Manage employee information
+                                </span>
                             </button>
                         </div>
-                    </div>
 
-                    <!-- FILTER BAR: search-by-name/code/email input + "include inactive" checkbox, drives table filtering -->
-                    <div class="management-card">
-                        <div
-                            class="p-3 d-flex flex-wrap gap-3 align-items-center justify-content-between">
-                            <input type="search" id="employeeSearchInput"
-                                class="form-control" style="max-width: 320px;"
-                                placeholder="Search by name, code or email...">
-                            <div class="form-check">
-                                <input type="checkbox" class="form-check-input"
-                                    id="employeeIncludeInactive">
-                                <label class="form-check-label"
-                                    for="employeeIncludeInactive">
-                                    Include inactive employees
-                                </label>
-                            </div>
-                        </div>
 
-                        <!-- Employee table: rows injected by JS into #employeesTableBody; pagination controls in #employeesPagination -->
-                        <div class="table-responsive">
-                            <table class="table management-table mb-0">
-                                <thead>
-                                    <tr>
-                                        <th>Emp Code</th>
-                                        <th>Name</th>
-                                        <th>Email</th>
-                                        <th>Phone</th>
-                                        <th>Role</th>
-                                        <th>Login Account</th>
-                                        <th>Status</th>
-                                        <th class="text-end">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="employeesTableBody">
-                                    <tr>
-                                        <td colspan="8"
-                                            class="text-center py-5">
-                                            Loading employees...
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="p-3 d-flex justify-content-end"
-                            id="employeesPagination"></div>
-                    </div>
-                </section>
-
-                <!-- =========================================================
-                        ADD EMPLOYEE MODAL
-                    ========================================================= -->
-
-                <div class="modal fade"
-                    id="addEmployeeModal"
-                    tabindex="-1"
-                    aria-labelledby="addEmployeeModalLabel"
-                    aria-hidden="true">
-
-                    <div
-                        class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
-
-                        <div
-                            class="modal-content role-modal-content add-employee-modal-content">
-
-                            <!-- =========================
-                                    HEADER
-                                ========================== -->
-                            <div class="modal-header">
-
-                                <div>
-                                    <p class="page-label mb-1">
-                                        EMPLOYEE MANAGEMENT
-                                    </p>
-
-                                    <h5 class="modal-title"
-                                        id="addEmployeeModalLabel">
-                                        Add Employee
-                                    </h5>
-                                </div>
-
-                                <button type="button"
-                                    class="btn-close"
-                                    data-bs-dismiss="modal"
-                                    aria-label="Close">
-                                </button>
-
-                            </div>
-
-                            <!-- =========================
-                                    FORM
-                                ========================== -->
-                            <form id="addEmployeeForm">
-
-                                <div class="modal-body">
-
-                                    <!-- Message -->
-                                    <div id="addEmployeeMessage"></div>
-
-                                    <div class="row g-3">
-
-                                        <!-- =========================
-                                                FIRST NAME
-                                            ========================== -->
-                                        <div class="col-md-6">
-
-                                            <label for="addEmpFirstName"
-                                                class="form-label">
-
-                                                First Name
-                                                <span
-                                                    class="required-star">*</span>
-
-                                            </label>
-
-                                            <input type="text"
-                                                id="addEmpFirstName"
-                                                class="form-control"
-                                                maxlength="60"
-                                                placeholder="Enter first name"
-                                                required>
-
-                                        </div>
-
-                                        <!-- =========================
-                                                LAST NAME
-                                            ========================== -->
-                                        <div class="col-md-6">
-
-                                            <label for="addEmpLastName"
-                                                class="form-label">
-
-                                                Last Name
-
-                                            </label>
-
-                                            <input type="text"
-                                                id="addEmpLastName"
-                                                class="form-control"
-                                                maxlength="60"
-                                                placeholder="Enter last name">
-
-                                        </div>
-
-                                        <!-- =========================
-                                                WORK EMAIL
-                                            ========================== -->
-                                        <div class="col-md-6">
-
-                                            <label for="addEmpEmail"
-                                                class="form-label">
-
-                                                Work Email
-                                                <span
-                                                    class="required-star">*</span>
-
-                                            </label>
-
-                                            <input type="email"
-                                                id="addEmpEmail"
-                                                class="form-control"
-                                                maxlength="150"
-                                                placeholder="user@example.com"
-                                                required>
-
-                                        </div>
-
-                                        <!-- =========================
-                                                PHONE
-                                            ========================== -->
-                                        <div class="col-md-6">
-
-                                            <label for="addEmpPhone"
-                                                class="form-label">
-
-                                                Phone
-
-                                            </label>
-
-                                            <input type="text"
-                                                id="addEmpPhone"
-                                                class="form-control"
-                                                maxlength="20"
-                                                placeholder="Enter phone number">
-
-                                        </div>
-
-                                        <!-- =========================
-                                                GENDER
-                                            ========================== -->
-                                        <div class="col-md-6">
-
-                                            <label for="addEmpGender"
-                                                class="form-label">
-
-                                                Gender
-                                                <span
-                                                    class="required-star">*</span>
-
-                                            </label>
-
-                                            <select id="addEmpGender"
-                                                name="gender"
-                                                class="form-select"
-                                                required>
-
-                                                <option value
-                                                    selected
-                                                    disabled>
-                                                    Select Gender
-                                                </option>
-
-                                                <option value="MALE">
-                                                    Male
-                                                </option>
-
-                                                <option value="FEMALE">
-                                                    Female
-                                                </option>
-
-                                                <option value="OTHER">
-                                                    Other
-                                                </option>
-
-                                            </select>
-
-                                        </div>
-
-                                        <!-- =========================
-                                                DESIGNATION
-                                            ========================== -->
-                                        <div class="col-md-6">
-
-                                            <label for="addEmpDesignation"
-                                                class="form-label">
-
-                                                Designation
-                                                <span
-                                                    class="required-star">*</span>
-
-                                            </label>
-
-                                            <input type="text"
-                                                id="addEmpDesignation"
-                                                class="form-control"
-                                                maxlength="100"
-                                                placeholder="Enter designation"
-                                                required>
-
-                                        </div>
-
-                                        <!-- =========================
-                                            JOINING DATE
-                                        ========================== -->
-                                        <div class="col-md-6">
-
-                                            <label for="addEmpJoiningDate"
-                                                class="form-label">
-
-                                                Joining Date
-                                                <span
-                                                    class="required-star">*</span>
-
-                                            </label>
-
-                                            <input type="date"
-                                                id="addEmpJoiningDate"
-                                                class="form-control"
-                                                required>
-
-                                        </div>
-
-                                        <!-- =========================
-                                                DEPARTMENT
-                                            ========================== -->
-                                        <div class="col-md-6">
-
-                                            <label for="addEmpDepartment"
-                                                class="form-label">
-
-                                                Department
-                                                <span
-                                                    class="required-star">*</span>
-
-                                            </label>
-
-                                            <select id="addEmpDepartment"
-                                                class="form-select" required>
-                                                <option value>Select
-                                                    Department</option>
-                                            </select>
-
-                                        </div>
-
-                                        <!-- =========================
-                                                      ROLE
-                                         ========================== -->
-                                        <div class="col-md-6">
-
-                                            <label for="addEmpRole"
-                                                class="form-label">
-
-                                                Role
-                                                <span
-                                                    class="required-star">*</span>
-
-                                            </label>
-
-                                            <select id="addEmpRole"
-                                                class="form-select" required>
-                                                <option value>Select
-                                                    Role</option>
-                                            </select>
-
-                                        </div>
-
-                                        <!-- =========================
-                                                MANAGER
-                                            ========================== -->
-                                        <div class="col-md-6">
-
-                                            <label for="addEmpManagerId"
-                                                class="form-label">
-
-                                                Manager
-
-                                            </label>
-
-                                            <select id="addEmpManagerId"
-                                                class="form-select">
-                                                <option value>Select
-                                                    Manager</option>
-                                            </select>
-
-                                        </div>
-
-                                        <!-- =========================
-                                                PASSWORD
-                                            ========================== -->
-                                        <div class="col-md-6">
-
-                                            <label for="addEmpPassword"
-                                                class="form-label">
-
-                                                Password
-                                                <span
-                                                    class="required-star">*</span>
-
-                                            </label>
-
-                                            <input type="password"
-                                                id="addEmpPassword"
-                                                class="form-control"
-                                                minlength="6"
-                                                placeholder="Enter password"
-                                                required>
-
-                                        </div>
-
-                                    </div>
-
-                                </div>
-
-                                <!-- =========================
-                                        FOOTER
-                                    ========================== -->
-                                <div class="modal-footer">
-
-                                    <button type="button"
-                                        class="secondary-action-btn"
-                                        data-bs-dismiss="modal">
-
-                                        Cancel
-
-                                    </button>
-
-                                    <button type="submit"
-                                        class="primary-action-btn">
-
-                                        Create Employee
-
-                                    </button>
-
-                                </div>
-
-                            </form>
-
-                        </div>
-
-                    </div>
-
-                </div>
-                <!-- DEACTIVATE EMPLOYEE MODAL: collects exit details, PUT /api/employees/{id}/exit -->
-                <div class="modal fade" id="deactivateEmployeeModal"
-                    tabindex="-1"
-                    aria-labelledby="deactivateEmployeeModalLabel"
-                    aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content role-modal-content">
-                            <div class="modal-header">
-                                <div>
-                                    <p class="page-label mb-1">EMPLOYEE
-                                        MANAGEMENT</p>
-                                    <h5 class="modal-title"
-                                        id="deactivateEmployeeModalLabel">Deactivate
-                                        Employee</h5>
-                                </div>
-                                <button type="button" class="btn-close"
-                                    data-bs-dismiss="modal"
-                                    aria-label="Close"></button>
-                            </div>
-                            <form id="deactivateEmployeeForm">
-                                <div class="modal-body">
-                                    <div id="deactivateEmployeeMessage"></div>
-                                    <input type="hidden" id="deactivateEmpId">
-                                    <div class="row g-3">
-                                        <div class="col-md-6">
-                                            <label for="deactivateExitDate"
-                                                class="form-label">Exit Date
-                                                <span
-                                                    class="required-star">*</span></label>
-                                            <input type="date"
-                                                id="deactivateExitDate"
-                                                class="form-control" required>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label
-                                                for="deactivateSeparationMode"
-                                                class="form-label">Separation
-                                                Mode
-                                                <span
-                                                    class="required-star">*</span></label>
-                                            <select
-                                                id="deactivateSeparationMode"
-                                                class="form-select" required>
-                                                <option value selected
-                                                    disabled>Select
-                                                    mode</option>
-                                                <option
-                                                    value="VOLUNTARY">Voluntary</option>
-                                                <option
-                                                    value="INVOLUNTARY">Involuntary</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="deactivateExitType"
-                                                class="form-label">Exit Type
-                                                <span
-                                                    class="required-star">*</span></label>
-                                            <select id="deactivateExitType"
-                                                class="form-select" required>
-                                                <option value selected
-                                                    disabled>Select
-                                                    type</option>
-                                                <option
-                                                    value="RESIGNATION">Resignation</option>
-                                                <option
-                                                    value="TERMINATION">Termination</option>
-                                                <option
-                                                    value="RETIREMENT">Retirement</option>
-                                                <option
-                                                    value="LAYOFF">Layoff</option>
-                                                <option
-                                                    value="CONTRACT_END">Contract
-                                                    End</option>
-                                                <option
-                                                    value="ABSCONDING">Absconding</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-12">
-                                            <label for="deactivateReason"
-                                                class="form-label">Reason <span
-                                                    class="required-star">*</span></label>
-                                            <textarea id="deactivateReason"
-                                                class="form-control" rows="2"
-                                                required></textarea>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button"
-                                        class="secondary-action-btn"
-                                        data-bs-dismiss="modal">Cancel</button>
-                                    <button type="submit"
-                                        class="btn btn-outline-danger btn-sm">Deactivate</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-                <!-- VIEW EMPLOYEE MODAL: read-only employee detail panel, content injected into #viewEmployeeBody by JS -->
-                <div class="modal fade" id="viewEmployeeModal" tabindex="-1"
-                    aria-labelledby="viewEmployeeModalLabel"
-                    aria-hidden="true">
-                    <div
-                        class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
-                        <div class="modal-content role-modal-content">
-                            <div class="modal-header">
-                                <div>
-                                    <p class="page-label mb-1">EMPLOYEE
-                                        MANAGEMENT</p>
-                                    <h5 class="modal-title"
-                                        id="viewEmployeeModalLabel">Employee
-                                        Details</h5>
-                                </div>
-                                <button type="button" class="btn-close"
-                                    data-bs-dismiss="modal"
-                                    aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <div id="viewEmployeeBody">Loading...</div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button"
-                                    class="secondary-action-btn"
-                                    data-bs-dismiss="modal">Close</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- EDIT EMPLOYEE MODAL: limited-field edit form — only name, work email, employee code and salary -->
-                <div class="modal fade" id="editEmployeeModal" tabindex="-1"
-                    aria-labelledby="editEmployeeModalLabel"
-                    aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content role-modal-content">
-                            <div class="modal-header">
-                                <div>
-                                    <p class="page-label mb-1">EMPLOYEE
-                                        MANAGEMENT</p>
-                                    <h5 class="modal-title"
-                                        id="editEmployeeModalLabel">Edit
-                                        Employee</h5>
-                                    <p class="mb-0 text-muted small">
-                                        Only name, work email, employee code and
-                                        salary can be updated here.
-                                    </p>
-                                </div>
-                                <button type="button" class="btn-close"
-                                    data-bs-dismiss="modal"
-                                    aria-label="Close"></button>
-                            </div>
-                            <form id="editEmployeeForm">
-                                <div class="modal-body">
-                                    <div id="editEmployeeMessage"></div>
-                                    <div class="mb-3">
-                                        <label class="form-label">Full Name
-                                            <span
-                                                class="required-star">*</span></label>
-                                        <input type="text" id="editEmpName"
-                                            class="form-control" required
-                                            maxlength="100">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">Work Email
-                                            <span
-                                                class="required-star">*</span></label>
-                                        <input type="email" id="editEmpEmail"
-                                            class="form-control" required
-                                            maxlength="150">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">Employee Code
-                                            <span
-                                                class="required-star">*</span></label>
-                                        <input type="text" id="editEmpCode"
-                                            class="form-control" required
-                                            pattern="^[A-Za-z0-9_-]{2,30}$">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">Salary <span
-                                                class="required-star">*</span></label>
-                                        <input type="number" id="editEmpSalary"
-                                            class="form-control" min="0"
-                                            step="0.01"
-                                            required>
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button"
-                                        class="secondary-action-btn"
-                                        data-bs-dismiss="modal">Cancel</button>
-                                    <button type="submit"
-                                        class="primary-action-btn">Save
-                                        Changes</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- USERS VIEW: table of system user accounts + their roles, table filled by JS -->
-                <section id="usersView" class="content-view d-none">
-                    <div class="page-header">
-                        <div>
-                            <p class="page-label">
-                                ADMINISTRATION
-                            </p>
-                            <h1>
-                                User Management
-                            </h1>
-                            <p>
-                                Manage system users and their roles.
-                            </p>
-                        </div>
-                    </div>
-                    <div class="management-card">
-                        <div class="table-responsive">
-                            <table class="table management-table mb-0">
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Email</th>
-                                        <th>Roles</th>
-                                        <th>Status</th>
-                                        <th class="text-end">
-                                            Action
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody id="usersTableBody">
-                                    <tr>
-                                        <td colspan="5"
-                                            class="text-center py-5">
-                                            Loading users...
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- USER ROLES MODAL: assign/remove roles for a single user, list populated by JS, saved via #saveUserRolesButton -->
-                <div class="modal fade" id="userRolesModal" tabindex="-1"
-                    aria-labelledby="userRolesModalLabel"
-                    aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <!-- HEADER -->
-                            <div class="modal-header">
-                                <h5 class="modal-title"
-                                    id="userRolesModalLabel">
+                        <!-- Roles: shortcut to #rolesView -->
+                        <div class="col-12 col-sm-6 col-xl-3">
+                            <button class="quick-action-card quick-action-button" type="button" data-view="roles">
+                                <strong>
                                     Roles
-                                </h5>
-                                <button type="button" class="btn-close"
-                                    data-bs-dismiss="modal" aria-label="Close">
-                                </button>
-                            </div>
-                            <!-- BODY: checkbox list of all roles, injected by JS -->
-                            <div class="modal-body">
-                                <div id="userRolesList">
-                                    Loading roles...
-                                </div>
-                            </div>
-                            <!-- FOOTER -->
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-light"
-                                    data-bs-dismiss="modal">
-                                    Cancel
-                                </button>
-                                <button type="button" class="primary-action-btn"
-                                    id="saveUserRolesButton">
-                                    Save roles
-                                </button>
-                            </div>
+                                </strong>
+                                <span>
+                                    Manage system roles
+                                </span>
+                            </button>
                         </div>
-                    </div>
-                </div>
 
-                <!-- ATTENDANCE VIEW: placeholder — attendance records/management not yet implemented -->
-                <section id="attendanceView" class="content-view d-none">
-                    <div class="page-header">
-                        <div>
-                            <p class="page-label">
-                                ATTENDANCE MANAGEMENT
-                            </p>
-                            <h1>
-                                Attendance
-                            </h1>
-                            <p>
-                                Monitor and manage employee attendance records.
-                            </p>
-                        </div>
-                    </div>
-                    <div class="management-card">
-                        <div class="p-4">
-                            <h5 class="mb-2">
-                                Attendance Management
-                            </h5>
-                            <p class="text-muted mb-0">
-                                Attendance records and attendance management
-                                features will appear here.
-                            </p>
-                        </div>
-                    </div>
-                </section>
 
-                <!-- ROLES VIEW: role cards (create/edit/manage-permissions), cards injected by JS into #rolesCardsContainer -->
-                <section id="rolesView" class="content-view d-none">
-                    <div class="page-header">
-                        <div>
-                            <p class="page-label">
-                                ACCESS CONTROL
-                            </p>
-                            <h1>
-                                Role Management
-                            </h1>
-                            <p>
-                                Create and manage roles available in the system.
-                            </p>
-                        </div>
-                        <!-- Opens #addRoleModal -->
-                        <button type="button" id="addRoleButton"
-                            class="primary-action-btn">
-                            + Add New Role
-                        </button>
-                    </div>
-                    <div id="rolesMessage"></div>
-                    <div id="rolesCardsContainer" class="roles-cards-container">
-                        <div class="text-center py-5">
-                            Loading roles...
-                        </div>
-                    </div>
-                </section>
-
-                <!-- edit modal in roles: edit an existing role's name/description, saved via #saveEditRoleButton -->
-                <div class="modal fade" id="editRoleModal" tabindex="-1">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">
-                                    Edit role
-                                </h5>
-                                <button type="button" class="btn-close"
-                                    data-bs-dismiss="modal">
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                <div class="mb-3">
-                                    <label class="form-label">
-                                        Role name
-                                    </label>
-                                    <input type="text" id="editRoleName"
-                                        class="form-control">
-                                </div>
-                                <div>
-                                    <label class="form-label">
-                                        Description
-                                    </label>
-                                    <textarea id="editRoleDescription"
-                                        class="form-control" rows="3">
-                    </textarea>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button"
-                                    class="secondary-action-btn"
-                                    data-bs-dismiss="modal">
-                                    Cancel
-                                </button>
-                                <button type="button" id="saveEditRoleButton"
-                                    class="primary-action-btn">
-                                    Save
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- permission modal in roles: toggle which permissions belong to a role, saved via #saveRolePermissionsButton -->
-                <div class="modal fade" id="rolePermissionsModal" tabindex="-1">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title"
-                                    id="rolePermissionsTitle">
+                        <!-- Permissions: shortcut to #permissionsView -->
+                        <div class="col-12 col-sm-6 col-xl-3">
+                            <button class="quick-action-card quick-action-button" type="button" data-view="permissions">
+                                <strong>
                                     Permissions
-                                </h5>
-                                <button type="button" class="btn-close"
-                                    data-bs-dismiss="modal">
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                <div id="rolePermissionsList">
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button"
-                                    class="secondary-action-btn"
-                                    data-bs-dismiss="modal">
-                                    Cancel
-                                </button>
-                                <button type="button"
-                                    id="saveRolePermissionsButton"
-                                    class="primary-action-btn">
-                                    Save permissions
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ADD ROLE MODAL: name + description form, submitted via #addRoleForm -->
-                <div class="modal fade" id="addRoleModal" tabindex="-1"
-                    aria-labelledby="addRoleModalLabel"
-                    aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content role-modal-content">
-                            <div class="modal-header">
-                                <div>
-                                    <h5 class="modal-title"
-                                        id="addRoleModalLabel">
-                                        Add New Role
-                                    </h5>
-                                    <p class="mb-0 text-muted small">
-                                        Create a new system role.
-                                    </p>
-                                </div>
-                                <button type="button" class="btn-close"
-                                    data-bs-dismiss="modal"
-                                    aria-label="Close"></button>
-                            </div>
-                            <form id="addRoleForm">
-                                <div class="modal-body">
-                                    <div id="addRoleMessage"></div>
-                                    <!-- Role Name -->
-                                    <div class="mb-3">
-                                        <label for="roleName"
-                                            class="form-label">
-                                            Role Name
-                                        </label>
-                                        <input type="text" id="roleName"
-                                            class="form-control"
-                                            placeholder="Enter role name"
-                                            required>
-                                    </div>
-                                    <!-- Description -->
-                                    <div class="mb-3">
-                                        <label for="roleDescription"
-                                            class="form-label">
-                                            Description
-                                        </label>
-                                        <textarea id="roleDescription"
-                                            class="form-control" rows="4"
-                                            placeholder="Enter role description"
-                                            required></textarea>
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button"
-                                        class="secondary-action-btn"
-                                        data-bs-dismiss="modal">
-                                        Cancel
-                                    </button>
-                                    <button type="submit"
-                                        id="submitAddRoleButton"
-                                        class="primary-action-btn">
-                                        Add Role
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- PERMISSIONS VIEW: table of all permissions, with add/remove entry points, rows filled by JS -->
-                <section id="permissionsView" class="content-view d-none">
-                    <div class="page-header">
-                        <div>
-                            <p class="page-label">
-                                ACCESS CONTROL
-                            </p>
-                            <h1>
-                                Permission Management
-                            </h1>
-                            <p>
-                                View permissions configured in the system.
-                            </p>
-                        </div>
-                        <div class="d-flex flex-column align-items-end gap-2">
-                            <!-- Opens #addPermissionModal -->
-                            <button type="button" id="addPermissionButton"
-                                class="primary-action-btn">
-                                + Add Permission
+                                </strong>
+                                <span>
+                                    View system permissions
+                                </span>
                             </button>
-                            <!-- Opens #removePermissionModal -->
-                            <button type="button" id="removePermissionButton"
-                                class="remove-permission-btn">
-                                <i class="fa-solid fa-trash"></i> Remove
-                                Permission
+                        </div>
+
+
+                        <!-- Reports: shortcut to #reportsView -->
+                        <div class="col-12 col-sm-6 col-xl-3">
+                            <button class="quick-action-card quick-action-button" type="button" data-view="reports">
+                                <strong>
+                                    Reports
+                                </strong>
+                                <span>
+                                    View organization reports
+                                </span>
                             </button>
                         </div>
                     </div>
-                    <div id="permissionsMessage"></div>
-                    <div class="management-card">
-                        <div class="table-responsive">
-                            <table class="table management-table mb-0">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Permission Name</th>
-                                        <th>Description</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="permissionsTableBody">
-                                    <tr>
-                                        <td colspan="4"
-                                            class="text-center py-5">
-                                            Loading permissions...
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
                 </section>
 
-                <!-- ADD PERMISSION MODAL: name + description form, submitted via #addPermissionForm -->
-                <div class="modal fade" id="addPermissionModal" tabindex="-1"
-                    aria-labelledby="addPermissionModalLabel"
-                    aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content role-modal-content">
-                            <div class="modal-header">
-                                <div>
-                                    <h5 class="modal-title"
-                                        id="addPermissionModalLabel">
-                                        Add New Permission
-                                    </h5>
-                                    <p class="mb-0 text-muted small">
-                                        Create a new system permission.
-                                    </p>
-                                </div>
-                                <button type="button" class="btn-close"
-                                    data-bs-dismiss="modal" aria-label="Close">
-                                </button>
-                            </div>
-                            <form id="addPermissionForm">
-                                <div class="modal-body">
-                                    <div id="addPermissionMessage"></div>
-                                    <div class="mb-3">
-                                        <label for="permissionName"
-                                            class="form-label">
-                                            Permission Name
-                                        </label>
-                                        <input type="text" id="permissionName"
-                                            class="form-control"
-                                            placeholder="Enter permission name"
-                                            required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="permissionDescription"
-                                            class="form-label">
-                                            Description
-                                        </label>
-                                        <textarea id="permissionDescription"
-                                            class="form-control" rows="4"
-                                            placeholder="Enter permission description"
-                                            required></textarea>
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button"
-                                        class="secondary-action-btn"
-                                        data-bs-dismiss="modal">
-                                        Cancel
-                                    </button>
-                                    <button type="submit"
-                                        id="submitAddPermissionButton"
-                                        class="primary-action-btn">
-                                        Add Permission
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- EDIT PERMISSION MODAL: update an existing permission's name/description, submitted via #editPermissionForm -->
-                <div class="modal fade" id="editPermissionModal" tabindex="-1"
-                    aria-labelledby="editPermissionModalLabel"
-                    aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content role-modal-content">
-                            <div class="modal-header">
-                                <div>
-                                    <h5 class="modal-title"
-                                        id="editPermissionModalLabel">
-                                        Edit Permission
-                                    </h5>
-                                    <p class="mb-0 text-muted small">
-                                        Update the permission name and
-                                        description.
-                                    </p>
-                                </div>
-                                <button type="button" class="btn-close"
-                                    data-bs-dismiss="modal" aria-label="Close">
-                                </button>
-                            </div>
-                            <form id="editPermissionForm">
-                                <div class="modal-body">
-                                    <div id="editPermissionMessage"></div>
-                                    <div class="mb-3">
-                                        <label for="editPermissionName"
-                                            class="form-label">
-                                            Permission Name
-                                        </label>
-                                        <input type="text"
-                                            id="editPermissionName"
-                                            class="form-control"
-                                            placeholder="Enter permission name"
-                                            required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="editPermissionDescription"
-                                            class="form-label">
-                                            Description
-                                        </label>
-                                        <textarea id="editPermissionDescription"
-                                            class="form-control" rows="4"
-                                            placeholder="Enter permission description"
-                                            required></textarea>
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button"
-                                        class="secondary-action-btn"
-                                        data-bs-dismiss="modal">
-                                        Cancel
-                                    </button>
-                                    <button type="submit"
-                                        id="submitEditPermissionButton"
-                                        class="primary-action-btn">
-                                        Save Changes
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- REMOVE PERMISSION MODAL: delete a permission by ID, submitted via #removePermissionForm -->
-                <div class="modal fade" id="removePermissionModal" tabindex="-1"
-                    aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content role-modal-content">
-                            <div class="modal-header">
-                                <div>
-                                    <h5 class="modal-title">
-                                        Remove Permission
-                                    </h5>
-                                    <p class="mb-0 text-muted small">
-                                        Enter the permission ID you want to
-                                        remove.
-                                    </p>
-                                </div>
-                                <button type="button" class="btn-close"
-                                    data-bs-dismiss="modal">
-                                </button>
-                            </div>
-                            <form id="removePermissionForm">
-                                <div class="modal-body">
-                                    <div id="removePermissionMessage"></div>
-                                    <div class="mb-3">
-                                        <label class="form-label">
-                                            Permission ID
-                                        </label>
-                                        <input type="number"
-                                            id="removePermissionId"
-                                            class="form-control"
-                                            placeholder="Enter permission ID"
-                                            required>
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button"
-                                        class="secondary-action-btn"
-                                        data-bs-dismiss="modal">
-                                        Cancel
-                                    </button>
-                                    <button type="submit"
-                                        class="remove-permission-btn">
-                                        <i class="fa-solid fa-trash"></i> Remove
-                                        Permission
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- PAYROLL VIEW: placeholder — payroll/salary management not yet implemented -->
-                <section id="payrollView" class="content-view d-none">
-                    <div class="page-header">
+                <!-- Logged In Access: shows the logged-in admin's own roles + permission tags, filled by JS -->
+                <section class="dashboard-section access-section">
+                    <div class="section-heading">
                         <div>
-                            <p class="page-label">
-                                PAYROLL MANAGEMENT
-                            </p>
-                            <h1>
-                                Payroll
-                            </h1>
+                            <h3>
+                                Your Access
+                            </h3>
                             <p>
-                                Manage employee salary and payroll information.
+                                Roles and permissions assigned to your account.
                             </p>
                         </div>
                     </div>
-                    <div class="management-card">
-                        <div class="p-4">
-                            <h5 class="mb-2">
-                                Payroll Management
-                            </h5>
-                            <p class="text-muted mb-0">
-                                Payroll records and salary management features
-                                will appear here.
-                            </p>
+                    <div class="access-card">
+                        <div class="access-card-header">
+                            <div>
+                                <span class="access-title">
+                                    Assigned Roles
+                                </span>
+                                <!-- Role badges injected here by JS (renderDashboardRoles) -->
+                                <div id="dashboardRoles" class="role-badges">
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </section>
-
-                <!-- REPORTS VIEW: placeholder — reporting not yet implemented -->
-                <section id="reportsView" class="content-view d-none">
-                    <div class="page-header">
-                        <div>
-                            <p class="page-label">
-                                REPORTING
-                            </p>
-                            <h1>
-                                Reports
-                            </h1>
-                            <p>
-                                View and generate organization reports.
-                            </p>
-                        </div>
-                    </div>
-                    <div class="management-card">
-                        <div class="p-4">
-                            <h5 class="mb-2">
-                                Organization Reports
-                            </h5>
-                            <p class="text-muted mb-0">
-                                Attendance, employee and payroll reports
-                                will appear here.
-                            </p>
+                        <div class="permissions-preview">
+                            <div class="permissions-preview-header">
+                                <span>
+                                    Permissions
+                                </span>
+                                <span id="permissionCount" class="permission-count">
+                                    0
+                                </span>
+                            </div>
+                            <!-- Permission tags injected here by JS (renderDashboardPermissions) -->
+                            <div id="dashboardPermissions" class="permission-tags">
+                            </div>
                         </div>
                     </div>
                 </section>
-            </main>
-        </div>
+            </section>
 
-        <!-- ADD / EDIT ROLE MODAL: a second, unused-looking generic role form (id="roleModal") — appears to duplicate
-         the purpose of #addRoleModal/#editRoleModal above; check whether this is still wired to any button before keeping it -->
-        <div class="modal fade" id="roleModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content role-modal-content">
-                    <div class="modal-header">
-                        <div>
-                            <p class="page-label mb-1">
-                                ROLE MANAGEMENT
-                            </p>
-                            <h5 class="modal-title" id="roleModalTitle">
-                                Add New Role
-                            </h5>
+
+            <!-- // PROFILE VIEW: admin's own profile — basic info, contact, roles, permissions, password reset -->
+            <section id="profileView" class="content-view d-none">
+                <div class="">
+
+                </div>
+
+                <!-- ADMIN PROFILE CARD: wraps every profile sub-section below -->
+                <div class="admin-profile-page-card">
+                    <!-- PROFILE COVER WRAP: cover image fills the whole banner; the header (avatar+name)
+                         is overlaid directly on top of it instead of sitting in a separate white strip -->
+                    <div class="admin-profile-cover-wrap">
+                        <div class="admin-profile-cover">
+                            <img src="../assets/image/cover-earth-image.jpg" alt="Cover"
+                                class="admin-profile-cover-image">
                         </div>
-                        <button type="button" class="btn-close"
-                            data-bs-dismiss="modal">
-                        </button>
+
+                        <!-- PROFILE HEADER: large avatar + name + role badge, overlaid on the cover -->
+                        <div class="profile-header">
+
+                            <div class="profile-avatar" id="profileAvatarClickable">
+
+                                <img id="profileAvatarImg" class="admin-avatar-img d-none" src=""
+                                    alt="Admin profile photo">
+
+                                <span id="profileInitials"></span>
+
+                                <button type="button" id="profileAvatarEditBtn" class="admin-avatar-edit-btn"
+                                    title="Change photo" aria-label="Change profile photo">
+
+                                    <i class="fa-solid fa-camera"></i>
+
+                                </button>
+
+                            </div>
+
+
+                            <div class="profile-main-info">
+
+                                <h2 id="profileName">
+                                    Loading...
+                                </h2>
+
+                                <p id="profileRole"></p>
+
+                                <span class="profile-status">
+                                    <span class="status-dot"></span>
+                                    Active Administrator
+                                </span>
+
+                            </div>
+
+                        </div>
                     </div>
-                    <form id="roleForm">
+
+                    <!-- BASIC INFORMATION: read-only full name + primary role -->
+                    <div class="profile-section">
+                        <div class="profile-section-title">
+                            <span class="profile-section-icon">
+                                <i class="fa-solid fa-user"></i>
+                            </span>
+                            <div>
+                                <h4>Basic Information</h4>
+                                <p>Administrator account details</p>
+                            </div>
+                        </div>
+                        <div class="profile-info-grid">
+                            <div class="profile-info-item">
+                                <span class="profile-label">Full Name</span>
+                                <strong id="profileFullName">Loading...</strong>
+                            </div>
+                            <div class="profile-info-item">
+                                <span class="profile-label">Primary Role</span>
+                                <strong id="profilePrimaryRole"></strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CONTACT INFORMATION: email display + button that opens the reset-password modal -->
+                    <div class="profile-section">
+                        <div class="profile-section-title">
+                            <span class="profile-section-icon">
+                                <i class="fa-solid fa-envelope"></i>
+                            </span>
+                            <div>
+                                <h4>Contact Information</h4>
+                                <p>Your registered account details</p>
+                            </div>
+                        </div>
+                        <div class="profile-info-grid">
+                            <div class="profile-info-item">
+                                <span class="profile-label">Email Address</span>
+                                <strong id="profileEmail">--</strong>
+                            </div>
+                            <div class="profile-info-item profile-password-card">
+                                <span class="profile-label">Password</span>
+                                <!-- Opens #resetPasswordModal -->
+                                <button type="button" id="resetPasswordToggleButton" class="btn-reset-password">
+                                    Reset Password
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ROLE INFORMATION: role tags for this admin account, injected by JS (renderProfileRoles) -->
+                    <div class="profile-section">
+                        <div class="profile-section-title">
+                            <span class="profile-section-icon">
+                                <i class="fa-solid fa-user-tag"></i>
+                            </span>
+                            <div>
+                                <h4>Assigned Roles</h4>
+                                <p>Roles assigned to your account</p>
+                            </div>
+                        </div>
+                        <div id="profileRoles" class="profile-access-tags">
+                        </div>
+                    </div>
+
+                    <!-- PERMISSIONS: permission tags for this admin account, injected by JS (renderProfilePermissions) -->
+                    <div class="profile-section">
+                        <div class="profile-section-title">
+                            <span class="profile-section-icon">
+                                <i class="fa-solid fa-lock"></i>
+                            </span>
+                            <div>
+                                <h4>Assigned Permissions</h4>
+                                <p>Access permissions available to your account</p>
+                            </div>
+                        </div>
+                        <div class="profile-permission-heading">
+                            <span>Permissions</span>
+                            <span id="profilePermissionCount" class="profile-permission-count">0</span>
+                        </div>
+                        <div id="profilePermissions" class="profile-access-tags">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- RESET PASSWORD MODAL -->
+            <div class="modal fade" id="resetPasswordModal" tabindex="-1" aria-labelledby="resetPasswordModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <div>
+                                <h5 class="modal-title" id="resetPasswordModalLabel">Reset Password</h5>
+                                <small class="text-muted">Update your account password securely.</small>
+                            </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
                         <div class="modal-body">
-                            <!-- NOTE: id="roleId" and id="roleName"/"roleDescription" duplicate ids already used
-                             inside #addRoleModal above — duplicate ids across the page, only the first
-                             DOM match is reachable via getElementById. -->
-                            <input type="hidden" id="roleId">
-                            <div class="mb-3">
-                                <label for="roleName" class="form-label">
-                                    Role Name
-                                </label>
-                                <input type="text" class="form-control"
-                                    id="roleName"
-                                    placeholder="Example: ROLE_MANAGER"
-                                    required>
-                                <div class="form-text">
-                                    Example: ROLE_MANAGER
+                            <div id="resetPasswordMessage"></div>
+                            <form id="resetPasswordForm">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Current Password <span
+                                                class="required-star">*</span></label>
+                                        <input type="password" id="currentPasswordField" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">New Password <span
+                                                class="required-star">*</span></label>
+                                        <input type="password" id="newPasswordField" class="form-control" minlength="6"
+                                            required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Confirm New Password <span
+                                                class="required-star">*</span></label>
+                                        <input type="password" id="confirmPasswordField" class="form-control"
+                                            minlength="6" required>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="mb-3">
-                                <label for="roleDescription" class="form-label">
-                                    Description
-                                </label>
-                                <textarea class="form-control"
-                                    id="roleDescription" rows="4"
-                                    placeholder="Enter role description"
-                                    required></textarea>
-                            </div>
-                            <div id="roleFormMessage"></div>
+                                <div class="admin-password-action-row">
+                                    <button type="submit" class="primary-action-btn">Update Password</button>
+                                </div>
+                            </form>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="secondary-action-btn"
-                                data-bs-dismiss="modal">
-                                Cancel
-                            </button>
-                            <button type="submit" class="primary-action-btn"
-                                id="saveRoleButton">
-                                Create Role
-                            </button>
-                        </div>
-                    </form>
+                    </div>
                 </div>
             </div>
-        </div>
-        <!-- JavaScript: load order — Bootstrap JS, then config/api/auth (shared), then employees.js, then the page controller -->
-        <script src="../assets/js/bootstrap.bundle.min.js"></script>
-        <script src="../js/config.js"></script>
-        <script src="../js/api.js"></script>
-        <script src="../js/auth.js"></script>
-        <script src="../js/employees.js"></script>
-        <script src="../js/admin-dashboard.js"></script>
 
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    </body>
+            <!-- SESSION MANAGEMENT MODAL: lists active login sessions/devices for this account, with revoke actions -->
+            <div class="modal fade" id="sessionsModal" tabindex="-1" aria-labelledby="sessionsModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                    <div class="modal-content">
+                        <!-- HEADER: modal title + close button -->
+                        <div class="modal-header">
+                            <div>
+                                <p class="page-label mb-1">
+                                    SECURITY
+                                </p>
+                                <h5 class="modal-title" id="sessionsModalLabel">
+                                    Session Management
+                                </h5>
+                                <small class="text-muted">
+                                    View and manage devices where your account is logged in.
+                                </small>
+                            </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                            </button>
+                        </div>
+                        <!-- BODY: status message + the session list, both filled/populated by JS (loadSessions) -->
+                        <div class="modal-body">
+                            <!-- MESSAGE: success/error banner for session actions -->
+                            <div id="sessionsMessage" class="mb-3">
+                            </div>
+                            <!-- SESSION LIST: one card per active session, injected by JS -->
+                            <div id="sessionsList" class="sessions-list">
+                                <div class="text-center py-4">
+                                    <span class="text-muted">
+                                        Loading sessions...
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW PHOTO MODAL: shows the admin's current profile photo full-size, with an edit shortcut -->
+            <div class="modal fade" id="adminViewPhotoModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-sm">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Profile Photo</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body admin-view-photo-body">
+                            <div class="admin-view-photo-wrapper">
+                                <img id="viewAdminPhotoImage" src="" alt="Profile Photo"
+                                    class="admin-view-photo-image d-none">
+                                <span id="viewAdminPhotoFallback" class="admin-view-photo-fallback"></span>
+                                <button type="button" id="openUploadAdminPhotoButton"
+                                    class="admin-avatar-edit-btn admin-view-photo-edit-btn" title="Change Photo"><i
+                                        class="fa-solid fa-camera"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- UPLOAD PHOTO MODAL: pick a file, preview it, then POST it to /api/profile-photos/me -->
+            <div class="modal fade" id="adminUploadPhotoModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Update Profile Photo</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div id="uploadAdminPhotoMessage"></div>
+
+                            <div class="admin-upload-photo-preview-wrapper">
+                                <img id="uploadAdminPhotoPreview" src="" alt="Preview"
+                                    class="admin-upload-photo-preview d-none">
+                                <span id="uploadAdminPhotoPreviewFallback"
+                                    class="admin-upload-photo-preview-fallback"></span>
+                            </div>
+
+                            <div class="mb-0 mt-3">
+                                <label class="form-label">Choose Image</label>
+                                <input type="file" id="uploadAdminPhotoInput" class="form-control" accept="image/*">
+                                <small class="text-muted">JPG or PNG, max 2MB recommended.</small>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="secondary-action-btn" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" id="saveAdminPhotoButton" class="primary-action-btn" disabled>Save
+                                Photo</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- using api/auth/employee  -->
+            <!-- EMPLOYEES VIEW: employee list with search/filter, "Add Employee" entry point, table filled by JS -->
+            <section id="employeesView" class="content-view d-none">
+                <div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div>
+                        <p class="page-label">
+                            EMPLOYEE MANAGEMENT
+                        </p>
+                        <h1>
+                            Employees
+                        </h1>
+                        <p>
+                            Manage employee records and employee information
+                            from the admin panel.
+                        </p>
+                    </div>
+                    <div class="page-header-action">
+                        <!-- Opens #addEmployeeModal -->
+                        <button type="button" id="addEmployeeButton" class="primary-action-btn">
+                            + Add Employee
+                        </button>
+                    </div>
+                </div>
+
+
+                <!-- FILTER BAR: search-by-name/code/email input + "include inactive" checkbox, drives table filtering -->
+                <div class="management-card">
+                    <div class="p-3 d-flex flex-wrap gap-3 align-items-center justify-content-between">
+                        <input type="search" id="employeeSearchInput" class="form-control" style="max-width: 320px;"
+                            placeholder="Search by name, code or email...">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="employeeIncludeInactive">
+                            <label class="form-check-label" for="employeeIncludeInactive">
+                                Include inactive employees
+                            </label>
+                        </div>
+                    </div>
+
+
+                    <!-- Employee table: rows injected by JS into #employeesTableBody; pagination controls in #employeesPagination -->
+                    <div class="table-responsive">
+                        <table class="table management-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Emp Code</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Role</th>
+                                    <th>Login Account</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="employeesTableBody">
+                                <tr>
+                                    <td colspan="8" class="text-center py-5">
+                                        Loading employees...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="p-3 d-flex justify-content-end" id="employeesPagination"></div>
+                </div>
+            </section>
+
+            <!-- ADD EMPLOYEE MODAL: full new-hire form (identity, contact, role, job/shift/company, salary, RM assignment) -->
+            <div class="modal fade" id="addEmployeeModal" tabindex="-1" aria-labelledby="addEmployeeModalLabel"
+                aria-hidden="true">
+
+                <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
+
+                    <div class="modal-content role-modal-content add-employee-modal-content">
+
+                        <!-- Header -->
+                        <div class="modal-header">
+                            <div>
+                                <p class="page-label mb-1">EMPLOYEE
+                                    MANAGEMENT</p>
+
+                                <h5 class="modal-title" id="addEmployeeModalLabel">
+                                    Add Employee
+                                </h5>
+                            </div>
+
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                            </button>
+                        </div>
+
+                        <!-- Form -->
+                        <form id="addEmployeeForm">
+
+                            <div class="modal-body">
+
+                                <!-- Message -->
+                                <div id="addEmployeeMessage"></div>
+
+                                <div class="row g-3">
+
+                                    <!-- Employee Code -->
+                                    <div class="col-md-6">
+                                        <label for="addEmpCode" class="form-label">
+                                            Employee Code
+                                            <span class="required-star">*</span>
+                                        </label>
+
+                                        <input type="text" id="addEmpCode" class="form-control" maxlength="50"
+                                            placeholder="Enter employee code" required>
+                                    </div>
+
+                                    <!-- First Name -->
+                                    <div class="col-md-6">
+                                        <label for="addEmpFirstName" class="form-label">
+                                            First Name
+                                            <span class="required-star">*</span>
+                                        </label>
+
+                                        <input type="text" id="addEmpFirstName" class="form-control" maxlength="60"
+                                            placeholder="Enter first name" required>
+                                    </div>
+
+                                    <!-- Last Name -->
+                                    <div class="col-md-6">
+                                        <label for="addEmpLastName" class="form-label">
+                                            Last Name
+                                        </label>
+
+                                        <input type="text" id="addEmpLastName" class="form-control" maxlength="60"
+                                            placeholder="Enter last name">
+                                    </div>
+
+                                    <!-- Email -->
+                                    <div class="col-md-6">
+                                        <label for="addEmpEmail" class="form-label">
+                                            Work Email
+                                            <span class="required-star">*</span>
+                                        </label>
+
+                                        <input type="email" id="addEmpEmail" class="form-control" maxlength="150"
+                                            placeholder="user@example.com" required>
+                                    </div>
+
+                                    <!-- Phone -->
+                                    <div class="col-md-6">
+                                        <label for="addEmpPhone" class="form-label">
+                                            Phone
+                                        </label>
+
+                                        <input type="text" id="addEmpPhone" class="form-control" maxlength="20"
+                                            placeholder="Enter phone number">
+                                    </div>
+
+                                    <!-- Gender -->
+                                    <div class="col-md-6">
+                                        <label for="addEmpGender" class="form-label">
+                                            Gender
+                                            <span class="required-star">*</span>
+                                        </label>
+
+                                        <select id="addEmpGender" name="gender" class="form-select" required>
+
+                                            <option value selected disabled>
+                                                Select Gender
+                                            </option>
+
+                                            <option value="MALE">
+                                                Male
+                                            </option>
+
+                                            <option value="FEMALE">
+                                                Female
+                                            </option>
+
+                                            <option value="OTHER">
+                                                Other
+                                            </option>
+
+                                        </select>
+                                    </div>
+
+                                    <!-- Designation -->
+                                    <div class="col-md-6">
+                                        <label for="addEmpDesignation" class="form-label">
+                                            Designation
+                                            <span class="required-star">*</span>
+                                        </label>
+
+                                        <input type="text" id="addEmpDesignation" class="form-control" maxlength="100"
+                                            placeholder="Enter designation" required>
+                                    </div>
+
+                                    <!-- Joining Date -->
+                                    <div class="col-md-6">
+                                        <label for="addEmpJoiningDate" class="form-label">
+                                            Joining Date
+                                            <span class="required-star">*</span>
+                                        </label>
+
+                                        <input type="date" id="addEmpJoiningDate" class="form-control" required>
+                                    </div>
+
+                                    <!-- Department -->
+                                    <div class="col-md-6">
+                                        <label for="addEmpDepartment" class="form-label">
+                                            Department
+                                            <span class="required-star">*</span>
+                                        </label>
+
+                                        <select id="addEmpDepartment" class="form-select" required>
+
+                                            <option value selected disabled>
+                                                Select Department
+                                            </option>
+
+                                        </select>
+                                    </div>
+
+                                    <!-- Role -->
+                                    <div class="col-md-6">
+                                        <label for="addEmpRole" class="form-label">
+                                            Role
+                                            <span class="required-star">*</span>
+                                        </label>
+
+                                        <select id="addEmpRole" class="form-select" required>
+
+                                            <option value selected disabled>
+                                                Select Role
+                                            </option>
+
+                                            <!-- Replace IDs with your actual backend role IDs -->
+                                            <option value="1">
+                                                Admin
+                                            </option>
+
+                                            <option value="2">
+                                                HR
+                                            </option>
+
+                                            <option value="3">
+                                                Employee
+                                            </option>
+
+                                        </select>
+                                    </div>
+
+                                    <!-- Password -->
+                                    <div class="col-md-6">
+                                        <label for="addEmpPassword" class="form-label">
+                                            Password
+                                            <span class="required-star">*</span>
+                                        </label>
+
+                                        <input type="password" id="addEmpPassword" class="form-control" minlength="6"
+                                            placeholder="Enter password" required>
+                                    </div>
+
+                                    <!-- Manager ID -->
+                                    <div class="col-md-6">
+                                        <label for="addEmpManagerId" class="form-label">
+                                            Manager ID
+                                            <span class="required-star">*</span>
+                                        </label>
+
+                                        <input type="number" id="addEmpManagerId" class="form-control" min="1"
+                                            placeholder="Enter manager ID" required>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <!-- Footer -->
+                            <div class="modal-footer">
+
+                                <button type="button" class="secondary-action-btn" data-bs-dismiss="modal">
+                                    Cancel
+                                </button>
+
+                                <button type="submit" class="primary-action-btn">
+                                    Create Employee
+                                </button>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- DEACTIVATE EMPLOYEE MODAL: collects exit details, PUT /api/employees/{id}/exit -->
+            <div class="modal fade" id="deactivateEmployeeModal" tabindex="-1"
+                aria-labelledby="deactivateEmployeeModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content role-modal-content">
+                        <div class="modal-header">
+                            <div>
+                                <p class="page-label mb-1">EMPLOYEE MANAGEMENT</p>
+                                <h5 class="modal-title" id="deactivateEmployeeModalLabel">Deactivate Employee</h5>
+                            </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form id="deactivateEmployeeForm">
+                            <div class="modal-body">
+                                <div id="deactivateEmployeeMessage"></div>
+                                <input type="hidden" id="deactivateEmpId">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="deactivateExitDate" class="form-label">Exit Date <span
+                                                class="required-star">*</span></label>
+                                        <input type="date" id="deactivateExitDate" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="deactivateSeparationMode" class="form-label">Separation Mode
+                                            <span class="required-star">*</span></label>
+                                        <select id="deactivateSeparationMode" class="form-select" required>
+                                            <option value selected disabled>Select mode</option>
+                                            <option value="VOLUNTARY">Voluntary</option>
+                                            <option value="INVOLUNTARY">Involuntary</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="deactivateExitType" class="form-label">Exit Type <span
+                                                class="required-star">*</span></label>
+                                        <select id="deactivateExitType" class="form-select" required>
+                                            <option value selected disabled>Select type</option>
+                                            <option value="RESIGNATION">Resignation</option>
+                                            <option value="TERMINATION">Termination</option>
+                                            <option value="RETIREMENT">Retirement</option>
+                                            <option value="LAYOFF">Layoff</option>
+                                            <option value="CONTRACT_END">Contract End</option>
+                                            <option value="ABSCONDING">Absconding</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12">
+                                        <label for="deactivateReason" class="form-label">Reason <span
+                                                class="required-star">*</span></label>
+                                        <textarea id="deactivateReason" class="form-control" rows="2"
+                                            required></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="secondary-action-btn"
+                                    data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-outline-danger btn-sm">Deactivate</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="modal fade" id="viewEmployeeModal" tabindex="-1" aria-labelledby="viewEmployeeModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
+                    <div class="modal-content role-modal-content">
+                        <div class="modal-header">
+                            <div>
+                                <p class="page-label mb-1">EMPLOYEE MANAGEMENT</p>
+                                <h5 class="modal-title" id="viewEmployeeModalLabel">Employee Details</h5>
+                            </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div id="viewEmployeeBody">Loading...</div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" id="openPersonalInfoBtn" class="secondary-action-btn">Personal
+                                Info</button>
+
+                            <button type="button" class="secondary-action-btn" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PERSONAL INFO MODAL: GET/PUT /api/employees/{employeeId}/personal-info -->
+            <div class="modal fade" id="personalInfoModal" tabindex="-1" aria-labelledby="personalInfoModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
+                    <div class="modal-content role-modal-content add-employee-modal-content">
+                        <div class="modal-header">
+                            <div>
+                                <p class="page-label mb-1">EMPLOYEE MANAGEMENT</p>
+                                <h5 class="modal-title" id="personalInfoModalLabel">Personal Information</h5>
+                            </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form id="personalInfoForm">
+                            <div class="modal-body">
+                                <div id="personalInfoMessage"></div>
+                                <input type="hidden" id="personalInfoEmpId">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Date of Birth</label>
+                                        <input type="date" id="piDateOfBirth" class="form-control">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Gender</label>
+                                        <select id="piGender" class="form-select">
+                                            <option value="">Select Gender</option>
+                                            <option value="MALE">Male</option>
+                                            <option value="FEMALE">Female</option>
+                                            <option value="OTHER">Other</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Height (cm)</label>
+                                        <input type="number" id="piHeightCm" class="form-control" step="0.1" min="0">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Weight (kg)</label>
+                                        <input type="number" id="piWeightKg" class="form-control" step="0.1" min="0">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Blood Group</label>
+                                        <select id="piBloodGroup" class="form-select">
+                                            <option value="">Select Blood Group</option>
+                                            <option value="A_POSITIVE">A+</option>
+                                            <option value="A_NEGATIVE">A-</option>
+                                            <option value="B_POSITIVE">B+</option>
+                                            <option value="B_NEGATIVE">B-</option>
+                                            <option value="AB_POSITIVE">AB+</option>
+                                            <option value="AB_NEGATIVE">AB-</option>
+                                            <option value="O_POSITIVE">O+</option>
+                                            <option value="O_NEGATIVE">O-</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Marital Status</label>
+                                        <select id="piMaritalStatus" class="form-select">
+                                            <option value="">Select Status</option>
+                                            <option value="SINGLE">Single</option>
+                                            <option value="MARRIED">Married</option>
+                                            <option value="DIVORCED">Divorced</option>
+                                            <option value="WIDOWED">Widowed</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Religion</label>
+                                        <input type="text" id="piReligion" class="form-control" maxlength="50">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Nationality</label>
+                                        <input type="text" id="piNationality" class="form-control" maxlength="50">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Aadhaar Number</label>
+                                        <input type="text" id="piAadhaarNumber" class="form-control" maxlength="20">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">PAN Number</label>
+                                        <input type="text" id="piPanNumber" class="form-control" maxlength="20">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Passport Number</label>
+                                        <input type="text" id="piPassportNumber" class="form-control" maxlength="20">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Driving License Number</label>
+                                        <input type="text" id="piDrivingLicenseNumber" class="form-control"
+                                            maxlength="30">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="secondary-action-btn"
+                                    data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="primary-action-btn">Save</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal fade" id="editEmployeeModal" tabindex="-1" aria-labelledby="editEmployeeModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
+                    <div class="modal-content role-modal-content add-employee-modal-content">
+                        <div class="modal-header">
+                            <div>
+                                <p class="page-label mb-1">EMPLOYEE MANAGEMENT</p>
+                                <h5 class="modal-title" id="editEmployeeModalLabel">Edit Employee</h5>
+                            </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form id="editEmployeeForm">
+                            <div class="modal-body">
+                                <div id="editEmployeeMessage"></div>
+                                <input type="hidden" id="editEmpId">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">First Name <span
+                                                class="required-star">*</span></label>
+                                        <input type="text" id="editEmpFirstName" class="form-control" required
+                                            maxlength="60">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Last Name</label>
+                                        <input type="text" id="editEmpLastName" class="form-control" maxlength="60">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Work Email <span
+                                                class="required-star">*</span></label>
+                                        <input type="email" id="editEmpEmail" class="form-control" required
+                                            maxlength="150">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Phone</label>
+                                        <input type="text" id="editEmpPhone" class="form-control" maxlength="20">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Gender <span class="required-star">*</span></label>
+                                        <select id="editEmpGender" class="form-select" required>
+                                            <option value="">Select Gender</option>
+                                            <option value="MALE">Male</option>
+                                            <option value="FEMALE">Female</option>
+                                            <option value="OTHER">Other</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Designation <span
+                                                class="required-star">*</span></label>
+                                        <input type="text" id="editEmpDesignation" class="form-control" required
+                                            maxlength="100">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Joining Date <span
+                                                class="required-star">*</span></label>
+                                        <input type="date" id="editEmpJoiningDate" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Department <span
+                                                class="required-star">*</span></label>
+                                        <select id="editEmpDepartment" class="form-select" required>
+                                            <option value="">Select Department</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Role <span class="required-star">*</span></label>
+                                        <select id="editEmpRole" class="form-select" required>
+                                            <option value="">Select Role</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Manager</label>
+                                        <select id="editEmpManagerId" class="form-select">
+                                            <option value="">Select Manager</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">New Password</label>
+                                        <input type="password" id="editEmpPassword" class="form-control" minlength="6"
+                                            placeholder="Leave blank to keep unchanged">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="secondary-action-btn"
+                                    data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="primary-action-btn">Save Changes</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- USERS VIEW: table of system user accounts + their roles, table filled by JS -->
+            <section id="usersView" class="content-view d-none">
+                <div class="page-header">
+                    <div>
+                        <p class="page-label">
+                            ADMINISTRATION
+                        </p>
+                        <h1>
+                            User Management
+                        </h1>
+                        <p>
+                            Manage system users and their roles.
+                        </p>
+                    </div>
+                </div>
+                <div class="management-card">
+                    <div class="table-responsive">
+                        <table class="table management-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Roles</th>
+                                    <th>Status</th>
+                                    <th class="text-end">
+                                        Action
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody">
+                                <tr>
+                                    <td colspan="5" class="text-center py-5">
+                                        Loading users...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- USER ROLES MODAL: assign/remove roles for a single user, list populated by JS, saved via #saveUserRolesButton -->
+            <div class="modal fade" id="userRolesModal" tabindex="-1" aria-labelledby="userRolesModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <!-- HEADER -->
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="userRolesModalLabel">
+                                Roles
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                            </button>
+                        </div>
+                        <!-- BODY: checkbox list of all roles, injected by JS -->
+                        <div class="modal-body">
+                            <div id="userRolesList">
+                                Loading roles...
+                            </div>
+                        </div>
+                        <!-- FOOTER -->
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+                                Cancel
+                            </button>
+                            <button type="button" class="primary-action-btn" id="saveUserRolesButton">
+                                Save roles
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- ATTENDANCE VIEW: placeholder — attendance records/management not yet implemented -->
+            <section id="attendanceView" class="content-view d-none">
+                <div class="page-header">
+                    <div>
+                        <p class="page-label">
+                            ATTENDANCE MANAGEMENT
+                        </p>
+                        <h1>
+                            Attendance
+                        </h1>
+                        <p>
+                            Monitor and manage employee attendance records.
+                        </p>
+                    </div>
+                </div>
+                <div class="management-card">
+                    <div class="p-4">
+                        <h5 class="mb-2">
+                            Attendance Management
+                        </h5>
+                        <p class="text-muted mb-0">
+                            Attendance records and attendance management
+                            features will appear here.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ROLES VIEW: role cards (create/edit/manage-permissions), cards injected by JS into #rolesCardsContainer -->
+            <section id="rolesView" class="content-view d-none">
+                <div class="page-header">
+                    <div>
+                        <p class="page-label">
+                            ACCESS CONTROL
+                        </p>
+                        <h1>
+                            Role Management
+                        </h1>
+                        <p>
+                            Create and manage roles available in the system.
+                        </p>
+                    </div>
+                    <!-- Opens #addRoleModal -->
+                    <button type="button" id="addRoleButton" class="primary-action-btn">
+                        + Add New Role
+                    </button>
+                </div>
+                <div id="rolesMessage"></div>
+                <div id="rolesCardsContainer" class="roles-cards-container">
+                    <div class="text-center py-5">
+                        Loading roles...
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- edit modal in roles: edit an existing role's name/description, saved via #saveEditRoleButton -->
+            <div class="modal fade" id="editRoleModal" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">
+                                Edit role
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal">
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    Role name
+                                </label>
+                                <input type="text" id="editRoleName" class="form-control">
+                            </div>
+                            <div>
+                                <label class="form-label">
+                                    Description
+                                </label>
+                                <textarea id="editRoleDescription" class="form-control" rows="3">
+                    </textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="secondary-action-btn" data-bs-dismiss="modal">
+                                Cancel
+                            </button>
+                            <button type="button" id="saveEditRoleButton" class="primary-action-btn">
+                                Save
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- permission modal in roles: toggle which permissions belong to a role, saved via #saveRolePermissionsButton -->
+            <div class="modal fade" id="rolePermissionsModal" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="rolePermissionsTitle">
+                                Permissions
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal">
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div id="rolePermissionsList">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="secondary-action-btn" data-bs-dismiss="modal">
+                                Cancel
+                            </button>
+                            <button type="button" id="saveRolePermissionsButton" class="primary-action-btn">
+                                Save permissions
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- ADD ROLE MODAL: name + description form, submitted via #addRoleForm -->
+            <div class="modal fade" id="addRoleModal" tabindex="-1" aria-labelledby="addRoleModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content role-modal-content">
+                        <div class="modal-header">
+                            <div>
+                                <h5 class="modal-title" id="addRoleModalLabel">
+                                    Add New Role
+                                </h5>
+                                <p class="mb-0 text-muted small">
+                                    Create a new system role.
+                                </p>
+                            </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form id="addRoleForm">
+                            <div class="modal-body">
+                                <div id="addRoleMessage"></div>
+                                <!-- Role Name -->
+                                <div class="mb-3">
+                                    <label for="roleName" class="form-label">
+                                        Role Name
+                                    </label>
+                                    <input type="text" id="roleName" class="form-control" placeholder="Enter role name"
+                                        required>
+                                </div>
+                                <!-- Description -->
+                                <div class="mb-3">
+                                    <label for="roleDescription" class="form-label">
+                                        Description
+                                    </label>
+                                    <textarea id="roleDescription" class="form-control" rows="4"
+                                        placeholder="Enter role description" required></textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="secondary-action-btn" data-bs-dismiss="modal">
+                                    Cancel
+                                </button>
+                                <button type="submit" id="submitAddRoleButton" class="primary-action-btn">
+                                    Add Role
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- PERMISSIONS VIEW: table of all permissions, with add/remove entry points, rows filled by JS -->
+            <section id="permissionsView" class="content-view d-none">
+                <div class="page-header">
+                    <div>
+                        <p class="page-label">
+                            ACCESS CONTROL
+                        </p>
+                        <h1>
+                            Permission Management
+                        </h1>
+                        <p>
+                            View permissions configured in the system.
+                        </p>
+                    </div>
+                    <div class="d-flex flex-column align-items-end gap-2">
+                        <!-- Opens #addPermissionModal -->
+                        <button type="button" id="addPermissionButton" class="primary-action-btn">
+                            + Add Permission
+                        </button>
+                        <!-- Opens #removePermissionModal -->
+                        <button type="button" id="removePermissionButton" class="remove-permission-btn">
+                            <i class="fa-solid fa-trash"></i> Remove Permission
+                        </button>
+                    </div>
+                </div>
+                <div id="permissionsMessage"></div>
+                <div class="management-card">
+                    <div class="table-responsive">
+                        <table class="table management-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Permission Name</th>
+                                    <th>Description</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="permissionsTableBody">
+                                <tr>
+                                    <td colspan="4" class="text-center py-5">
+                                        Loading permissions...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ADD PERMISSION MODAL: name + description form, submitted via #addPermissionForm -->
+            <div class="modal fade" id="addPermissionModal" tabindex="-1" aria-labelledby="addPermissionModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content role-modal-content">
+                        <div class="modal-header">
+                            <div>
+                                <h5 class="modal-title" id="addPermissionModalLabel">
+                                    Add New Permission
+                                </h5>
+                                <p class="mb-0 text-muted small">
+                                    Create a new system permission.
+                                </p>
+                            </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                            </button>
+                        </div>
+                        <form id="addPermissionForm">
+                            <div class="modal-body">
+                                <div id="addPermissionMessage"></div>
+                                <div class="mb-3">
+                                    <label for="permissionName" class="form-label">
+                                        Permission Name
+                                    </label>
+                                    <input type="text" id="permissionName" class="form-control"
+                                        placeholder="Enter permission name" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="permissionDescription" class="form-label">
+                                        Description
+                                    </label>
+                                    <textarea id="permissionDescription" class="form-control" rows="4"
+                                        placeholder="Enter permission description" required></textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="secondary-action-btn" data-bs-dismiss="modal">
+                                    Cancel
+                                </button>
+                                <button type="submit" id="submitAddPermissionButton" class="primary-action-btn">
+                                    Add Permission
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- EDIT PERMISSION MODAL: update an existing permission's name/description, submitted via #editPermissionForm -->
+            <div class="modal fade" id="editPermissionModal" tabindex="-1" aria-labelledby="editPermissionModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content role-modal-content">
+                        <div class="modal-header">
+                            <div>
+                                <h5 class="modal-title" id="editPermissionModalLabel">
+                                    Edit Permission
+                                </h5>
+                                <p class="mb-0 text-muted small">
+                                    Update the permission name and description.
+                                </p>
+                            </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                            </button>
+                        </div>
+                        <form id="editPermissionForm">
+                            <div class="modal-body">
+                                <div id="editPermissionMessage"></div>
+                                <div class="mb-3">
+                                    <label for="editPermissionName" class="form-label">
+                                        Permission Name
+                                    </label>
+                                    <input type="text" id="editPermissionName" class="form-control"
+                                        placeholder="Enter permission name" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="editPermissionDescription" class="form-label">
+                                        Description
+                                    </label>
+                                    <textarea id="editPermissionDescription" class="form-control" rows="4"
+                                        placeholder="Enter permission description" required></textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="secondary-action-btn" data-bs-dismiss="modal">
+                                    Cancel
+                                </button>
+                                <button type="submit" id="submitEditPermissionButton" class="primary-action-btn">
+                                    Save Changes
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- REMOVE PERMISSION MODAL: delete a permission by ID, submitted via #removePermissionForm -->
+            <div class="modal fade" id="removePermissionModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content role-modal-content">
+                        <div class="modal-header">
+                            <div>
+                                <h5 class="modal-title">
+                                    Remove Permission
+                                </h5>
+                                <p class="mb-0 text-muted small">
+                                    Enter the permission ID you want to remove.
+                                </p>
+                            </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal">
+                            </button>
+                        </div>
+                        <form id="removePermissionForm">
+                            <div class="modal-body">
+                                <div id="removePermissionMessage"></div>
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        Permission ID
+                                    </label>
+                                    <input type="number" id="removePermissionId" class="form-control"
+                                        placeholder="Enter permission ID" required>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="secondary-action-btn" data-bs-dismiss="modal">
+                                    Cancel
+                                </button>
+                                <button type="submit" class="remove-permission-btn">
+                                    <i class="fa-solid fa-trash"></i> Remove Permission
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- PAYROLL VIEW: placeholder — payroll/salary management not yet implemented -->
+            <section id="payrollView" class="content-view d-none">
+                <div class="page-header">
+                    <div>
+                        <p class="page-label">
+                            PAYROLL MANAGEMENT
+                        </p>
+                        <h1>
+                            Payroll
+                        </h1>
+                        <p>
+                            Manage employee salary and payroll information.
+                        </p>
+                    </div>
+                </div>
+                <div class="management-card">
+                    <div class="p-4">
+                        <h5 class="mb-2">
+                            Payroll Management
+                        </h5>
+                        <p class="text-muted mb-0">
+                            Payroll records and salary management features
+                            will appear here.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- REPORTS VIEW: placeholder — reporting not yet implemented -->
+            <section id="reportsView" class="content-view d-none">
+                <div class="page-header">
+                    <div>
+                        <p class="page-label">
+                            REPORTING
+                        </p>
+                        <h1>
+                            Reports
+                        </h1>
+                        <p>
+                            View and generate organization reports.
+                        </p>
+                    </div>
+                </div>
+                <div class="management-card">
+                    <div class="p-4">
+                        <h5 class="mb-2">
+                            Organization Reports
+                        </h5>
+                        <p class="text-muted mb-0">
+                            Attendance, employee and payroll reports
+                            will appear here.
+                        </p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+
+    <!-- ADD / EDIT ROLE MODAL: a second, unused-looking generic role form (id="roleModal") — appears to duplicate
+         the purpose of #addRoleModal/#editRoleModal above; check whether this is still wired to any button before keeping it -->
+    <div class="modal fade" id="roleModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content role-modal-content">
+                <div class="modal-header">
+                    <div>
+                        <p class="page-label mb-1">
+                            ROLE MANAGEMENT
+                        </p>
+                        <h5 class="modal-title" id="roleModalTitle">
+                            Add New Role
+                        </h5>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal">
+                    </button>
+                </div>
+                <form id="roleForm">
+                    <div class="modal-body">
+                        <!-- NOTE: id="roleId" and id="roleName"/"roleDescription" duplicate ids already used
+                             inside #addRoleModal above — duplicate ids across the page, only the first
+                             DOM match is reachable via getElementById. -->
+                        <input type="hidden" id="roleId">
+                        <div class="mb-3">
+                            <label for="roleName" class="form-label">
+                                Role Name
+                            </label>
+                            <input type="text" class="form-control" id="roleName" placeholder="Example: ROLE_MANAGER"
+                                required>
+                            <div class="form-text">
+                                Example: ROLE_MANAGER
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="roleDescription" class="form-label">
+                                Description
+                            </label>
+                            <textarea class="form-control" id="roleDescription" rows="4"
+                                placeholder="Enter role description" required></textarea>
+                        </div>
+                        <div id="roleFormMessage"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="secondary-action-btn" data-bs-dismiss="modal">
+                            Cancel
+                        </button>
+                        <button type="submit" class="primary-action-btn" id="saveRoleButton">
+                            Create Role
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- JavaScript: load order — Bootstrap JS, then config/api/auth (shared), then employees.js, then the page controller -->
+    <script src="../assets/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/employees.js"></script>
+    <script src="../js/admin-dashboard.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</body>
 
 </html>
