@@ -945,76 +945,145 @@
                                     <div id="personalInfoFormMessage"></div>
 
                                     <div class="row g-3">
+
+                                        <!-- Date of Birth -->
                                         <div class="col-md-6">
                                             <label class="form-label">Date of Birth</label>
-                                            <input type="date" id="dobField" class="form-control">
+                                            <input
+                                                type="date"
+                                                id="dobField"
+                                                class="form-control"
+                                            >
                                         </div>
+
+                                        <!-- Gender -->
                                         <div class="col-md-6">
                                             <label class="form-label">Gender</label>
                                             <select id="genderField" class="form-select">
+                                                <option value="">Select Gender</option>
                                                 <option value="MALE">Male</option>
                                                 <option value="FEMALE">Female</option>
                                                 <option value="OTHER">Other</option>
                                             </select>
                                         </div>
+
+                                        <!-- Marital Status -->
                                         <div class="col-md-6">
                                             <label class="form-label">Marital Status</label>
                                             <select id="maritalStatusField" class="form-select">
+                                                <option value="">Select Marital Status</option>
                                                 <option value="SINGLE">Single</option>
                                                 <option value="MARRIED">Married</option>
                                                 <option value="OTHER">Other</option>
                                             </select>
                                         </div>
+
+                                        <!-- Height -->
+                                        <div class="col-md-6">
+                                            <label class="form-label">Height (cm)</label>
+                                            <input
+                                                type="number"
+                                                step="0.1"
+                                                id="heightField"
+                                                class="form-control"
+                                                placeholder="Enter height"
+                                            >
+                                        </div>
+
+                                        <!-- Weight -->
+                                        <div class="col-md-6">
+                                            <label class="form-label">Weight (kg)</label>
+                                            <input
+                                                type="number"
+                                                step="0.1"
+                                                id="weightField"
+                                                class="form-control"
+                                                placeholder="Enter weight"
+                                            >
+                                        </div>
+
+                                        <!-- Blood Group -->
                                         <div class="col-md-6">
                                             <label class="form-label">Blood Group</label>
                                             <select id="bloodGroupField" class="form-select">
-                                                <option value="A+">A+</option>
-                                                <option value="A-">A-</option>
-                                                <option value="B+">B+</option>
-                                                <option value="B-">B-</option>
-                                                <option value="AB+">AB+</option>
-                                                <option value="AB-">AB-</option>
-                                                <option value="O+">O+</option>
-                                                <option value="O-">O-</option>
+                                                <option value="">Select Blood Group</option>
+                                                <option value="A_POSITIVE">A+</option>
+                                                <option value="A_NEGATIVE">A-</option>
+                                                <option value="B_POSITIVE">B+</option>
+                                                <option value="B_NEGATIVE">B-</option>
+                                                <option value="AB_POSITIVE">AB+</option>
+                                                <option value="AB_NEGATIVE">AB-</option>
+                                                <option value="O_POSITIVE">O+</option>
+                                                <option value="O_NEGATIVE">O-</option>
                                             </select>
                                         </div>
+
+                                        <!-- Religion -->
                                         <div class="col-md-6">
-                                            <label class="form-label">Occupation</label>
-                                            <input type="text" id="occupationField" class="form-control">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Nationality</label>
-                                            <input type="text" id="nationalityField" class="form-control">
-                                        </div>
-                                        <div class="col-12">
-                                            <label class="form-label">Bio</label>
-                                            <textarea id="bioField" class="form-control" rows="3"></textarea>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Address 1</label>
-                                            <input type="text" id="addressLine1Field" class="form-control">
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Address 2</label>
-                                            <input type="text" id="addressLine2Field" class="form-control">
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label class="form-label">City</label>
-                                            <input type="text" id="addressCityField" class="form-control">
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label class="form-label">State</label>
-                                            <input type="text" id="addressStateField" class="form-control">
+                                            <label class="form-label">Religion</label>
+                                            <input
+                                                type="text"
+                                                id="religionField"
+                                                class="form-control"
+                                                placeholder="Enter religion"
+                                            >
                                         </div>
 
+                                        <!-- Nationality -->
                                         <div class="col-md-6">
-                                            <label class="form-label">Country</label>
-                                            <input type="text" id="addressCountryField" class="form-control">
+                                            <label class="form-label">Nationality</label>
+                                            <input
+                                                type="text"
+                                                id="nationalityField"
+                                                class="form-control"
+                                                placeholder="Enter nationality"
+                                            >
                                         </div>
+
+                                        <!-- Aadhaar -->
                                         <div class="col-md-6">
-                                            <label class="form-label">Postal Code</label>
-                                            <input type="text" id="addressPostalCodeField" class="form-control">
+                                            <label class="form-label">Aadhaar Number</label>
+                                            <input
+                                                type="text"
+                                                id="aadhaarNumberField"
+                                                class="form-control"
+                                                placeholder="Enter Aadhaar number"
+                                            >
                                         </div>
+
+                                        <!-- PAN -->
+                                        <div class="col-md-6">
+                                            <label class="form-label">PAN Number</label>
+                                            <input
+                                                type="text"
+                                                id="panNumberField"
+                                                class="form-control"
+                                                placeholder="Enter PAN number"
+                                            >
+                                        </div>
+
+                                        <!-- Passport -->
+                                        <div class="col-md-6">
+                                            <label class="form-label">Passport Number</label>
+                                            <input
+                                                type="text"
+                                                id="passportNumberField"
+                                                class="form-control"
+                                                placeholder="Enter passport number"
+                                            >
+                                        </div>
+
+                                        <!-- Driving License -->
+                                        <div class="col-md-6">
+                                            <label class="form-label">Driving License Number</label>
+                                            <input
+                                                type="text"
+                                                id="drivingLicenseNumberField"
+                                                class="form-control"
+                                                placeholder="Enter driving license number"
+                                            >
+                                        </div>
+
                                     </div>
                                 </div>
                                 <div class="modal-footer">
@@ -1415,41 +1484,181 @@
                 <div class="modal fade" id="familyMemberModal" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content role-modal-content">
+
                             <div class="modal-header">
-                                <h5 class="modal-title" id="familyMemberModalTitle">Add Family Member</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                <h5 class="modal-title" id="familyMemberModalTitle">
+                                    Add Family Member
+                                </h5>
+
+                                <button
+                                    type="button"
+                                    class="btn-close"
+                                    data-bs-dismiss="modal"
+                                    aria-label="Close">
+                                </button>
                             </div>
+
                             <form id="familyMemberForm">
+
                                 <div class="modal-body">
+
                                     <div id="familyMemberFormMessage"></div>
+
                                     <input type="hidden" id="familyMemberId">
 
+                                    <!-- Member Name -->
                                     <div class="mb-3">
-                                        <label class="form-label">Name <span class="required-star">*</span></label>
-                                        <input type="text" id="familyMemberName" class="form-control" required>
+                                        <label class="form-label">
+                                            Name <span class="required-star">*</span>
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            id="familyMemberName"
+                                            class="form-control"
+                                            placeholder="Enter family member name"
+                                            required>
                                     </div>
+
+                                    <!-- Relationship -->
                                     <div class="mb-3">
-                                        <label class="form-label">Relationship <span class="required-star">*</span></label>
-                                        <input type="text" id="familyMemberRelationship" class="form-control" required>
+                                        <label class="form-label">
+                                            Relationship <span class="required-star">*</span>
+                                        </label>
+
+                                        <select
+                                            id="familyMemberRelationship"
+                                            class="form-select"
+                                            required>
+
+                                            <option value="">
+                                                Select Relationship
+                                            </option>
+
+                                            <option value="FATHER">Father</option>
+                                            <option value="MOTHER">Mother</option>
+                                            <option value="SPOUSE">Spouse</option>
+                                            <option value="SON">Son</option>
+                                            <option value="DAUGHTER">Daughter</option>
+                                            <option value="BROTHER">Brother</option>
+                                            <option value="SISTER">Sister</option>
+                                            <option value="OTHER">Other</option>
+
+                                        </select>
                                     </div>
+
+                                    <!-- Date of Birth -->
                                     <div class="mb-3">
-                                        <label class="form-label">Date of Birth</label>
-                                        <input type="date" id="familyMemberDob" class="form-control">
+                                        <label class="form-label">
+                                            Date of Birth
+                                        </label>
+
+                                        <input
+                                            type="date"
+                                            id="familyMemberDob"
+                                            class="form-control">
                                     </div>
+
+                                    <!-- Gender -->
                                     <div class="mb-3">
-                                        <label class="form-label">Dependent</label>
-                                        <select id="familyMemberDependent" class="form-select">
+                                        <label class="form-label">
+                                            Gender
+                                        </label>
+
+                                        <select
+                                            id="familyMemberGender"
+                                            class="form-select">
+
+                                            <option value="">
+                                                Select Gender
+                                            </option>
+
+                                            <option value="MALE">Male</option>
+                                            <option value="FEMALE">Female</option>
+                                            <option value="OTHER">Other</option>
+
+                                        </select>
+                                    </div>
+
+                                    <!-- Mobile Number -->
+                                    <div class="mb-3">
+                                        <label class="form-label">
+                                            Mobile Number
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            id="familyMemberMobile"
+                                            class="form-control"
+                                            placeholder="Enter mobile number">
+                                    </div>
+
+                                    <!-- Occupation -->
+                                    <div class="mb-3">
+                                        <label class="form-label">
+                                            Occupation
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            id="familyMemberOccupation"
+                                            class="form-control"
+                                            placeholder="Enter occupation">
+                                    </div>
+
+                                    <!-- Dependent -->
+                                    <div class="mb-3">
+                                        <label class="form-label">
+                                            Dependent
+                                        </label>
+
+                                        <select
+                                            id="familyMemberDependent"
+                                            class="form-select">
+
                                             <option value="false">No</option>
                                             <option value="true">Yes</option>
+
+                                        </select>
+                                    </div>
+
+                                    <!-- Nominee -->
+                                    <div class="mb-3">
+                                        <label class="form-label">
+                                            Nominee
+                                        </label>
+
+                                        <select
+                                            id="familyMemberNominee"
+                                            class="form-select">
+
+                                            <option value="false">No</option>
+                                            <option value="true">Yes</option>
+
                                         </select>
                                     </div>
 
                                 </div>
+
                                 <div class="modal-footer">
-                                    <button type="button" class="secondary-action-btn" data-bs-dismiss="modal">Cancel</button>
-                                    <button type="submit" class="btn-primary-erp">Save</button>
+
+                                    <button
+                                        type="button"
+                                        class="secondary-action-btn"
+                                        data-bs-dismiss="modal">
+                                        Cancel
+                                    </button>
+
+                                    <button
+                                        type="submit"
+                                        class="btn-primary-erp">
+                                        Save
+                                    </button>
+
                                 </div>
+
                             </form>
+
                         </div>
                     </div>
                 </div>

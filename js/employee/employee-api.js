@@ -4,58 +4,6 @@
 //      GET /api/profiles/me → Fetches employee profile details and profile photo.
 //      Used to display the current employee's profile information.
 // ==========================================================================================
-// function fetchCurrentUserProfile() {
-//     return Promise.all([
-//         apiRequest("/api/employees/me"),
-//         apiRequest("/api/employees/me/profile-image").catch(function (error) {
-//             if (error.message && error.message.includes("No profile found")) {
-//                 return { data: {} };
-//             }
-//             return { data: {} };
-//         }),
-//         demoGetProfile(),
-//         getRealProfilePhotoUrl()
-//     ]).then(function (results) {
-
-//         const u = results[0].data || {};
-//         const ext = results[1].data || {};
-//         const d = results[2].data || {};
-//         const realPhotoUrl = results[3];
-
-//         return {
-//             success: true,
-//             data: {
-//                 employeeCode: u.employeeCode || d.employeeCode || "--",
-//                 firstName: u.firstName || d.firstName || "",
-//                 lastName: u.lastName || d.lastName || "",
-//                 email: u.email || d.email || "--",
-//                 phone: u.phone || d.phone || "--",
-
-//                 departmentName: u.departmentName || d.departmentName || "Not available",
-//                 designation: u.designation || d.designation || "Not available",
-//                 joiningDate: u.joiningDate || d.joiningDate || "Not available",
-//                 reportingManager: u.reportingManager || d.reportingManager || "Not available",
-
-//                 roles: u.roleName ? [u.roleName] : (u.roles || []),
-//                 permissions: u.permissions || [],
-
-//                 profileImage:
-//                     overriddenProfileImage ||
-//                     realPhotoUrl ||
-//                     u.profileImage ||
-//                     d.profileImage ||
-//                     null,
-
-//                 dateOfBirth: ext.dateOfBirth || u.dateOfBirth || d.dateOfBirth || "Not available",
-//                 gender: ext.gender || u.gender || d.gender || "Not available"
-//             }
-//         };
-//     })
-//         .catch(function (error) {
-//             return demoGetProfile();
-//         });
-// }
-
 function fetchCurrentUserProfile() {
 
     return apiRequest("/api/employees/me")
@@ -422,36 +370,70 @@ function deleteMyEmergencyContact(contactId) {
 }
 
 // ---------------------------------------------------------------------------------------
-//  GET /api/family-members/me
+// GET /api/employees/me/family
 // ---------------------------------------------------------------------------------------
 function fetchMyFamilyMembers() {
-    return apiRequest("/api/family-members/me");
+    return apiRequest(
+        "/api/employees/me/family",
+        {
+            method: "GET",
+            skipAutoLogoutOn401: true
+        }
+    );
 }
+
+
+
+
 // ---------------------------------------------------------------------------------------
-//  POST /api/family-members/me
+// POST /api/employees/me/family
 // ---------------------------------------------------------------------------------------
+
 function addMyFamilyMember(payload) {
-    return apiRequest("/api/family-members/me", {
-        method: "POST",
-        body: JSON.stringify(payload)
-    });
+    return apiRequest(
+        "/api/employees/me/family",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload),
+            skipAutoLogoutOn401: true
+        }
+    );
 }
+
+
+
 // ---------------------------------------------------------------------------------------
-//  PUT /api/family-members/me/{id}
+// PUT /api/employees/me/family/{memberID}
 // ---------------------------------------------------------------------------------------
 function updateMyFamilyMember(id, payload) {
-    return apiRequest(`/api/family-members/me/${id}`, {
-        method: "PUT",
-        body: JSON.stringify(payload)
-    });
+    return apiRequest(
+        `/api/employees/me/family/${id}`,
+        {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload),
+            skipAutoLogoutOn401: true
+        }
+    );
 }
+
+
 // ---------------------------------------------------------------------------------------
-//  DELETE /api/family-members/me/{id}
+// DEACTIVATE /api/employees/me/family/{memberID}/deactivate
 // ---------------------------------------------------------------------------------------
-function deleteMyFamilyMember(id) {
-    return apiRequest(`/api/family-members/me/${id}`, {
-        method: "DELETE"
-    });
+function deactivateMyFamilyMember(id) {
+    return apiRequest(
+        `/api/employees/me/family/${id}/deactivate`,
+        {
+            method: "PUT",
+            skipAutoLogoutOn401: true
+        }
+    );
 }
 
 // ==================================================================================================
@@ -600,7 +582,7 @@ function deleteMyNominee(id) {
 //  GET /api/bank-information/me
 // ---------------------------------------------------------------------------------------
 function fetchMyBankInformation() {
-    return apiRequest("/api/bank-information/me");
+    return apiRequest("/api/employees/me/bank-info");
 }
 
 
@@ -633,20 +615,51 @@ function updateMyExtendedProfile(payload) {
 //                  Get Logged-in Employee Personal Information
 //                  GET /api/employees/me/personal-info
 // ==========================================================================================
+// function fetchPersonalInfo() {
+
+//     return apiRequest("/api/employees/me/personal-info")
+//         .then(function (res) {
+//             return {
+//                 success: true,
+//                 data: res.data || {}
+//             };
+//         })
+//         .catch(function (error) {
+//             console.error(
+//                 "Personal information API failed:",
+//                 error
+//             );
+//             return {
+//                 success: false,
+//                 data: {}
+//             };
+//         });
+// }
+
 function fetchPersonalInfo() {
 
-    return apiRequest("/api/employees/me/personal-info")
+    return apiRequest(
+        "/api/employees/me/personal-info",
+        {
+            method: "GET",
+            skipAutoLogoutOn401: true
+        }
+    )
         .then(function (res) {
+
             return {
                 success: true,
                 data: res.data || {}
             };
+
         })
         .catch(function (error) {
+
             console.error(
                 "Personal information API failed:",
                 error
             );
+
             return {
                 success: false,
                 data: {}
@@ -654,19 +667,126 @@ function fetchPersonalInfo() {
         });
 }
 
-function updatePersonalInfo(payload) {
 
-    return apiRequest("/employees/me/personal-info", {
-        method: "PUT",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(payload)
-    });
-}
+
+// async function updatePersonalInfo(payload) {
+//     console.log("PERSONAL INFO PUT PAYLOAD:", payload);
+
+//     try {
+//         const response = await apiRequest(
+//             "/api/employees/me/personal-info",
+//             {
+//                 method: "PUT",
+//                 headers: {
+//                     "Content-Type": "application/json"
+//                 },
+//                 body: JSON.stringify(payload),
+
+//                 // 401 par automatic logout mat karo
+//                 skipAutoLogoutOn401: true
+//             }
+//         );
+
+//         console.log("PERSONAL INFO PUT SUCCESS:", response);
+//         return response;
+
+//     } catch (error) {
+//         console.error("PERSONAL INFO PUT FAILED:", error);
+//         console.error("STATUS:", error.status);
+//         console.error("RESPONSE:", error.responseData);
+
+//         throw error;
+//     }
+// }
 // ---------------------------------------------------------------------------------------
 //  POST /api/addresses/me
 // ---------------------------------------------------------------------------------------
+
+
+async function updatePersonalInfo(payload) {
+
+    return apiRequest(
+        "/api/employees/me/personal-info",
+        {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload),
+            skipAutoLogoutOn401: true
+        }
+    );
+}
+
+
+async function savePersonalInfo() {
+
+    const payload = {
+        dateOfBirth:
+            document.getElementById("dateOfBirth")?.value || null,
+
+        gender:
+            document.getElementById("gender")?.value || null,
+
+        heightCm:
+            document.getElementById("heightCm")?.value
+                ? Number(document.getElementById("heightCm").value)
+                : null,
+
+        weightKg:
+            document.getElementById("weightKg")?.value
+                ? Number(document.getElementById("weightKg").value)
+                : null,
+
+        bloodGroup:
+            document.getElementById("bloodGroup")?.value || null,
+
+        maritalStatus:
+            document.getElementById("maritalStatus")?.value || null,
+
+        religion:
+            document.getElementById("religion")?.value || null,
+
+        nationality:
+            document.getElementById("nationality")?.value || null,
+
+        aadhaarNumber:
+            document.getElementById("aadhaarNumber")?.value || null,
+
+        panNumber:
+            document.getElementById("panNumber")?.value || null,
+
+        passportNumber:
+            document.getElementById("passportNumber")?.value || null,
+
+        drivingLicenseNumber:
+            document.getElementById("drivingLicenseNumber")?.value || null
+    };
+
+    try {
+
+        const response = await updatePersonalInfo(payload);
+
+        console.log("Personal Info Updated:", response);
+
+        alert("Personal information updated successfully.");
+
+        // GET API se fresh data reload
+        await loadPersonalInfo();
+
+    } catch (error) {
+
+        console.error("Unable to update personal information:", error);
+
+        alert(
+            error?.message ||
+            "Failed to update personal information."
+        );
+    }
+}
+
+
+
 function addMyAddress(payload) {
     return apiRequest("/api/addresses/me", {
         method: "POST",
@@ -680,5 +800,34 @@ function updateMyAddress(id, payload) {
     return apiRequest(`/api/addresses/me/${id}`, {
         method: "PUT",
         body: JSON.stringify(payload)
+    });
+}
+
+
+// =================================================================================================
+//                  ATTENDANCE - CHECK IN / CHECK OUT
+// =================================================================================================
+// ---------------------------------------------------------------------------------------
+//  POST /api/attendance/check-in
+//  Body optional hai — shiftId pass kar sakte ho, ya blank bhej sakte ho
+// ---------------------------------------------------------------------------------------
+function checkInAttendance(shiftId) {
+    const payload = shiftId ? { shiftId: shiftId } : {};
+
+    return apiRequest("/api/attendance/check-in", {
+        method: "POST",
+        body: JSON.stringify(payload),
+        skipAutoLogoutOn401: true
+    });
+}
+
+// ---------------------------------------------------------------------------------------
+//  POST /api/attendance/check-out
+// ---------------------------------------------------------------------------------------
+function checkOutAttendance() {
+    return apiRequest("/api/attendance/check-out", {
+        method: "POST",
+        body: JSON.stringify({}),
+        skipAutoLogoutOn401: true
     });
 }

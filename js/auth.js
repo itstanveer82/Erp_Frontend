@@ -485,156 +485,217 @@ function getAuthData() {
 
 let refreshInFlight = null;
 
+// async function refreshAccessToken() {
+
+//     if (refreshInFlight) {
+//         return refreshInFlight;
+//     }
+
+//     refreshInFlight = (async function () {
+
+//         const response = await fetch(
+//             API_BASE_URL + "/api/auth/refresh-token",
+//             {
+//                 method: "POST",
+//                 headers: {
+//                     "Content-Type": "application/json"
+//                 },
+//                 credentials: "include"
+//             }
+//         );
+
+//         let data = {};
+
+//         try {
+//             data = await response.json();
+//         } catch (error) {
+//             data = {};
+//         }
+
+//         console.log("REFRESH STATUS:", response.status);
+//         console.log("REFRESH RESPONSE:", data);
+
+//         if (!response.ok || data?.success === false) {
+//             throw new Error(
+//                 data?.message ||
+//                 "Session expired. Please login again."
+//             );
+//         }
+
+//         const newAccessToken =
+//             data?.data?.accessToken;
+
+//         if (!newAccessToken) {
+//             throw new Error(
+//                 "Refresh response did not contain an access token."
+//             );
+//         }
+
+//         const current = getAuthData();
+
+//         if (!current) {
+//             throw new Error(
+//                 "Authentication data not found."
+//             );
+//         }
+
+//         /*
+//          * Backend refresh endpoint returns a new LoginResponse.
+//          * Keep the new access token and all current user information.
+//          */
+//         const updatedAuthData = {
+//             ...current,
+//             token: newAccessToken,
+
+//             /*
+//              * Backend currently returns the refresh token
+//              * again in the response.
+//              */
+//             refreshToken:
+//                 data?.data?.refreshToken ||
+//                 current.refreshToken,
+
+//             tokenType:
+//                 data?.data?.tokenType ||
+//                 current.tokenType ||
+//                 "Bearer",
+
+//             expiresIn:
+//                 data?.data?.expiresIn ||
+//                 current.expiresIn ||
+//                 null
+//         };
+
+//         // if (current.remember) {
+
+//         //     localStorage.setItem(
+//         //         "authData",
+//         //         JSON.stringify(updatedAuthData)
+//         //     );
+
+//         // } else {
+
+//         //     sessionStorage.setItem(
+//         //         "authData",
+//         //         JSON.stringify(updatedAuthData)
+//         //     );
+//         // }
+
+//         console.log(
+//             "ACCESS TOKEN REFRESHED SUCCESSFULLY"
+//         );
+
+//         return newAccessToken;
+
+//     })();
+
+//     try {
+//         return await refreshInFlight;
+//     } finally {
+//         refreshInFlight = null;
+//     }
+// }
+
+// ============================================================
+// LOGOUT
+// ============================================================
 
 async function refreshAccessToken() {
 
-    const current = getAuthData();
-
-
-    // ----------------------------------------------------------
-    // No refresh token
-    // ----------------------------------------------------------
-
-    if (
-        !current ||
-        !current.refreshToken
-    ) {
-
-        throw new Error(
-            "No refresh token available."
-        );
-    }
-
-
-    // ----------------------------------------------------------
-    // If another refresh request is already running,
-    // reuse its promise.
-    // ----------------------------------------------------------
-
     if (refreshInFlight) {
-
         return refreshInFlight;
     }
-
-
-    // ----------------------------------------------------------
-    // Start refresh request
-    // ----------------------------------------------------------
 
     refreshInFlight = (async function () {
 
         const response = await fetch(
-            API_BASE_URL +
-            "/api/auth/refresh-token",
+            API_BASE_URL + "/api/auth/refresh-token",
             {
                 method: "POST",
-
                 headers: {
-                    "Content-Type":
-                        "application/json"
+                    "Content-Type": "application/json"
                 },
-
-                body: JSON.stringify({
-                    refreshToken:
-                        current.refreshToken
-                })
+                credentials: "include"
             }
         );
-
-
-        // ------------------------------------------------------
-        // Parse response
-        // ------------------------------------------------------
 
         let data = {};
 
         try {
-
             data = await response.json();
-
         } catch (error) {
-
             data = {};
         }
 
+        console.log("REFRESH STATUS:", response.status);
+        console.log("REFRESH RESPONSE:", data);
 
-        console.log(
-            "REFRESH STATUS:",
-            response.status
-        );
-
-        console.log(
-            "REFRESH RESPONSE:",
-            data
-        );
-
-
-        // ------------------------------------------------------
-        // Refresh failed
-        // ------------------------------------------------------
-
-        if (
-            !response.ok ||
-            data?.success === false
-        ) {
-
+        if (!response.ok || data?.success === false) {
             throw new Error(
                 data?.message ||
-                "Session expired. Please log in again."
+                "Session expired. Please login again."
             );
         }
-
-
-        // ------------------------------------------------------
-        // Validate new access token
-        // ------------------------------------------------------
 
         const newAccessToken =
             data?.data?.accessToken;
 
-
         if (!newAccessToken) {
-
             throw new Error(
                 "Refresh response did not contain an access token."
             );
         }
 
+        const current = getAuthData();
 
-        // ------------------------------------------------------
-        // Save new authentication data
-        //
-        // Keep the original remember-me setting.
-        // ------------------------------------------------------
+        if (!current) {
+            throw new Error("Authentication data not found.");
+        }
 
-        saveAuthData(
-            data,
-            current.remember
-        );
+        const updatedAuthData = {
+            ...current,
+            token: newAccessToken,
 
+            tokenType:
+                data?.data?.tokenType ||
+                current.tokenType ||
+                "Bearer",
+
+            expiresIn:
+                data?.data?.expiresIn ||
+                current.expiresIn ||
+                null
+        };
+
+        // Save NEW access token
+        if (localStorage.getItem("authData")) {
+
+            localStorage.setItem(
+                "authData",
+                JSON.stringify(updatedAuthData)
+            );
+
+        } else {
+
+            sessionStorage.setItem(
+                "authData",
+                JSON.stringify(updatedAuthData)
+            );
+        }
+
+        console.log("NEW ACCESS TOKEN SAVED");
 
         return newAccessToken;
 
     })();
 
-
-    // ----------------------------------------------------------
-    // Always clear the shared promise after completion
-    // ----------------------------------------------------------
-
     try {
-
         return await refreshInFlight;
-
     } finally {
-
         refreshInFlight = null;
     }
 }
 
-// ============================================================
-// LOGOUT
-// ============================================================
 
 const logoutButton =
     document.getElementById("logoutButton");
