@@ -1055,13 +1055,31 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
             rolesCardsContainer.innerHTML = "";
-            roles.forEach(function (role) {
+            roles.forEach(async function (role) {
                 // Build the permission-tag list for this role card
                 // (or a "No permissions" placeholder if it has none).
-                const permissions =
-                    Array.isArray(role.permissions)
-                        ? role.permissions
-                        : [];
+                let permissions = [];
+
+                try {
+
+                    const permissionResponse =
+                        await apiRequest(
+                            `/api/roles/${role.id}/permissions`
+                        );
+
+                    permissions =
+                        Array.isArray(permissionResponse.data)
+                            ? permissionResponse.data
+                            : [];
+
+                } catch (error) {
+
+                    console.error(
+                        `Failed to load permissions for role ${role.id}:`,
+                        error
+                    );
+
+                }
                 const permissionsHtml =
                     permissions.length > 0
                         ? permissions.map(
@@ -1153,16 +1171,6 @@ document.addEventListener("DOMContentLoaded", function () {
                         editRoleModal.show();
                     });
 
-                // Wire this specific card's Permissions button:
-                // opens the role-permissions modal for this role.
-                roleCard.querySelector(".role-permissions-btn")
-                    .addEventListener("click", function () {
-                        selectedRoleId = role.id;
-                        selectedRole = role;
-                        loadRolePermissions(role);
-                        rolePermissionsModal.show();
-                    });
-
                 // Wire this specific card's Delete button.
                 roleCard.querySelector(".delete-role-btn")
                     .addEventListener("click", function () {
@@ -1189,6 +1197,137 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    async function loadRolePermissions(role) {
+
+        const roleId = role.id;
+
+        const permissionsList =
+            document.getElementById(
+                "rolePermissionsList"
+            );
+
+        const title =
+            document.getElementById(
+                "rolePermissionsTitle"
+            );
+
+        title.textContent =
+            `Permissions for ${role.name}`;
+
+        permissionsList.innerHTML = `
+        <div class="text-center py-3">
+            Loading permissions...
+        </div>
+    `;
+
+        try {
+
+            // Get all available permissions
+            const allPermissionsResponse =
+                await apiRequest(
+                    "/api/permissions"
+                );
+
+            const allPermissions =
+                Array.isArray(
+                    allPermissionsResponse.data
+                )
+                    ? allPermissionsResponse.data
+                    : [];
+
+            // Get permissions already assigned to this role
+            const assignedResponse =
+                await apiRequest(
+                    `/api/roles/${roleId}/permissions`
+                );
+
+            const assignedData =
+                Array.isArray(
+                    assignedResponse.data
+                )
+                    ? assignedResponse.data
+                    : [];
+
+            // Convert assigned permissions into names
+            const assignedPermissions =
+                assignedData.map(function (permission) {
+                    return getDisplayName(permission);
+                });
+
+            console.log(
+                "Role ID:",
+                roleId
+            );
+
+            console.log(
+                "All permissions:",
+                allPermissions
+            );
+
+            console.log(
+                "Assigned permissions:",
+                assignedPermissions
+            );
+
+            permissionsList.innerHTML =
+                allPermissions
+                    .map(function (permission) {
+
+                        const permissionName =
+                            getDisplayName(permission);
+
+                        const isAssigned =
+                            assignedPermissions.includes(
+                                permissionName
+                            );
+
+                        return `
+                        <div class="form-check mb-2">
+
+                            <input
+                                class="form-check-input role-permission-checkbox"
+                                type="checkbox"
+                                value="${escapeHtml(permissionName)}"
+                                data-permission-name="${escapeHtml(permissionName)}"
+                                id="permission_${escapeHtml(permissionName)}"
+                                ${isAssigned ? "checked" : ""}
+                            >
+
+                            <label
+                                class="form-check-label"
+                                for="permission_${escapeHtml(permissionName)}"
+                            >
+                                ${escapeHtml(permissionName)}
+                            </label>
+
+                        </div>
+                    `;
+
+                    })
+                    .join("");
+
+            // Store currently assigned permissions
+            // so Save can detect POST vs DELETE
+            permissionsList.dataset.assignedPermissions =
+                JSON.stringify(assignedPermissions);
+
+        } catch (error) {
+
+            console.error(
+                "Failed to load role permissions:",
+                error
+            );
+
+            permissionsList.innerHTML = `
+            <div class="text-danger">
+                ${escapeHtml(
+                error.message ||
+                "Failed to load permissions"
+            )}
+            </div>
+        `;
+        }
+    }
     // Bootstrap modal instances for the two role-related modals,
     // created once up front so they can be `.show()`/`.hide()`n
     // from anywhere below.
@@ -1245,57 +1384,182 @@ document.addEventListener("DOMContentLoaded", function () {
             // checkbox list, then marks the ones already assigned
             // to this role as checked.
             if (permissionsButton) {
+                Swal.close();
                 selectedRoleId =
                     permissionsButton.dataset.roleId;
-                const response =
-                    await apiRequest("/api/roles");
-                const role =
-                    response.data.find(
-                        function (item) {
-                            return String(item.id) ===
-                                String(selectedRoleId);
-                        }
-                    );
-                const permissionsResponse =
-                    await apiRequest("/api/permissions");
-                const permissions =
-                    permissionsResponse.data || [];
-                const assignedPermissions =
-                    role?.permissions || [];
+
+                const roleName =
+                    permissionsButton.dataset.roleName;
+
                 document.getElementById(
                     "rolePermissionsTitle"
                 ).textContent =
-                    `Permissions for ${permissionsButton.dataset.roleName}`;
-                document.getElementById(
-                    "rolePermissionsList"
-                ).innerHTML =
-                    permissions.map(
-                        function (permission) {
-                            const permissionName =
-                                permission.name || permission;
-                            return `
-                            <div class="form-check mb-2">
-                                <input
-                                    class="form-check-input role-permission-checkbox"
-                                    type="checkbox"
-                                    value="${escapeHtml(permissionName)}"
-                                    id="permission_${escapeHtml(permissionName)}"
-                                    ${assignedPermissions.includes(permissionName)
-                                    ? "checked"
-                                    : ""
-                                }>
-                                <label
-                                    class="form-check-label"
-                                    for="permission_${escapeHtml(permissionName)}">
-                                    ${escapeHtml(permissionName)}
-                                </label>
-                            </div>
-                        `;
-                        }
-                    ).join("");
-                rolePermissionsModal.show();
-            }
+                    `Permissions for ${roleName}`;
 
+                try {
+
+                    // =====================================
+                    // 1. GET ALL AVAILABLE PERMISSIONS
+                    // =====================================
+
+                    const permissionsResponse =
+                        await apiRequest(
+                            "/api/permissions"
+                        );
+
+                    const permissions =
+                        Array.isArray(permissionsResponse.data)
+                            ? permissionsResponse.data
+                            : [];
+
+
+                    // =====================================
+                    // 2. GET ASSIGNED PERMISSIONS
+                    // =====================================
+
+                    const assignedResponse =
+                        await apiRequest(
+                            `/api/roles/${selectedRoleId}/permissions`
+                        );
+
+                    const assignedData =
+                        Array.isArray(assignedResponse.data)
+                            ? assignedResponse.data
+                            : [];
+
+
+                    // Convert API response into permission names
+                    const assignedPermissions =
+                        assignedData.map(function (permission) {
+
+                            if (typeof permission === "string") {
+                                return permission;
+                            }
+
+                            if (
+                                permission &&
+                                typeof permission === "object"
+                            ) {
+                                return (
+                                    permission.permission ||
+                                    permission.name ||
+                                    permission.permissionName ||
+                                    permission.code ||
+                                    permission.authority ||
+                                    ""
+                                );
+                            }
+
+                            return "";
+
+                        }).filter(Boolean);
+
+
+                    console.log(
+                        "Role ID:",
+                        selectedRoleId
+                    );
+
+                    console.log(
+                        "Assigned Permissions:",
+                        assignedPermissions
+                    );
+
+
+                    // =====================================
+                    // 3. BUILD CHECKBOXES
+                    // =====================================
+
+                    const permissionsList =
+                        document.getElementById(
+                            "rolePermissionsList"
+                        );
+
+                    permissionsList.innerHTML =
+                        permissions.map(function (permission) {
+
+                            let permissionName = "";
+
+                            if (typeof permission === "string") {
+
+                                permissionName =
+                                    permission;
+
+                            } else if (
+                                permission &&
+                                typeof permission === "object"
+                            ) {
+
+                                permissionName =
+                                    permission.permission ||
+                                    permission.name ||
+                                    permission.permissionName ||
+                                    permission.code ||
+                                    permission.authority ||
+                                    "";
+                            }
+
+
+                            const isAssigned =
+                                assignedPermissions.includes(
+                                    permissionName
+                                );
+
+
+                            return `
+                    <div class="form-check mb-2">
+
+                        <input
+                            class="form-check-input role-permission-checkbox"
+                            type="checkbox"
+                            value="${escapeHtml(permissionName)}"
+                            id="permission_${escapeHtml(permissionName)}"
+                            ${isAssigned ? "checked" : ""}
+                        >
+
+                        <label
+                            class="form-check-label"
+                            for="permission_${escapeHtml(permissionName)}"
+                        >
+                            ${escapeHtml(permissionName)}
+                        </label>
+
+                    </div>
+                `;
+
+                        }).join("");
+
+
+                    // Store original state.
+                    // Save button will use this to know
+                    // which permissions were removed.
+                    permissionsList.dataset.assignedPermissions =
+                        JSON.stringify(assignedPermissions);
+
+
+                    rolePermissionsModal.show();
+
+                    permissionsList.addEventListener("change", function () {
+                        Swal.close();
+                    });
+
+                } catch (error) {
+
+                    console.error(
+                        "Failed to load role permissions:",
+                        error
+                    );
+
+                    Swal.fire({
+                        icon: "error",
+                        title: "Failed",
+                        text: error.message || "Failed to update permissions.",
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    Swal.close();
+                }
+            }
 
             // DELETE
             // Confirms with a SweetAlert2 dialog before calling
@@ -1397,28 +1661,145 @@ document.addEventListener("DOMContentLoaded", function () {
         .addEventListener(
             "click",
             async function () {
-                const permissionNames =
+
+                const permissionsList =
+                    document.getElementById(
+                        "rolePermissionsList"
+                    );
+
+                const oldAssignedPermissions =
+                    JSON.parse(
+                        permissionsList.dataset
+                            .assignedPermissions || "[]"
+                    );
+
+                const selectedPermissions =
                     Array.from(
                         document.querySelectorAll(
                             ".role-permission-checkbox:checked"
                         )
-                    ).map(
-                        function (checkbox) {
-                            return checkbox.value;
-                        }
-                    );
-                await apiRequest(
-                    `/api/roles/${selectedRoleId}/permissions`,
-                    {
-                        method: "POST",
-                        body: JSON.stringify({
-                            permissionNames:
-                                permissionNames
-                        })
-                    }
+                    ).map(function (checkbox) {
+                        return checkbox.value;
+                    });
+
+                console.log(
+                    "Role ID:",
+                    selectedRoleId
                 );
-                rolePermissionsModal.hide();
-                loadRoles();
+
+                console.log(
+                    "Old assigned:",
+                    oldAssignedPermissions
+                );
+
+                console.log(
+                    "New selected:",
+                    selectedPermissions
+                );
+
+                try {
+
+                    // ==========================
+                    // ADD NEW PERMISSIONS
+                    // ==========================
+
+                    const permissionsToAdd =
+                        selectedPermissions.filter(
+                            function (permission) {
+                                return !oldAssignedPermissions.includes(
+                                    permission
+                                );
+                            }
+                        );
+
+                    for (
+                        const permission
+                        of permissionsToAdd
+                    ) {
+
+                        await apiRequest(
+                            `/api/roles/${selectedRoleId}/permissions`,
+                            {
+                                method: "POST",
+                                body: JSON.stringify({
+                                    permission:
+                                        permission
+                                })
+                            }
+                        );
+
+                        console.log(
+                            "Permission added:",
+                            permission
+                        );
+                    }
+
+
+                    // ==========================
+                    // REMOVE UNCHECKED PERMISSIONS
+                    // ==========================
+
+                    const permissionsToRemove =
+                        oldAssignedPermissions.filter(
+                            function (permission) {
+                                return !selectedPermissions.includes(
+                                    permission
+                                );
+                            }
+                        );
+
+                    for (
+                        const permission
+                        of permissionsToRemove
+                    ) {
+
+                        await apiRequest(
+                            `/api/roles/${selectedRoleId}/permissions/${encodeURIComponent(permission)}`,
+                            {
+                                method: "DELETE"
+                            }
+                        );
+
+                        console.log(
+                            "Permission removed:",
+                            permission
+                        );
+                    }
+
+
+                    // ==========================
+                    // SUCCESS
+                    // ==========================
+
+                    rolePermissionsModal.hide();
+
+                    Swal.fire({
+                        icon: "success",
+                        title: "Success",
+                        text:
+                            "Role permissions updated successfully.",
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+
+                    // Reload role cards
+                    loadRoles();
+
+                } catch (error) {
+
+                    console.error(
+                        "Permission update failed:",
+                        error
+                    );
+
+                    Swal.fire({
+                        icon: "error",
+                        title: "Failed",
+                        text:
+                            error.message ||
+                            "Failed to update permissions."
+                    });
+                }
             }
         );
 
@@ -1532,42 +1913,76 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
             permissionsTableBody.innerHTML = "";
-            permissions.forEach(
-                function (permission) {
-                    const row =
-                        document.createElement("tr");
-                    row.innerHTML = `
-                    <td>
-                        ${escapeHtml(
-                        permission.id
-                    )}
-                    </td>
-                    <td class="table-permission-name">
-                        ${escapeHtml(
-                        getDisplayName(
-                            permission
-                        )
-                    )}
-                    </td>
-                    <td class="table-description">
-                        ${escapeHtml(
-                        permission.description ||
-                        "--"
-                    )}
-                    </td>
-                    <td>
-                        <button type="button"
-                            class="btn btn-outline-primary btn-sm edit-permission-btn"
-                            data-permission-id="${escapeHtml(permission.id)}"
-                            data-permission-name="${escapeHtml(getDisplayName(permission))}"
-                            data-permission-description="${escapeHtml(permission.description || "")}">
-                            Edit
-                        </button>
-                    </td>
-                `;
-                    permissionsTableBody.appendChild(row);
+
+
+            permissions.forEach(function (permission, index) {
+
+                const row = document.createElement("tr");
+
+                // API can return:
+                // "MANAGE_EMPLOYEES"
+                // OR
+                // { id: 1, permission: "MANAGE_EMPLOYEES" }
+
+                let permissionName = "";
+
+                if (typeof permission === "string") {
+
+                    permissionName = permission;
+
+                } else if (
+                    permission &&
+                    typeof permission === "object"
+                ) {
+
+                    permissionName =
+                        permission.permission ||
+                        permission.name ||
+                        permission.permissionName ||
+                        permission.code ||
+                        permission.authority ||
+                        "";
+
                 }
-            );
+
+                const permissionId =
+                    permission &&
+                        typeof permission === "object" &&
+                        permission.id !== undefined
+                        ? permission.id
+                        : index + 1;
+
+                const description =
+                    permission &&
+                        typeof permission === "object"
+                        ? (
+                            permission.description ||
+                            "--"
+                        )
+                        : "--";
+
+                row.innerHTML = `
+        <td>
+            ${escapeHtml(String(permissionId))}
+        </td>
+
+        <td class="table-permission-name">
+            ${escapeHtml(permissionName)}
+        </td>
+
+        <td class="table-description">
+            ${escapeHtml(description)}
+        </td>
+
+        <td>
+            <span class="text-muted">
+                Available
+            </span>
+        </td>
+    `;
+
+                permissionsTableBody.appendChild(row);
+            });
         } catch (error) {
             console.error(
                 "Failed to fetch permissions:",
@@ -1775,9 +2190,12 @@ document.addEventListener("DOMContentLoaded", function () {
                     document.getElementById(
                         "removePermissionId"
                     ).value;
+
                 const removePermissionMessage =
                     document.getElementById("removePermissionMessage");
-                removePermissionMessage.innerHTML = "";
+                document.getElementById("removePermissionId").addEventListener("input", function () {
+                    removePermissionMessage.innerHTML = "";
+                });
                 try {
                     await apiRequest(
                         `/api/permissions/${permissionId}`,
@@ -2457,17 +2875,22 @@ document.addEventListener("DOMContentLoaded", function () {
      * @returns {string}
      */
     function getDisplayName(value) {
+
         if (
             value === null ||
             value === undefined
         ) {
             return "";
         }
+
         if (typeof value === "string") {
             return value;
         }
+
         if (typeof value === "object") {
+
             return (
+                value.permission ||
                 value.name ||
                 value.roleName ||
                 value.permissionName ||
@@ -2476,9 +2899,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 String(value.id || "")
             );
         }
+
         return String(value);
     }
-
     /**
      * ESCAPE HTML
      * Safely escapes a value for injection into innerHTML by
