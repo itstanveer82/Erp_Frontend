@@ -43,32 +43,6 @@ async function apiRequest(endpoint, options = {}, _isRetry = false) {
         console.log("API Status:", response.status);
         console.log("API Response:", data);
 
-        // TOKEN EXPIRED -> try a silent refresh, then retry this
-        // request exactly once. Only applies to real API calls, not
-        // to the login/refresh endpoints themselves, and only when
-        // we actually have a token to have expired in the first place.
-        // if (
-        //     response.status === 401 &&
-        //     !skipAuthHandling &&
-        //     !_isRetry &&
-        //     token &&
-        //     typeof refreshAccessToken === "function"
-        // ) {
-        //     try {
-        //         await refreshAccessToken();
-
-        //         return await apiRequest(endpoint, options, true);
-
-        //     } catch (refreshError) {
-        //         console.error("Token refresh failed:", refreshError);
-
-        //         if (typeof logout === "function" && !options.skipAutoLogoutOn401) {
-        //             logout();
-        //         }
-        //         throw refreshError;
-        //     }
-        // }
-
 
         if (
             response.status === 401 &&

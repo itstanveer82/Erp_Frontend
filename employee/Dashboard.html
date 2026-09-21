@@ -768,54 +768,33 @@
                                         aria-label="Close"></button>
                                 </div>
 
-                                <form id="resetPasswordForm">
+                               <form id="resetPasswordForm">
                                     <div class="modal-body">
                                         <div id="resetPasswordMessage"></div>
 
                                         <div class="mb-3">
-                                            <label class="form-label">Current
-                                                Password <span
-                                                    class="required-star">*</span></label>
-                                            <input type="password"
-                                                id="currentPasswordField"
-                                                class="form-control"
-                                                placeholder="Enter current password"
-                                                required>
+                                            <label class="form-label">Current Password <span class="required-star">*</span></label>
+                                            <input type="password" id="currentPasswordField" class="form-control"
+                                                placeholder="Enter current password" required>
                                         </div>
 
                                         <div class="mb-3">
-                                            <label class="form-label">New
-                                                Password <span
-                                                    class="required-star">*</span></label>
-                                            <input type="password"
-                                                id="newPasswordField"
-                                                class="form-control"
-                                                placeholder="Enter new password"
-                                                minlength="6" required>
+                                            <label class="form-label">New Password <span class="required-star">*</span></label>
+                                            <input type="password" id="newPasswordField" class="form-control"
+                                                placeholder="Enter new password" minlength="6" required>
                                         </div>
 
                                         <div class="mb-0">
-                                            <label class="form-label">Confirm
-                                                New Password
-                                                <span
-                                                    class="required-star">*</span></label>
-                                            <input type="password"
-                                                id="confirmPasswordField"
-                                                class="form-control"
-                                                placeholder="Re-enter new password"
-                                                minlength="6" required>
-                                            <small id="confirmPasswordFeedback"
-                                                class="password-match-feedback"></small>
+                                            <label class="form-label">Confirm New Password <span class="required-star">*</span></label>
+                                            <input type="password" id="confirmPasswordField" class="form-control"
+                                                placeholder="Re-enter new password" minlength="6" required>
+                                            <small id="confirmPasswordFeedback" class="password-match-feedback"></small>
                                         </div>
                                     </div>
 
                                     <div class="modal-footer">
-                                        <button type="button"
-                                            class="secondary-action-btn"
-                                            data-bs-dismiss="modal">Cancel</button>
-                                        <button type="submit"
-                                            class="btn-primary-erp">Update
-                                            Password</button>
+                                        <button type="button" class="secondary-action-btn" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn-primary-erp">Update Password</button>
                                     </div>
                                 </form>
 
@@ -839,6 +818,11 @@
                                     <span id="viewPhotoFallback" class="view-photo-fallback"></span>
                                     <button type="button" id="openUploadPhotoButton" class="view-photo-edit-btn" title="Change Photo">📷</button>
                                 </div>
+                            </div>
+                            <div class="modal-footer justify-content-center d-none" id="viewPhotoFooter">
+                                <button type="button" id="deletePhotoButton" class="btn btn-sm btn-outline-danger">
+                                    🗑 Remove
+                                </button>
                             </div>
                         </div>
                     </div>

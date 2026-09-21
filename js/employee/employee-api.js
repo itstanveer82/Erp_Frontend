@@ -1,3 +1,180 @@
+let overriddenProfileImage = null;
+
+// ==========================================================================================
+//      Resolve the logged-in employee's reporting manager name.
+//      1) /me me direct name mile to wahi use hoga
+//      2) warna manager id se GET /api/employees/managers me match karega
+// ==========================================================================================
+async function resolveReportingManagerName(u) {
+    console.log("ME data for manager lookup:", u);
+
+    const managerKeys = Object.keys(u).filter(function (k) {
+        return /manager/i.test(k);
+    });
+    console.log("Manager-related keys in /me:", managerKeys);
+
+    let managerId = null;
+
+    for (const key of managerKeys) {
+        const val = u[key];
+
+        if (val === null || val === undefined || val === "" || typeof val === "boolean") {
+            continue;
+        }
+
+        // Direct name (string, numeric nahi)
+        if (typeof val === "string" && isNaN(Number(val))) {
+            return val;
+        }
+
+        // Object: { employeeId, fullName }
+        if (typeof val === "object") {
+            if (val.fullName) return val.fullName;
+            if (val.employeeId != null) managerId = val.employeeId;
+            continue;
+        }
+
+        // Numeric id
+        if (managerId === null) managerId = val;
+    }
+
+    const res = await fetchManagers();
+
+    // Manager id mili to list me se naam nikalo
+    if (managerId !== null) {
+        const match = res.data.find(function (m) {
+            return String(m.employeeId) === String(managerId);
+        });
+        if (match) return match.fullName;
+    }
+
+    // ------------------------------------------------------------------
+    // TEMP (sirf testing): backend field na bheje to pehla manager dikhao,
+    // agar logged-in employee khud wo manager nahi hai.
+    // Backend fix hone par ye block DELETE kar dena.
+    // ------------------------------------------------------------------
+    const other = res.data.find(function (m) {
+        return m.employeeCode !== u.employeeCode;
+    });
+    if (other) return other.fullName;
+
+    return "Not available";
+}
+
+
+// =============================================================================================
+//      Upload the logged-in employee's profile photo.
+//      API: POST /api/employees/me/profile-image  (multipart/form-data)
+// =============================================================================================
+async function uploadProfilePhoto(file) {
+    const authData = typeof getAuthData === "function" ? getAuthData() : null;
+    const token = authData ? authData.token : null;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    // Content-Type manually mat lagana, browser multipart boundary khud set karta hai
+    const response = await fetch(API_BASE_URL + "/api/employees/me/profile-image", {
+        method: "POST",
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        body: formData
+    });
+
+    let data = {};
+    try {
+        data = await response.json();
+    } catch (error) {
+        data = {};
+    }
+
+    if (!response.ok) {
+        const apiError = new Error(
+            data.message || `Upload failed with status ${response.status}`
+        );
+        apiError.responseData = data;
+        apiError.status = response.status;
+        throw apiError;
+    }
+
+    return data;
+}
+
+// =============================================================================================
+//      Delete the logged-in employee's profile photo.
+//      API: DELETE /api/employees/me/profile-image
+// =============================================================================================
+function deleteProfilePhoto() {
+    return photoApiRequest("/api/employees/me/profile-image", {
+        method: "DELETE"
+    });
+}
+
+
+
+// ==========================================================================================
+//      Profile image (GET /api/employees/me/profile-image)
+//      Image token ke saath fetch hoti hai, isliye blob URL banake <img> me lagate hain.
+//      Promise cache hota hai, taaki page load par ek hi baar call jaye.
+// ==========================================================================================
+let realPhotoPromise = null;
+
+async function loadRealProfilePhoto() {
+    try {
+        const authData = typeof getAuthData === "function" ? getAuthData() : null;
+        const token = authData ? authData.token : null;
+
+        const response = await fetch(API_BASE_URL + "/api/employees/me/profile-image", {
+            method: "GET",
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
+            cache: "no-store"
+        });
+
+        // 404 = photo set nahi hai
+        if (!response.ok) {
+            return null;
+        }
+
+        const type = response.headers.get("Content-Type") || "";
+
+        // Image seedha binary aati hai
+        if (type.startsWith("image/")) {
+            return URL.createObjectURL(await response.blob());
+        }
+
+        // Fallback: JSON aaye to URL wali field dhundo
+        const json = await response.json();
+        console.log("Profile image GET returned JSON:", json);
+        const d = json.data || {};
+        return d.imageUrl || d.url || d.profileImage || null;
+
+    } catch (error) {
+        console.warn("Could not load profile photo:", error);
+        return null;
+    }
+}
+
+function getRealProfilePhotoUrl() {
+    if (!realPhotoPromise) {
+        realPhotoPromise = loadRealProfilePhoto();
+    }
+    return realPhotoPromise;
+}
+
+// Upload / delete ke baad cache clear karo
+function resetProfilePhotoCache() {
+    if (realPhotoPromise) {
+        realPhotoPromise.then(function (url) {
+            if (url && String(url).startsWith("blob:")) {
+                URL.revokeObjectURL(url);
+            }
+        });
+    }
+    realPhotoPromise = null;
+}
+
+
+
+
 // ==========================================================================================
 //      Get the logged-in employee's user and profile details.
 //      GET /api/users/me  → Fetches basic logged-in user information.
@@ -7,9 +184,11 @@
 function fetchCurrentUserProfile() {
 
     return apiRequest("/api/employees/me")
-        .then(function (res) {
+        .then(async function (res) {
 
             const u = res.data || {};
+            const managerName = await resolveReportingManagerName(u);
+            const photoUrl = u.hasProfileImage === false ? null : await getRealProfilePhotoUrl();
 
             return {
                 success: true,
@@ -75,7 +254,7 @@ function fetchCurrentUserProfile() {
                         !!u.hasCoverImage,
 
                     profileImage:
-                        overriddenProfileImage || null,
+                        overriddenProfileImage || photoUrl,
 
 
                     // =========================
@@ -88,8 +267,7 @@ function fetchCurrentUserProfile() {
                     gender:
                         u.gender || "Not available",
 
-                    reportingManager:
-                        u.reportingManager || "Not available"
+                    reportingManager: managerName
                 }
             };
         })
@@ -106,184 +284,6 @@ function fetchCurrentUserProfile() {
         });
 }
 
-
-// ==========================================================================================
-//      Get and download the logged-in employee's profile photo.
-//      GET /api/profile-photos/me          → Fetches the employee's profile photo details.
-//      GET /api/profile-photos/me/download → Downloads the employee's profile photo file.
-//      Used to display or download the current employee's profile photo.)
-// ==========================================================================================
-let overriddenProfileImage = null;
-let cachedRealPhotoUrl = null;
-let realPhotoFetchedOnce = false;
-// ---------------------------------------------------------------------------------------
-// Fetches real profile photo once, caches the blob-URL,
-// ---------------------------------------------------------------------------------------
-function getRealProfilePhotoUrl() {
-    if (realPhotoFetchedOnce) {
-        return Promise.resolve(cachedRealPhotoUrl);
-    }
-    return photoApiRequest("/api/employees/me/profile-image")
-        .then(function (res) {
-            const photo = res.data;
-
-            if (!photo || !photo.id) {
-                return null;
-            }
-        })
-        .catch(function (error) {
-            console.warn("Could not load real profile photo:", error);
-            return null;
-        })
-        .then(function (url) {
-            cachedRealPhotoUrl = url;
-            realPhotoFetchedOnce = true;
-            return url;
-        });
-}
-
-// ==========================================================================================
-//      Clear the cached profile photo so the latest employee photo can be loaded.
-//      Used after updating or changing the profile photo.
-// ==========================================================================================
-function resetProfilePhotoCache() {
-    realPhotoFetchedOnce = false;
-}
-
-// ==========================================================================================
-//      Set an override profile image for the logged-in employee.
-//      Used to display a custom image instead of the default profile photo.
-// ==========================================================================================
-function setOverriddenProfileImage(imageUrl) {
-    overriddenProfileImage = imageUrl;
-}
-
-// =========================================================================================
-//      Common authenticated API request function for profile photo endpoints.
-//      Handles the request based on the endpoint provided.
-//      Used by profile photo APIs to avoid duplicating authentication/request logic.
-// =========================================================================================
-async function photoApiRequest(endpoint, options = {}) {
-    let authData = null;
-    if (typeof getAuthData === "function") {
-        authData = getAuthData();
-    }
-    const token = authData ? authData.token : null;
-
-    const headers = {
-        "Content-Type": "application/json",
-        ...(options.headers || {})
-    };
-
-    if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
-    }
-    const response = await fetch(API_BASE_URL + endpoint, {
-        ...options,
-        headers: headers,
-        cache: "no-store"
-    });
-
-    let data = {};
-    try {
-        data = await response.json();
-    } catch (error) {
-        data = {};
-    }
-    if (!response.ok) {
-        const apiError = new Error(
-            data.message || `Request failed with status ${response.status}`
-        );
-        apiError.responseData = data;
-        throw apiError;
-    }
-
-    return data;
-}
-
-// ============================================================================================
-//      Download the employee profile photo as binary data.
-//      Creates a Blob URL from the downloaded file for displaying or using the photo.
-// ============================================================================================
-async function fetchProfilePhotoAsObjectUrl(downloadPath) {
-    let authData = null;
-    if (typeof getAuthData === "function") {
-        authData = getAuthData();
-    }
-    const token = authData ? authData.token : null;
-
-    const headers = {};
-    if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
-    }
-
-    const response = await fetch(API_BASE_URL + downloadPath, {
-        headers,
-        cache: "no-store"   // sirf ye rakho, URL me query param mat jodo
-    });
-
-    if (!response.ok) {
-        throw new Error(`Failed to load photo (status ${response.status})`);
-    }
-
-    const blob = await response.blob();
-    return URL.createObjectURL(blob);
-}
-
-// =============================================================================================
-//      Upload the logged-in employee's profile photo.
-//      API: POST /api/profile-photos/me
-//      Sends the selected photo to the server and updates the employee's profile image.
-// =============================================================================================
-async function uploadProfilePhoto(file) {
-    let authData = null;
-    if (typeof getAuthData === "function") {
-        authData = getAuthData();
-    }
-    const token = authData ? authData.token : null;
-
-    const formData = new FormData();
-    formData.append("file", file);
-
-    const headers = {};
-    if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
-    }
-
-    const response = await fetch(API_BASE_URL + "/api/employees/me/profile-image", {
-        method: "POST",
-        headers: headers,
-        body: formData
-    });
-
-    let data = {};
-    try {
-        data = await response.json();
-    } catch (error) {
-        data = {};
-    }
-
-    if (!response.ok) {
-        const apiError = new Error(
-            data.message || `Upload failed with status ${response.status}`
-        );
-        apiError.responseData = data;
-        throw apiError;
-    }
-
-    return data;
-}
-
-// =============================================================================================
-//      Delete the logged-in employee's profile photo.
-//      API: DELETE /api/profile-photos/me
-//      Removes the current profile photo from the employee's account.
-// =============================================================================================
-function deleteProfilePhoto() {
-    return photoApiRequest("/api/employees/me/profile-image", {
-        method: "DELETE"
-    });
-}
 
 
 // ============================================================================================
@@ -308,14 +308,14 @@ function revokeEmployeeSession(sessionId) {
 
 // ===========================================================================================
 //      Change the logged-in employee's password.
-//      API: POST /api/auth/change-password
-//      Updates the employee's account password after validating the current password.
+//      API: PUT /api/employees/me/change-password
+//      Body: { currentPassword, newPassword }
 // ===========================================================================================
-function changeEmployeePassword(oldPassword, newPassword) {
-    return apiRequest("/api/auth/change-password", {
-        method: "POST",
+function changeEmployeePassword(currentPassword, newPassword) {
+    return photoApiRequest("/api/employees/me/change-password", {
+        method: "PUT",
         body: JSON.stringify({
-            oldPassword: oldPassword,
+            currentPassword: currentPassword,
             newPassword: newPassword
         })
     });
@@ -586,56 +586,6 @@ function fetchMyBankInformation() {
 }
 
 
-// =================================================================================================
-//              USER PROFILE (extended)
-// =================================================================================================
-// ---------------------------------------------------------------------------------------
-//  GET /api/profiles/me
-// ---------------------------------------------------------------------------------------
-function fetchMyExtendedProfile() {
-    return apiRequest("/api/profiles/me");
-}
-// ---------------------------------------------------------------------------------------
-//  PUT /api/profiles/me
-// ---------------------------------------------------------------------------------------
-function updateMyExtendedProfile(payload) {
-    return apiRequest("/api/profiles/me", {
-        method: "PUT",
-        body: JSON.stringify(payload)
-    });
-}
-
-// =================================================================================================
-//                  ADDRESS (Personal Information)
-// =================================================================================================
-// ---------------------------------------------------------------------------------------
-//  GET /api/addresses/me
-// ---------------------------------------------------------------------------------------
-// ==========================================================================================
-//                  Get Logged-in Employee Personal Information
-//                  GET /api/employees/me/personal-info
-// ==========================================================================================
-// function fetchPersonalInfo() {
-
-//     return apiRequest("/api/employees/me/personal-info")
-//         .then(function (res) {
-//             return {
-//                 success: true,
-//                 data: res.data || {}
-//             };
-//         })
-//         .catch(function (error) {
-//             console.error(
-//                 "Personal information API failed:",
-//                 error
-//             );
-//             return {
-//                 success: false,
-//                 data: {}
-//             };
-//         });
-// }
-
 function fetchPersonalInfo() {
 
     return apiRequest(
@@ -666,42 +616,6 @@ function fetchPersonalInfo() {
             };
         });
 }
-
-
-
-// async function updatePersonalInfo(payload) {
-//     console.log("PERSONAL INFO PUT PAYLOAD:", payload);
-
-//     try {
-//         const response = await apiRequest(
-//             "/api/employees/me/personal-info",
-//             {
-//                 method: "PUT",
-//                 headers: {
-//                     "Content-Type": "application/json"
-//                 },
-//                 body: JSON.stringify(payload),
-
-//                 // 401 par automatic logout mat karo
-//                 skipAutoLogoutOn401: true
-//             }
-//         );
-
-//         console.log("PERSONAL INFO PUT SUCCESS:", response);
-//         return response;
-
-//     } catch (error) {
-//         console.error("PERSONAL INFO PUT FAILED:", error);
-//         console.error("STATUS:", error.status);
-//         console.error("RESPONSE:", error.responseData);
-
-//         throw error;
-//     }
-// }
-// ---------------------------------------------------------------------------------------
-//  POST /api/addresses/me
-// ---------------------------------------------------------------------------------------
-
 
 async function updatePersonalInfo(payload) {
 
@@ -830,4 +744,48 @@ function checkOutAttendance() {
         body: JSON.stringify({}),
         skipAutoLogoutOn401: true
     });
+}
+
+// ==========================================================================================
+//      Get the logged-in employee's permissions.
+//      API: GET /api/employees/me/permissions
+//      Returns: [{ id, permission, grantedByName, grantedAt }]
+// ==========================================================================================
+function fetchMyPermissions() {
+    return apiRequest("/api/employees/me/permissions", {
+        method: "GET",
+        skipAutoLogoutOn401: true
+    })
+        .then(function (res) {
+            return {
+                success: true,
+                data: Array.isArray(res.data) ? res.data : []
+            };
+        })
+        .catch(function (error) {
+            console.error("Permissions API failed:", error);
+            return { success: false, data: [] };
+        });
+}
+
+// ==========================================================================================
+//      Get list of managers (for Apply To / CC To dropdowns)
+//      API: GET /api/employees/managers
+//      Returns: [{ employeeId, fullName, ... }]
+// ==========================================================================================
+function fetchManagers() {
+    return apiRequest("/api/employees/managers", {
+        method: "GET",
+        skipAutoLogoutOn401: true
+    })
+        .then(function (res) {
+            return {
+                success: true,
+                data: Array.isArray(res.data) ? res.data : []
+            };
+        })
+        .catch(function (error) {
+            console.error("Managers API failed:", error);
+            return { success: false, data: [] };
+        });
 }

@@ -237,8 +237,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const fullName =
                 `${p.firstName || ""} ${p.lastName || ""}`.trim();
 
-            const employeeImage =
-                p.profileImage;
+            const employeeImage = p.profileImage || "../assets/image/Barrownz-Logo.png";
 
             headerEmployeeName.textContent =
                 fullName || "Employee";
@@ -267,41 +266,198 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     loadHeaderEmployeeProfile();
 
+    // ==============================================================================================
+    //      SYSTEM IN / OUT
+    //      State (check-in time ke saath) browser me save hota hai, isliye logout / reload ke
+    //      baad bhi jab tak System Out na ho, "System Out" hi dikhega.
+    // ==============================================================================================
     const systemInButton = document.getElementById("systemInButton");
     const systemOutButton = document.getElementById("systemOutButton");
 
+    const SYSTEM_STATE_KEY =
+        "erp_system_state_" +
+        (authData.email || (authData.user && authData.user.id) || "unknown");
+
+    // ---- Helpers ----
+    function renderSystemButtons(isCheckedIn) {
+        systemInButton.classList.toggle("d-none", isCheckedIn);
+        systemOutButton.classList.toggle("d-none", !isCheckedIn);
+    }
+
+    function saveSystemState(checkInTimestamp) {
+        try {
+            if (checkInTimestamp) {
+                localStorage.setItem(SYSTEM_STATE_KEY, String(checkInTimestamp));
+            } else {
+                localStorage.removeItem(SYSTEM_STATE_KEY);
+            }
+        } catch (e) {
+            console.warn("Could not save system state:", e);
+        }
+    }
+
+    // Saved check-in time (ms). Purana "IN" value ho to null (time unknown).
+    function getSavedCheckInTime() {
+        const v = localStorage.getItem(SYSTEM_STATE_KEY);
+        const t = Number(v);
+        return v && !isNaN(t) ? t : null;
+    }
+
+    function formatClock(date) {
+        return date.toLocaleTimeString("en-IN", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true
+        });
+    }
+
+    function formatDuration(ms) {
+        const totalMin = Math.max(0, Math.floor(ms / 60000));
+        const days = Math.floor(totalMin / 1440);
+        const hours = Math.floor((totalMin % 1440) / 60);
+        const mins = totalMin % 60;
+
+        return (days ? days + "d " : "") + hours + "h " + mins + "m";
+    }
+
+    function getGreeting(date) {
+        const h = date.getHours();
+        if (h < 12) return "Good Morning";
+        if (h < 17) return "Good Afternoon";
+        return "Good Evening";
+    }
+
+    function getFirstName() {
+        const name = (headerEmployeeName.textContent || "").trim().split(/\s+/)[0];
+        return name && name !== "Employee" ? name : "";
+    }
+
+    function showSystemPopup(o) {
+        Swal.fire({
+            html: `
+            <div style="text-align:center;padding:6px 4px 2px;">
+                <div style="width:76px;height:76px;margin:0 auto 14px;border-radius:50%;
+                            background:${o.bg};display:flex;align-items:center;
+                            justify-content:center;font-size:26px;">${o.icon}</div>
+
+                <div style="font-size:0.6rem;color:#6c757d;letter-spacing:1px;
+                            text-transform:uppercase;">${escapeHtml(o.kicker)}</div>
+
+                <h3 style="margin:4px 0 2px;font-weight:500;color:${o.color};">${escapeHtml(o.title)}</h3>
+
+                <div style="font-size:2rem;font-weight:500;letter-spacing:1px;
+                            margin:6px 0;">${escapeHtml(o.time)}</div>
+
+                <div style="color:#6c757d;font-size:0.75rem;">${escapeHtml(o.subtitle)}</div>
+
+                ${o.extra || ""}
+            </div>
+        `,
+            width: 380,
+            showConfirmButton: false,
+            timer: o.timer,
+            timerProgressBar: true
+        });
+    }
+
+    function statCard(label, value, color) {
+        return `
+            <div style="flex:1;background:#f5f7fa;border-radius:10px;padding:10px 6px;">
+                <div style="font-size:0.7rem;color:#6c757d;text-transform:uppercase;">${escapeHtml(label)}</div>
+                <div style="font-weight:700;color:${color};margin-top:2px;">${escapeHtml(value)}</div>
+            </div>
+        `;
+    }
+
+    // ---- Page load par saved state apply karo ----
+    renderSystemButtons(!!localStorage.getItem(SYSTEM_STATE_KEY));
+
+    // ---- SYSTEM IN ----
     systemInButton.addEventListener("click", function () {
         systemInButton.disabled = true;
 
-        checkInAttendance()   // agar shiftId bhejna hai to: checkInAttendance(1)
+        checkInAttendance()
             .then(function (res) {
                 console.log("Check-in success:", res);
 
-                systemInButton.classList.add("d-none");
-                systemOutButton.classList.remove("d-none");
+                const now = new Date();
+                saveSystemState(now.getTime());
+                renderSystemButtons(true);
+
+                const name = getFirstName();
+
+                showSystemPopup({
+                    icon: "🟢",
+                    bg: "#e6f7ec",
+                    color: "#1a7f4b",
+                    kicker: getGreeting(now) + (name ? ", " + name : ""),
+                    title: "You're checked in!",
+                    time: formatClock(now),
+                    subtitle: "Have a productive day 🚀",
+                    timer: 2500
+                });
             })
             .catch(function (error) {
                 console.error("Check-in failed:", error);
-                alert(error?.message || "Check-in failed. Please try again.");
+
+                Swal.fire({
+                    icon: "error",
+                    title: "System In failed",
+                    text: error?.message || "Check-in failed. Please try again.",
+                    confirmButtonColor: "#17a2b8"
+                });
             })
             .finally(function () {
                 systemInButton.disabled = false;
             });
     });
 
+    // ---- SYSTEM OUT ----
     systemOutButton.addEventListener("click", function () {
         systemOutButton.disabled = true;
+
+        // Check-out state clear hone se pehle check-in time nikaal lo
+        const checkInTime = getSavedCheckInTime();
 
         checkOutAttendance()
             .then(function (res) {
                 console.log("Check-out success:", res);
 
-                systemOutButton.classList.add("d-none");
-                systemInButton.classList.remove("d-none");
+                const now = new Date();
+                saveSystemState(null);
+                renderSystemButtons(false);
+
+                const name = getFirstName();
+
+                const extra = checkInTime
+                    ? `<div style="display:flex;gap:8px;margin-top:16px;">
+                            ${statCard("Check-in", formatClock(new Date(checkInTime)), "#1a7f4b")}
+                            ${statCard("Check-out", formatClock(now), "#b3261e")}
+                            ${statCard("Worked", formatDuration(now.getTime() - checkInTime), "#17a2b8")}
+                       </div>`
+                    : "";
+
+                showSystemPopup({
+                    icon: "👋",
+                    bg: "#fde8e8",
+                    color: "#b3261e",
+                    kicker: "See you soon" + (name ? ", " + name : ""),
+                    title: "You're checked out!",
+                    time: formatClock(now),
+                    subtitle: "Thanks for today's work 🙌",
+                    extra: extra,
+                    timer: 4000
+                });
             })
             .catch(function (error) {
                 console.error("Check-out failed:", error);
-                alert(error?.message || "Check-out failed. Please try again.");
+
+                Swal.fire({
+                    icon: "error",
+                    title: "System Out failed",
+                    text: error?.message || "Check-out failed. Please try again.",
+                    confirmButtonColor: "#17a2b8"
+                });
             })
             .finally(function () {
                 systemOutButton.disabled = false;
@@ -716,16 +872,33 @@ document.addEventListener("DOMContentLoaded", function () {
 
             document.getElementById("fromSession").innerHTML = sessionOptions;
             document.getElementById("toSession").innerHTML = sessionOptions;
+        });
 
-            document.getElementById("applyTo").innerHTML = `<option value="">-- Select --</option>` +
-                meta.applyToOptions.map(function (a) {
-                    return `<option value="${a.id}">${escapeHtml(a.name)}</option>`;
-                }).join("");
+        fetchManagers().then(function (res) {
+            const applyTo = document.getElementById("applyTo");
+            const ccSelect = document.getElementById("ccSelect");
 
-            document.getElementById("ccSelect").innerHTML = `<option value="">-- Select person --</option>` +
-                meta.ccOptions.map(function (c) {
-                    return `<option value="${c.id}" data-name="${escapeHtml(c.name)}">${escapeHtml(c.name)}</option>`;
-                }).join("");
+            if (!res.success) {
+                applyTo.innerHTML = `<option value="">Failed to load managers</option>`;
+                ccSelect.innerHTML = `<option value="">Failed to load managers</option>`;
+                return;
+            }
+
+            const managers = res.data || [];
+
+            if (managers.length === 0) {
+                applyTo.innerHTML = `<option value="">No managers found</option>`;
+                ccSelect.innerHTML = `<option value="">No managers found</option>`;
+                return;
+            }
+
+            const managerOptions = managers.map(function (m) {
+                const name = m.fullName || `Manager ${m.employeeId}`;
+                return `<option value="${m.employeeId}" data-name="${escapeHtml(name)}">${escapeHtml(name)}</option>`;
+            }).join("");
+
+            applyTo.innerHTML = `<option value="">-- Select --</option>` + managerOptions;
+            ccSelect.innerHTML = `<option value="">-- Select person --</option>` + managerOptions;
         });
 
         ccSelectedList = [];
@@ -1129,8 +1302,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function buildProfileHeader(p) {
         const headerBar = document.getElementById("profileHeaderBar");
-        const fullName = `${p.firstName} ${p.lastName}`.trim();
-        const initials = `${p.firstName.charAt(0)}${p.lastName.charAt(0)}`.toUpperCase();
+        const fullName = `${p.firstName || ""} ${p.lastName || ""}`.trim();
+        const initials = `${(p.firstName || "").charAt(0)}${(p.lastName || "").charAt(0)}`.toUpperCase();
+
+        const rawStatus = (p.status && p.status !== "Not available") ? String(p.status) : "";
+        const isActiveStatus = rawStatus.toUpperCase() === "ACTIVE";
+
+        const statusLabel = rawStatus
+            ? rawStatus.charAt(0).toUpperCase() + rawStatus.slice(1).toLowerCase()
+            : "Status not available";
 
         currentProfileInitials = initials;
 
@@ -1166,7 +1346,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
                         <div class="d-flex align-items-center">
                             <span class="profile-status">${escapeHtml(p.designation)}</span>
-                            <span class="profile-status"><span class="status-dot"></span> Active Employee</span>
+                            <span class="profile-status">
+                                <span class="status-dot" style="${isActiveStatus ? "" : "background:#b3261e;"}"></span>
+                                ${escapeHtml(statusLabel)}
+                            </span>
                         </div>
 
                         <div class="profile-info-buttons">
@@ -1368,18 +1551,13 @@ document.addEventListener("DOMContentLoaded", function () {
                     </div>
 
                     <div class="profile-info-item">
-                        <span class="profile-label">Status</span>
-                        <strong>${escapeHtml(p.status)}</strong>
-                    </div>
-
-                    <div class="profile-info-item">
                         <span class="profile-label">Birthday</span>
-                        <strong>${escapeHtml(p.dateOfBirth)}</strong>
+                        <strong id="profileBirthday">Loading...</strong>
                     </div>
 
                     <div class="profile-info-item">
                         <span class="profile-label">Gender</span>
-                        <strong>${escapeHtml(p.gender)}</strong>
+                        <strong id="profileGender">Loading...</strong>
                     </div>
 
                 </div>
@@ -1400,7 +1578,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 </div>
             </div>
 
-            <div class="profile-section">
+           <div class="profile-section">
                 <div class="profile-section-title">
                     <span class="profile-section-icon">💼</span>
                     <div><h4>Work Information</h4><p>Employment and reporting details</p></div>
@@ -1408,31 +1586,68 @@ document.addEventListener("DOMContentLoaded", function () {
                 <div class="profile-info-grid">
                     <div class="profile-info-item"><span class="profile-label">Joining Date</span><strong>${escapeHtml(p.joiningDate)}</strong></div>
                     <div class="profile-info-item"><span class="profile-label">Reporting Manager</span><strong>${escapeHtml(p.reportingManager)}</strong></div>
-                    <div class="profile-info-item role-info-item " style="grid-column: 1 / -1;">
+
+                    <!-- ROLE -->
+                    <div class="profile-info-item role-info-item" style="grid-column: 1 / -1;">
                         <span class="profile-label">Role</span>
-                        <div class="permission-chips role-chips ">
+                        <div class="permission-chips role-chips">
                             ${(p.roles && p.roles.length)
-                    ? p.roles.map(function (perm) {
-                        return `<span class="permission-chip">${escapeHtml(perm)}</span>`;
+                    ? p.roles.map(function (role) {
+                        return `<span class="permission-chip">${escapeHtml(role)}</span>`;
                     }).join("")
                     : `<span class="text-muted" style="font-size:0.85rem;">--</span>`
                 }
                         </div>
                     </div>
-                   <div class="profile-info-item permission-info-item" style="grid-column: 1 / -1;">
+
+                    <!-- PERMISSION (API se load hoga) -->
+                    <div class="profile-info-item permission-info-item" style="grid-column: 1 / -1;">
                         <span class="profile-label">Permission</span>
-                        <div class="permission-chips">
-                            ${(p.permissions && p.permissions.length)
-                    ? p.permissions.map(function (perm) {
-                        return `<span class="permission-chip">${escapeHtml(perm)}</span>`;
-                    }).join("")
-                    : `<span class="text-muted" style="font-size:0.85rem;">--</span>`
-                }
+                        <div class="permission-chips" id="profilePermissionChips">
+                            <span class="text-muted" style="font-size:0.85rem;">Loading...</span>
                         </div>
                     </div>
                 </div>
             </div>
         `;
+
+            fetchMyPermissions().then(function (res) {
+                const box = document.getElementById("profilePermissionChips");
+                if (!box) return;
+
+                const list = res.data || [];
+
+                if (list.length === 0) {
+                    box.innerHTML = `<span class="text-muted" style="font-size:0.85rem;">--</span>`;
+                    return;
+                }
+
+                box.innerHTML = list.map(function (item) {
+                    const tip = item.grantedByName
+                        ? `Granted by ${item.grantedByName} on ${formatSessionDate(item.grantedAt)}`
+                        : "";
+
+                    return `<span class="permission-chip" title="${escapeHtml(tip)}">${escapeHtml(item.permission)}</span>`;
+                }).join("");
+            });
+
+
+            fetchPersonalInfo().then(function (res) {
+                const d = res.data || {};
+
+                const birthdayEl = document.getElementById("profileBirthday");
+                const genderEl = document.getElementById("profileGender");
+
+                if (birthdayEl) {
+                    birthdayEl.textContent = d.dateOfBirth || "Not available";
+                }
+
+                if (genderEl) {
+                    genderEl.textContent = d.gender
+                        ? d.gender.charAt(0).toUpperCase() + d.gender.slice(1).toLowerCase()
+                        : "Not available";
+                }
+            });
 
             const resetPasswordToggleButton = document.getElementById("resetPasswordToggleButton");
             const resetPasswordMessage = document.getElementById("resetPasswordMessage");
@@ -1451,6 +1666,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // ==============================================================================================
 
     function openViewPhotoModal(imageUrl, initialsText) {
+
+        const footer = document.getElementById("viewPhotoFooter");
+        if (footer) footer.classList.toggle("d-none", !imageUrl);
         const img = document.getElementById("viewPhotoImage");
         const fallback = document.getElementById("viewPhotoFallback");
 
@@ -1525,6 +1743,34 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    // ==============================================================================================
+    //      Photo change ke baad navbar, dropdown aur profile avatar sab refresh karo
+    // ==============================================================================================
+    function refreshProfileImageEverywhere() {
+        resetProfilePhotoCache();
+        overriddenProfileImage = null;
+
+        // Navbar + dropdown
+        loadHeaderEmployeeProfile();
+
+        // Profile page ka header (avatar) — sirf agar pehle bana ho
+        if (profileHeaderBuilt) {
+            profileHeaderBuilt = false;
+            cachedProfileData = null;
+
+            ensureProfileHeader(function () {
+                const activeName = profileFamilyViews.find(function (n) {
+                    return views[n] && !views[n].classList.contains("d-none");
+                });
+
+                document.querySelectorAll("#profileHeaderBar .profile-info-btn[data-view]").forEach(function (btn) {
+                    btn.classList.toggle("active", btn.dataset.view === activeName);
+                });
+            });
+        }
+    }
+
+    // ---- Upload ----
     const savePhotoButton = document.getElementById("savePhotoButton");
     if (savePhotoButton) {
         savePhotoButton.addEventListener("click", function () {
@@ -1534,37 +1780,63 @@ document.addEventListener("DOMContentLoaded", function () {
             messageBox.innerHTML = "";
             savePhotoButton.disabled = true;
 
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                const localPreviewUrl = e.target.result;
+            uploadProfilePhoto(selectedPhotoFile).then(function () {
+                const modal = bootstrap.Modal.getInstance(document.getElementById("uploadPhotoModal"));
+                if (modal) modal.hide();
 
-                uploadProfilePhoto(selectedPhotoFile).then(function () {
-                    overriddenProfileImage = localPreviewUrl;
+                Swal.fire({
+                    icon: "success",
+                    title: "Profile photo updated",
+                    confirmButtonColor: "#17a2b8",
+                    timer: 1500,
+                    showConfirmButton: false
+                });
 
-                    const modal = bootstrap.Modal.getInstance(document.getElementById("uploadPhotoModal"));
+                refreshProfileImageEverywhere();
+            }).catch(function (error) {
+                console.error("Photo upload failed:", error.responseData || error);
+                messageBox.innerHTML =
+                    `<div class="custom-alert error">${escapeHtml(error.message || "Upload failed.")}</div>`;
+                savePhotoButton.disabled = false;
+            });
+        });
+    }
+
+    // ---- Delete ----
+    const deletePhotoButton = document.getElementById("deletePhotoButton");
+    if (deletePhotoButton) {
+        deletePhotoButton.addEventListener("click", function () {
+            Swal.fire({
+                icon: "warning",
+                title: "Remove profile photo?",
+                showCancelButton: true,
+                confirmButtonText: "Yes, remove",
+                confirmButtonColor: "#b3261e"
+            }).then(function (result) {
+                if (!result.isConfirmed) return;
+
+                deleteProfilePhoto().then(function () {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById("viewPhotoModal"));
                     if (modal) modal.hide();
 
                     Swal.fire({
                         icon: "success",
-                        title: "Profile photo updated",
-                        confirmButtonColor: "#17a2b8"
+                        title: "Profile photo removed",
+                        confirmButtonColor: "#17a2b8",
+                        timer: 1500,
+                        showConfirmButton: false
                     });
 
-                    loadHeaderEmployeeProfile();
-                    refreshSidebarProfileImage();
-
-                    const profileViewEl = document.getElementById("profileView");
-                    if (profileViewEl && !profileViewEl.classList.contains("d-none")) {
-                        loadProfile();
-                    }
+                    refreshProfileImageEverywhere();
                 }).catch(function (error) {
-                    console.error("Photo upload failed:", error.responseData || error);
-                    messageBox.innerHTML =
-                        `<div class="custom-alert error">${escapeHtml(error.message || "Upload failed.")}</div>`;
-                    savePhotoButton.disabled = false;
+                    Swal.fire({
+                        icon: "error",
+                        title: "Could not remove photo",
+                        text: error.message,
+                        confirmButtonColor: "#17a2b8"
+                    });
                 });
-            };
-            reader.readAsDataURL(selectedPhotoFile);
+            });
         });
     }
 
@@ -1851,21 +2123,16 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         });
     }
-
     // ==============================================================================================
-    //              RESET PASSWORD (from Profile)
     //              RESET PASSWORD — SUBMIT (modal)
     // ==============================================================================================
-    const resetPasswordForm =
-        document.getElementById("resetPasswordForm");
+    const resetPasswordForm = document.getElementById("resetPasswordForm");
 
     if (resetPasswordForm) {
         resetPasswordForm.addEventListener("submit", function (e) {
             e.preventDefault();
 
-            const resetPasswordMessage =
-                document.getElementById("resetPasswordMessage");
-
+            const resetPasswordMessage = document.getElementById("resetPasswordMessage");
             resetPasswordMessage.innerHTML = "";
 
             const currentPassword = document.getElementById("currentPasswordField").value;
@@ -1886,12 +2153,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
             changeEmployeePassword(currentPassword, newPassword).then(function (res) {
 
-                const modalEl = document.getElementById("resetPasswordModal");
-                const modal = bootstrap.Modal.getInstance(modalEl);
-
-                if (modal) {
-                    modal.hide();
-                }
+                const modal = bootstrap.Modal.getInstance(document.getElementById("resetPasswordModal"));
+                if (modal) modal.hide();
 
                 resetPasswordForm.reset();
                 resetPasswordMessage.innerHTML = "";
@@ -1901,7 +2164,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 Swal.fire({
                     icon: "success",
-                    title: escapeHtml(res.message),
+                    title: escapeHtml(res.message || "Password updated successfully."),
                     confirmButtonColor: "#17a2b8",
                     timer: 2000,
                     timerProgressBar: true,
@@ -1909,10 +2172,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
 
             }).catch(function (error) {
-                resetPasswordMessage.innerHTML =
-                    `<div class="custom-alert error">${escapeHtml(error.message)}</div>`;
-            });
+                const msg = error.status === 401
+                    ? "Current password is incorrect."
+                    : (error.message || "Failed to update password.");
 
+                resetPasswordMessage.innerHTML =
+                    `<div class="custom-alert error">${escapeHtml(msg)}</div>`;
+            });
         });
     }
 
